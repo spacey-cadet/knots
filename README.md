@@ -1,6 +1,6 @@
-# Knots: Research-to-Media Recommendation Engine (Alexa+ MCP server)
+# Knots (Alexa+ MCP server)
 
-A self-hosted MCP server for the Alexa+ track of the Amazon Developer Hackathon.
+Knots is a self-hosted MCP server for the Alexa+ track of the Amazon Developer Hackathon.
 It acts as an **intellectual partner**: ask Alexa+ "what are we doing today?" and
 it says what you seem to be circling, including the ideas underneath that you
 never named, then suggests films and documentaries to watch, papers to read and

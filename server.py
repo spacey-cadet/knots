@@ -1,5 +1,5 @@
 """
-Alexa+ Research-to-Media Recommendation Engine — MCP server
+Knots — turns what you research into films, papers and videos that make it concrete (MCP server for Alexa+)
 
 Exposes four tools over Streamable HTTP (MCP spec 2025-11-25+):
   - thinking_partner(session_texts)      -> "what are we doing today?": threads,
@@ -32,7 +32,7 @@ from catalogs import search_content as _search_content  # noqa: E402
 from interests import Interest, extract  # noqa: E402
 from partner import build_session_plan  # noqa: E402
 
-mcp = FastMCP("research-to-media-recs", stateless_http=True)
+mcp = FastMCP("knots", stateless_http=True)
 
 
 @mcp.tool()
