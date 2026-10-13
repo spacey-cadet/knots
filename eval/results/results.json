@@ -1,0 +1,1975 @@
+{
+  "tmdb_live": true,
+  "results": [
+    {
+      "session_id": "s01",
+      "extractor": "heuristic",
+      "texts": [
+        "Alexa, what's a memecoin and why do people buy them?",
+        "Can you explain memecoin tokenomics, like liquidity pools and market cap?",
+        "I keep seeing memecoin threads on my Reddit feed, is this all just a bubble?",
+        "Tell me more about the research behind speculative crypto assets."
+      ],
+      "ok": true,
+      "used": "heuristic",
+      "interests": [
+        {
+          "topic": "memecoin",
+          "depth": "deep",
+          "sentiment": "skeptical",
+          "mentions": 3,
+          "concepts": [
+            "memecoin"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "memecoin"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "buy",
+          "depth": "deep",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "buy"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "buy"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "tokenomics",
+          "depth": "deep",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "tokenomics"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "tokenomics"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "liquidity",
+          "depth": "deep",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "liquidity"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "liquidity"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "pools",
+          "depth": "deep",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "pools"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "pools"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        }
+      ],
+      "plan": {
+        "extractor": "heuristic",
+        "threads": [
+          {
+            "topic": "memecoin",
+            "concepts": [
+              "memecoin"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "buy",
+            "concepts": [
+              "buy"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "tokenomics",
+            "concepts": [
+              "tokenomics"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "liquidity",
+            "concepts": [
+              "liquidity"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "pools",
+            "concepts": [
+              "pools"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          }
+        ],
+        "picks": {
+          "watch": [],
+          "read": [
+            {
+              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "https://arxiv.org/abs/2201.00000",
+              "reasoning": "If you want the research behind memecoin, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "matched_topic": "memecoin",
+              "concept": "memecoin",
+              "evidence": [],
+              "relevance": 0.5
+            }
+          ],
+          "explore": []
+        },
+        "spoken": "It sounds like you're circling memecoin and buy. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "ask": "Do you want to go deeper into memecoin, or see where it shows up elsewhere?"
+      }
+    },
+    {
+      "session_id": "s01",
+      "extractor": "bedrock=us.meta.llama3-3-70b-instruct-v1:0",
+      "texts": [
+        "Alexa, what's a memecoin and why do people buy them?",
+        "Can you explain memecoin tokenomics, like liquidity pools and market cap?",
+        "I keep seeing memecoin threads on my Reddit feed, is this all just a bubble?",
+        "Tell me more about the research behind speculative crypto assets."
+      ],
+      "ok": false,
+      "error": "ValidationException: An error occurred (ValidationException) when calling the Converse operation: This model doesn't support the toolConfig.toolChoice.tool field. Remove toolConfig.toolChoice.tool and try again."
+    },
+    {
+      "session_id": "s02",
+      "extractor": "heuristic",
+      "texts": [
+        "Alexa, is free will an illusion?",
+        "What did that neuroscience experiment say about decisions being made before we're aware of them?",
+        "If everything is determined, how can anyone be held responsible for what they do?",
+        "I've been reading about compatibilism, explain it simply."
+      ],
+      "ok": true,
+      "used": "heuristic",
+      "interests": [
+        {
+          "topic": "free",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "free"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "free"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "illusion",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "illusion"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "illusion"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "neuroscience",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "neuroscience"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "neuroscience"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "experiment",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "experiment"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "experiment"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "say",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "say"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "say"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        }
+      ],
+      "plan": {
+        "extractor": "heuristic",
+        "threads": [
+          {
+            "topic": "free",
+            "concepts": [
+              "free"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "illusion",
+            "concepts": [
+              "illusion"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "neuroscience",
+            "concepts": [
+              "neuroscience"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "experiment",
+            "concepts": [
+              "experiment"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "say",
+            "concepts": [
+              "say"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          }
+        ],
+        "picks": {
+          "watch": [
+            {
+              "title": "The Prestige",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2006",
+              "url": "https://www.themoviedb.org/movie/1124",
+              "reasoning": "You've been engaging with illusion; The Prestige explores similar themes on screen. Matched on: illusion.",
+              "matched_topic": "illusion",
+              "concept": "illusion",
+              "evidence": [
+                "illusion"
+              ],
+              "relevance": 0.79
+            },
+            {
+              "title": "F for Fake",
+              "type": "doc",
+              "kind": "watch",
+              "year": "1973",
+              "url": "https://www.themoviedb.org/movie/43003",
+              "reasoning": "Given your interest in illusion, F for Fake covers the real-world story behind it. Matched on: illusion.",
+              "matched_topic": "illusion",
+              "concept": "illusion",
+              "evidence": [
+                "illusion"
+              ],
+              "relevance": 0.79
+            }
+          ],
+          "read": [
+            {
+              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "https://arxiv.org/abs/2201.00000",
+              "reasoning": "If you want the research behind free, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "matched_topic": "free",
+              "concept": "free",
+              "evidence": [],
+              "relevance": 0.5
+            }
+          ],
+          "explore": []
+        },
+        "spoken": "It sounds like you're circling free and illusion. To see it on screen, try The Prestige. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "ask": "Do you want to go deeper into free, or see where it shows up elsewhere?"
+      }
+    },
+    {
+      "session_id": "s02",
+      "extractor": "bedrock=us.meta.llama3-3-70b-instruct-v1:0",
+      "texts": [
+        "Alexa, is free will an illusion?",
+        "What did that neuroscience experiment say about decisions being made before we're aware of them?",
+        "If everything is determined, how can anyone be held responsible for what they do?",
+        "I've been reading about compatibilism, explain it simply."
+      ],
+      "ok": false,
+      "error": "ValidationException: An error occurred (ValidationException) when calling the Converse operation: This model doesn't support the toolConfig.toolChoice.tool field. Remove toolConfig.toolChoice.tool and try again."
+    },
+    {
+      "session_id": "s03",
+      "extractor": "heuristic",
+      "texts": [
+        "Could a large language model ever be conscious?",
+        "What's the difference between an AI that seems to understand and one that actually does?",
+        "Explain the alignment problem. Why is it hard to specify what we want?",
+        "I keep reading threads about AI systems behaving differently when they know they are being tested."
+      ],
+      "ok": true,
+      "used": "heuristic",
+      "interests": [
+        {
+          "topic": "large",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "large"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "large"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "language",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "language"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "language"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "model",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "model"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "model"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "ever",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "ever"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "ever"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "conscious",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "conscious"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "conscious"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        }
+      ],
+      "plan": {
+        "extractor": "heuristic",
+        "threads": [
+          {
+            "topic": "large",
+            "concepts": [
+              "large"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "language",
+            "concepts": [
+              "language"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "model",
+            "concepts": [
+              "model"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "ever",
+            "concepts": [
+              "ever"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "conscious",
+            "concepts": [
+              "conscious"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          }
+        ],
+        "picks": {
+          "watch": [
+            {
+              "title": "Arrival",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2016",
+              "url": "https://www.themoviedb.org/movie/329865",
+              "reasoning": "You've been engaging with language; Arrival explores similar themes on screen. Matched on: language.",
+              "matched_topic": "language",
+              "concept": "language",
+              "evidence": [
+                "language"
+              ],
+              "relevance": 0.79
+            },
+            {
+              "title": "The Lost City",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2022",
+              "url": "https://www.themoviedb.org/movie/752623",
+              "reasoning": "You've been engaging with model; The Lost City explores similar themes on screen. Matched on: model.",
+              "matched_topic": "model",
+              "concept": "model",
+              "evidence": [
+                "model"
+              ],
+              "relevance": 0.79
+            }
+          ],
+          "read": [
+            {
+              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "https://arxiv.org/abs/2201.00000",
+              "reasoning": "If you want the research behind large, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "matched_topic": "large",
+              "concept": "large",
+              "evidence": [],
+              "relevance": 0.5
+            }
+          ],
+          "explore": []
+        },
+        "spoken": "It sounds like you're circling large and language. To see it on screen, try Arrival. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "ask": "Do you want to go deeper into large, or see where it shows up elsewhere?"
+      }
+    },
+    {
+      "session_id": "s03",
+      "extractor": "bedrock=us.meta.llama3-3-70b-instruct-v1:0",
+      "texts": [
+        "Could a large language model ever be conscious?",
+        "What's the difference between an AI that seems to understand and one that actually does?",
+        "Explain the alignment problem. Why is it hard to specify what we want?",
+        "I keep reading threads about AI systems behaving differently when they know they are being tested."
+      ],
+      "ok": false,
+      "error": "ValidationException: An error occurred (ValidationException) when calling the Converse operation: This model doesn't support the toolConfig.toolChoice.tool field. Remove toolConfig.toolChoice.tool and try again."
+    },
+    {
+      "session_id": "s04",
+      "extractor": "heuristic",
+      "texts": [
+        "How close are we to climate tipping points?",
+        "Explain the Atlantic current collapse thing I saw on the news.",
+        "Why does it feel like nothing gets done even though we know what the problem is?",
+        "What does research say about how societies react to slow-moving disasters?"
+      ],
+      "ok": true,
+      "used": "heuristic",
+      "interests": [
+        {
+          "topic": "close",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "close"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "close"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "climate",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "climate"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "climate"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "tipping",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "tipping"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "tipping"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "points",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "points"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "points"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "atlantic",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "atlantic"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "atlantic"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        }
+      ],
+      "plan": {
+        "extractor": "heuristic",
+        "threads": [
+          {
+            "topic": "close",
+            "concepts": [
+              "close"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "climate",
+            "concepts": [
+              "climate"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "tipping",
+            "concepts": [
+              "tipping"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "points",
+            "concepts": [
+              "points"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "atlantic",
+            "concepts": [
+              "atlantic"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          }
+        ],
+        "picks": {
+          "watch": [
+            {
+              "title": "Twister",
+              "type": "movie",
+              "kind": "watch",
+              "year": "1996",
+              "url": "https://www.themoviedb.org/movie/664",
+              "reasoning": "You've been engaging with climate; Twister explores similar themes on screen. Matched on: climate. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "climate",
+              "concept": "climate",
+              "evidence": [
+                "climate"
+              ],
+              "relevance": 0.79
+            },
+            {
+              "title": "An Inconvenient Truth",
+              "type": "doc",
+              "kind": "watch",
+              "year": "2006",
+              "url": "https://www.themoviedb.org/movie/1781",
+              "reasoning": "Given your interest in climate, An Inconvenient Truth covers the real-world story behind it. Matched on: climate. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "climate",
+              "concept": "climate",
+              "evidence": [
+                "climate"
+              ],
+              "relevance": 0.79
+            },
+            {
+              "title": "Assault on Wall Street",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2013",
+              "url": "https://www.themoviedb.org/movie/184125",
+              "reasoning": "You've been engaging with tipping; Assault on Wall Street explores similar themes on screen. Matched on: tipping. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "tipping",
+              "concept": "tipping",
+              "evidence": [
+                "tipping"
+              ],
+              "relevance": 0.79
+            }
+          ],
+          "read": [
+            {
+              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "https://arxiv.org/abs/2201.00000",
+              "reasoning": "If you want the research behind close, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "matched_topic": "close",
+              "concept": "close",
+              "evidence": [],
+              "relevance": 0.5
+            }
+          ],
+          "explore": []
+        },
+        "spoken": "It sounds like you're circling close and climate. To see it on screen, try Twister. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "ask": "Do you want to go deeper into close, or see where it shows up elsewhere?"
+      }
+    },
+    {
+      "session_id": "s04",
+      "extractor": "bedrock=us.meta.llama3-3-70b-instruct-v1:0",
+      "texts": [
+        "How close are we to climate tipping points?",
+        "Explain the Atlantic current collapse thing I saw on the news.",
+        "Why does it feel like nothing gets done even though we know what the problem is?",
+        "What does research say about how societies react to slow-moving disasters?"
+      ],
+      "ok": false,
+      "error": "ValidationException: An error occurred (ValidationException) when calling the Converse operation: This model doesn't support the toolConfig.toolChoice.tool field. Remove toolConfig.toolChoice.tool and try again."
+    },
+    {
+      "session_id": "s05",
+      "extractor": "heuristic",
+      "texts": [
+        "Why do I feel more lonely the more time I spend online?",
+        "Is there research on social media and mental health?",
+        "My feed is mostly strangers arguing. Why does outrage spread faster than anything else?",
+        "What happened to the idea that the internet would bring people together?"
+      ],
+      "ok": true,
+      "used": "heuristic",
+      "interests": [
+        {
+          "topic": "feel",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "feel"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "feel"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "lonely",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "lonely"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "lonely"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "time",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "time"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "time"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "spend",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "spend"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "spend"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "online",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "online"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "online"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        }
+      ],
+      "plan": {
+        "extractor": "heuristic",
+        "threads": [
+          {
+            "topic": "feel",
+            "concepts": [
+              "feel"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "lonely",
+            "concepts": [
+              "lonely"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "time",
+            "concepts": [
+              "time"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "spend",
+            "concepts": [
+              "spend"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "online",
+            "concepts": [
+              "online"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          }
+        ],
+        "picks": {
+          "watch": [
+            {
+              "title": "Arrival",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2016",
+              "url": "https://www.themoviedb.org/movie/329865",
+              "reasoning": "You've been engaging with time; Arrival explores similar themes on screen. Matched on: time. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "time",
+              "concept": "time",
+              "evidence": [
+                "time"
+              ],
+              "relevance": 0.79
+            },
+            {
+              "title": "Baraka",
+              "type": "doc",
+              "kind": "watch",
+              "year": "1992",
+              "url": "https://www.themoviedb.org/movie/14002",
+              "reasoning": "Given your interest in time, Baraka covers the real-world story behind it. Matched on: time. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "time",
+              "concept": "time",
+              "evidence": [
+                "time"
+              ],
+              "relevance": 0.79
+            },
+            {
+              "title": "Tideland",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2005",
+              "url": "https://www.themoviedb.org/movie/11559",
+              "reasoning": "You've been engaging with lonely; Tideland explores similar themes on screen. Matched on: lonely. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "lonely",
+              "concept": "lonely",
+              "evidence": [
+                "lonely"
+              ],
+              "relevance": 0.79
+            }
+          ],
+          "read": [
+            {
+              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "https://arxiv.org/abs/2201.00000",
+              "reasoning": "If you want the research behind feel, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "matched_topic": "feel",
+              "concept": "feel",
+              "evidence": [],
+              "relevance": 0.5
+            }
+          ],
+          "explore": []
+        },
+        "spoken": "It sounds like you're circling feel and lonely. To see it on screen, try Arrival. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "ask": "Do you want to go deeper into feel, or see where it shows up elsewhere?"
+      }
+    },
+    {
+      "session_id": "s05",
+      "extractor": "bedrock=us.meta.llama3-3-70b-instruct-v1:0",
+      "texts": [
+        "Why do I feel more lonely the more time I spend online?",
+        "Is there research on social media and mental health?",
+        "My feed is mostly strangers arguing. Why does outrage spread faster than anything else?",
+        "What happened to the idea that the internet would bring people together?"
+      ],
+      "ok": false,
+      "error": "ValidationException: An error occurred (ValidationException) when calling the Converse operation: This model doesn't support the toolConfig.toolChoice.tool field. Remove toolConfig.toolChoice.tool and try again."
+    },
+    {
+      "session_id": "s06",
+      "extractor": "heuristic",
+      "texts": [
+        "Alexa, explain the simulation hypothesis.",
+        "How would anyone even test whether we live in a simulation?",
+        "What's the Boltzmann brain problem? I keep seeing it mentioned.",
+        "If I can't tell the difference, does it matter?"
+      ],
+      "ok": true,
+      "used": "heuristic",
+      "interests": [
+        {
+          "topic": "simulation",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 2,
+          "concepts": [
+            "simulation"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "simulation"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "hypothesis",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "hypothesis"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "hypothesis"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "anyone",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "anyone"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "anyone"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "even",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "even"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "even"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "test",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "test"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "test"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        }
+      ],
+      "plan": {
+        "extractor": "heuristic",
+        "threads": [
+          {
+            "topic": "simulation",
+            "concepts": [
+              "simulation"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "hypothesis",
+            "concepts": [
+              "hypothesis"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "anyone",
+            "concepts": [
+              "anyone"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "even",
+            "concepts": [
+              "even"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "test",
+            "concepts": [
+              "test"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          }
+        ],
+        "picks": {
+          "watch": [
+            {
+              "title": "The Matrix Reloaded",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2003",
+              "url": "https://www.themoviedb.org/movie/604",
+              "reasoning": "You've been engaging with simulation; The Matrix Reloaded explores similar themes on screen. Matched on: simulation. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "simulation",
+              "concept": "simulation",
+              "evidence": [
+                "simulation"
+              ],
+              "relevance": 0.79
+            }
+          ],
+          "read": [
+            {
+              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "https://arxiv.org/abs/2201.00000",
+              "reasoning": "If you want the research behind simulation, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "matched_topic": "simulation",
+              "concept": "simulation",
+              "evidence": [],
+              "relevance": 0.5
+            }
+          ],
+          "explore": []
+        },
+        "spoken": "It sounds like you're circling simulation and hypothesis. To see it on screen, try The Matrix Reloaded. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "ask": "Do you want to go deeper into simulation, or see where it shows up elsewhere?"
+      }
+    },
+    {
+      "session_id": "s06",
+      "extractor": "bedrock=us.meta.llama3-3-70b-instruct-v1:0",
+      "texts": [
+        "Alexa, explain the simulation hypothesis.",
+        "How would anyone even test whether we live in a simulation?",
+        "What's the Boltzmann brain problem? I keep seeing it mentioned.",
+        "If I can't tell the difference, does it matter?"
+      ],
+      "ok": false,
+      "error": "ValidationException: An error occurred (ValidationException) when calling the Converse operation: This model doesn't support the toolConfig.toolChoice.tool field. Remove toolConfig.toolChoice.tool and try again."
+    },
+    {
+      "session_id": "s07",
+      "extractor": "heuristic",
+      "texts": [
+        "What data do companies actually collect about me?",
+        "I read about predictive policing and facial recognition being used in cities.",
+        "Is privacy dead or just changing?",
+        "Explain the chilling effect of knowing you're being watched."
+      ],
+      "ok": true,
+      "used": "heuristic",
+      "interests": [
+        {
+          "topic": "data",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "data"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "data"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "companies",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "companies"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "companies"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "actually",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "actually"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "actually"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "collect",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "collect"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "collect"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "read",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "read"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "read"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        }
+      ],
+      "plan": {
+        "extractor": "heuristic",
+        "threads": [
+          {
+            "topic": "data",
+            "concepts": [
+              "data"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "companies",
+            "concepts": [
+              "companies"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "actually",
+            "concepts": [
+              "actually"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "collect",
+            "concepts": [
+              "collect"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "read",
+            "concepts": [
+              "read"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          }
+        ],
+        "picks": {
+          "watch": [],
+          "read": [
+            {
+              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "https://arxiv.org/abs/2201.00000",
+              "reasoning": "If you want the research behind data, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "matched_topic": "data",
+              "concept": "data",
+              "evidence": [],
+              "relevance": 0.5
+            }
+          ],
+          "explore": []
+        },
+        "spoken": "It sounds like you're circling data and companies. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "ask": "Do you want to go deeper into data, or see where it shows up elsewhere?"
+      }
+    },
+    {
+      "session_id": "s07",
+      "extractor": "bedrock=us.meta.llama3-3-70b-instruct-v1:0",
+      "texts": [
+        "What data do companies actually collect about me?",
+        "I read about predictive policing and facial recognition being used in cities.",
+        "Is privacy dead or just changing?",
+        "Explain the chilling effect of knowing you're being watched."
+      ],
+      "ok": false,
+      "error": "ValidationException: An error occurred (ValidationException) when calling the Converse operation: This model doesn't support the toolConfig.toolChoice.tool field. Remove toolConfig.toolChoice.tool and try again."
+    },
+    {
+      "session_id": "s08",
+      "extractor": "heuristic",
+      "texts": [
+        "How does the brain store memories of people who have died?",
+        "My grandmother had dementia. Why do some memories survive and others vanish?",
+        "Can memories be edited or implanted?",
+        "I've been reading about how remembering changes the memory itself."
+      ],
+      "ok": true,
+      "used": "heuristic",
+      "interests": [
+        {
+          "topic": "memories",
+          "depth": "deep",
+          "sentiment": "engaged",
+          "mentions": 3,
+          "concepts": [
+            "memories"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "memories"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "brain",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "brain"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "brain"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "store",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "store"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "store"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "died",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "died"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "died"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "grandmother",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "grandmother"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "grandmother"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        }
+      ],
+      "plan": {
+        "extractor": "heuristic",
+        "threads": [
+          {
+            "topic": "memories",
+            "concepts": [
+              "memories"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "brain",
+            "concepts": [
+              "brain"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "store",
+            "concepts": [
+              "store"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "died",
+            "concepts": [
+              "died"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "grandmother",
+            "concepts": [
+              "grandmother"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          }
+        ],
+        "picks": {
+          "watch": [
+            {
+              "title": "127 Hours",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2010",
+              "url": "https://www.themoviedb.org/movie/44115",
+              "reasoning": "You've been engaging with memories; 127 Hours explores similar themes on screen. Matched on: memories. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "memories",
+              "concept": "memories",
+              "evidence": [
+                "memories"
+              ],
+              "relevance": 0.79
+            },
+            {
+              "title": "Flee",
+              "type": "doc",
+              "kind": "watch",
+              "year": "2021",
+              "url": "https://www.themoviedb.org/movie/680813",
+              "reasoning": "Given your interest in memories, Flee covers the real-world story behind it. Matched on: memories. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "memories",
+              "concept": "memories",
+              "evidence": [
+                "memories"
+              ],
+              "relevance": 0.79
+            }
+          ],
+          "read": [
+            {
+              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "https://arxiv.org/abs/2201.00000",
+              "reasoning": "If you want the research behind memories, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "matched_topic": "memories",
+              "concept": "memories",
+              "evidence": [],
+              "relevance": 0.5
+            }
+          ],
+          "explore": []
+        },
+        "spoken": "It sounds like you're circling memories and brain. To see it on screen, try 127 Hours. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "ask": "Do you want to go deeper into memories, or see where it shows up elsewhere?"
+      }
+    },
+    {
+      "session_id": "s08",
+      "extractor": "bedrock=us.meta.llama3-3-70b-instruct-v1:0",
+      "texts": [
+        "How does the brain store memories of people who have died?",
+        "My grandmother had dementia. Why do some memories survive and others vanish?",
+        "Can memories be edited or implanted?",
+        "I've been reading about how remembering changes the memory itself."
+      ],
+      "ok": false,
+      "error": "ValidationException: An error occurred (ValidationException) when calling the Converse operation: This model doesn't support the toolConfig.toolChoice.tool field. Remove toolConfig.toolChoice.tool and try again."
+    },
+    {
+      "session_id": "s09",
+      "extractor": "heuristic",
+      "texts": [
+        "Is meritocracy a myth?",
+        "How much of success is luck versus effort?",
+        "I keep seeing threads about wealth inequality and inherited advantage.",
+        "What does research say about social mobility in different countries?"
+      ],
+      "ok": true,
+      "used": "heuristic",
+      "interests": [
+        {
+          "topic": "meritocracy",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "meritocracy"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "meritocracy"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "myth",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "myth"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "myth"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "success",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "success"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "success"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "luck",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "luck"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "luck"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "versus",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "versus"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "versus"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        }
+      ],
+      "plan": {
+        "extractor": "heuristic",
+        "threads": [
+          {
+            "topic": "meritocracy",
+            "concepts": [
+              "meritocracy"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "myth",
+            "concepts": [
+              "myth"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "success",
+            "concepts": [
+              "success"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "luck",
+            "concepts": [
+              "luck"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "versus",
+            "concepts": [
+              "versus"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          }
+        ],
+        "picks": {
+          "watch": [
+            {
+              "title": "Cars",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2006",
+              "url": "https://www.themoviedb.org/movie/920",
+              "reasoning": "You've been engaging with success; Cars explores similar themes on screen. Matched on: success. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "success",
+              "concept": "success",
+              "evidence": [
+                "success"
+              ],
+              "relevance": 0.79
+            },
+            {
+              "title": "Gods of Egypt",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2016",
+              "url": "https://www.themoviedb.org/movie/205584",
+              "reasoning": "You've been engaging with myth; Gods of Egypt explores similar themes on screen. Matched on: myth. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "myth",
+              "concept": "myth",
+              "evidence": [
+                "myth"
+              ],
+              "relevance": 0.79
+            },
+            {
+              "title": "The Thinning",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2016",
+              "url": "https://www.themoviedb.org/movie/419639",
+              "reasoning": "You've been engaging with meritocracy; The Thinning explores similar themes on screen. Matched on: meritocracy. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "meritocracy",
+              "concept": "meritocracy",
+              "evidence": [
+                "meritocracy"
+              ],
+              "relevance": 0.79
+            }
+          ],
+          "read": [
+            {
+              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "https://arxiv.org/abs/2201.00000",
+              "reasoning": "If you want the research behind meritocracy, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "matched_topic": "meritocracy",
+              "concept": "meritocracy",
+              "evidence": [],
+              "relevance": 0.5
+            }
+          ],
+          "explore": []
+        },
+        "spoken": "It sounds like you're circling meritocracy and myth. To see it on screen, try Cars. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "ask": "Do you want to go deeper into meritocracy, or see where it shows up elsewhere?"
+      }
+    },
+    {
+      "session_id": "s09",
+      "extractor": "bedrock=us.meta.llama3-3-70b-instruct-v1:0",
+      "texts": [
+        "Is meritocracy a myth?",
+        "How much of success is luck versus effort?",
+        "I keep seeing threads about wealth inequality and inherited advantage.",
+        "What does research say about social mobility in different countries?"
+      ],
+      "ok": false,
+      "error": "ValidationException: An error occurred (ValidationException) when calling the Converse operation: This model doesn't support the toolConfig.toolChoice.tool field. Remove toolConfig.toolChoice.tool and try again."
+    },
+    {
+      "session_id": "s10",
+      "extractor": "heuristic",
+      "texts": [
+        "Alexa, what's the weather like later?",
+        "Play something relaxing. Also what time is it in Tokyo?",
+        "I've been kind of curious lately, not sure about what though.",
+        "Maybe something with time travel? Or not."
+      ],
+      "ok": true,
+      "used": "heuristic",
+      "interests": [
+        {
+          "topic": "something",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 2,
+          "concepts": [
+            "something"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "something"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "time",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 2,
+          "concepts": [
+            "time"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "time"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "not",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 2,
+          "concepts": [
+            "not"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "not"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "weather",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "weather"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "weather"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        },
+        {
+          "topic": "later",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "later"
+          ],
+          "implicit_themes": [],
+          "keywords": [
+            "later"
+          ],
+          "rationale": "",
+          "confidence": 0.3
+        }
+      ],
+      "plan": {
+        "extractor": "heuristic",
+        "threads": [
+          {
+            "topic": "something",
+            "concepts": [
+              "something"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "time",
+            "concepts": [
+              "time"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "not",
+            "concepts": [
+              "not"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "weather",
+            "concepts": [
+              "weather"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          },
+          {
+            "topic": "later",
+            "concepts": [
+              "later"
+            ],
+            "underneath": [],
+            "why_i_think_so": "",
+            "confidence": 0.3
+          }
+        ],
+        "picks": {
+          "watch": [
+            {
+              "title": "Arrival",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2016",
+              "url": "https://www.themoviedb.org/movie/329865",
+              "reasoning": "You've been engaging with time; Arrival explores similar themes on screen. Matched on: time.",
+              "matched_topic": "time",
+              "concept": "time",
+              "evidence": [
+                "time"
+              ],
+              "relevance": 0.79
+            },
+            {
+              "title": "Baraka",
+              "type": "doc",
+              "kind": "watch",
+              "year": "1992",
+              "url": "https://www.themoviedb.org/movie/14002",
+              "reasoning": "Given your interest in time, Baraka covers the real-world story behind it. Matched on: time.",
+              "matched_topic": "time",
+              "concept": "time",
+              "evidence": [
+                "time"
+              ],
+              "relevance": 0.79
+            }
+          ],
+          "read": [
+            {
+              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "https://arxiv.org/abs/2201.00000",
+              "reasoning": "If you want the research behind something, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "matched_topic": "something",
+              "concept": "something",
+              "evidence": [],
+              "relevance": 0.5
+            }
+          ],
+          "explore": []
+        },
+        "spoken": "It sounds like you're circling something and time. To see it on screen, try Arrival. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "ask": "Do you want to go deeper into something, or see where it shows up elsewhere?"
+      }
+    },
+    {
+      "session_id": "s10",
+      "extractor": "bedrock=us.meta.llama3-3-70b-instruct-v1:0",
+      "texts": [
+        "Alexa, what's the weather like later?",
+        "Play something relaxing. Also what time is it in Tokyo?",
+        "I've been kind of curious lately, not sure about what though.",
+        "Maybe something with time travel? Or not."
+      ],
+      "ok": false,
+      "error": "ValidationException: An error occurred (ValidationException) when calling the Converse operation: This model doesn't support the toolConfig.toolChoice.tool field. Remove toolConfig.toolChoice.tool and try again."
+    }
+  ]
+}
