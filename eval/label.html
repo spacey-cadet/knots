@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knots labelling tool</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f6f5f2; --panel: #ffffff; --ink: #1b1b1f; --muted: #6a6a73; --line: #e3e1db;
+    --good: #1f7a4d; --good-bg: #e4f4ec; --bad: #b3372f; --bad-bg: #fbe8e6;
+    --accent: #3a4fd6; --chip: #eeece6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141416; --panel: #1d1d21; --ink: #ececf0; --muted: #9a9aa6; --line: #2e2e35;
+      --good: #5cc994; --good-bg: #16301f; --bad: #f08a82; --bad-bg: #3a1c1a;
+      --accent: #8c9bff; --chip: #2a2a31;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  header {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px;
+    padding: 14px 20px; border-bottom: 1px solid var(--line); background: var(--panel);
+  }
+  header h1 { font-size: 17px; margin: 0; font-weight: 650; letter-spacing: -0.01em; }
+  .tabs { display: flex; gap: 4px; }
+  .tab {
+    border: 1px solid var(--line); background: transparent; color: var(--ink);
+    padding: 6px 14px; border-radius: 8px; font: inherit; font-size: 14px; cursor: pointer;
+  }
+  .tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .grow { flex: 1; }
+  .progress { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .bar { width: 160px; height: 6px; background: var(--chip); border-radius: 99px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); width: 0; transition: width .2s; }
+  .toggle { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; cursor: pointer; }
+  main { max-width: 780px; margin: 0 auto; padding: 20px 16px 120px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px;
+  }
+  .eyebrow {
+    font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
+    margin: 0 0 8px; font-weight: 600;
+  }
+  .said { margin: 0 0 4px; padding: 0; list-style: none; }
+  .said li {
+    padding: 8px 12px; margin: 0 0 6px; background: var(--chip); border-radius: 8px; font-size: 15px;
+  }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 20px 0; }
+  .title { font-size: 24px; line-height: 1.25; margin: 0 0 6px; font-weight: 650; letter-spacing: -0.015em; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 14px; }
+  .badge {
+    font-size: 12px; padding: 2px 9px; border-radius: 99px; background: var(--chip);
+    color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
+  }
+  .badge.mock { background: var(--bad-bg); color: var(--bad); }
+  a { color: var(--accent); }
+  .why { font-size: 16px; margin: 0 0 12px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 4px; }
+  .chip { font-size: 13px; padding: 3px 10px; border-radius: 99px; background: var(--chip); }
+  .claim { font-size: 22px; line-height: 1.3; font-weight: 650; margin: 0 0 10px; letter-spacing: -0.01em; }
+  .quiet { color: var(--muted); font-size: 15px; margin: 0 0 10px; }
+  .question { font-size: 15px; font-weight: 600; margin: 4px 0 0; }
+  .note { width: 100%; margin-top: 18px; }
+  .note input {
+    width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--bg); color: var(--ink); font: inherit; font-size: 14px;
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; align-items: center; }
+  button.act {
+    font: inherit; font-size: 15px; font-weight: 600; padding: 11px 20px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer;
+  }
+  button.act kbd { margin-left: 8px; }
+  button.good { color: var(--good); border-color: var(--good); }
+  button.bad { color: var(--bad); border-color: var(--bad); }
+  button.good.on { background: var(--good); color: #fff; }
+  button.bad.on { background: var(--bad); color: #fff; }
+  button.plain { border-color: transparent; color: var(--muted); font-weight: 500; padding: 11px 12px; }
+  kbd {
+    font: 12px ui-monospace, Menlo, Consolas, monospace; padding: 1px 6px; border-radius: 5px;
+    border: 1px solid var(--line); background: var(--chip); color: var(--muted);
+  }
+  .status { font-size: 13px; color: var(--muted); margin-left: auto; }
+  .status.err { color: var(--bad); font-weight: 600; }
+  details.rubric { margin: 0 0 16px; font-size: 14px; color: var(--muted); }
+  details.rubric summary { cursor: pointer; }
+  details.rubric ul { margin: 8px 0 0; padding-left: 20px; }
+  .center { text-align: center; padding: 30px 10px; }
+  .center h2 { margin: 0 0 8px; }
+  footer {
+    position: fixed; left: 0; right: 0; bottom: 0; padding: 10px 16px; text-align: center;
+    background: var(--panel); border-top: 1px solid var(--line); font-size: 13px; color: var(--muted);
+  }
+  footer kbd { margin: 0 2px; }
+  @media (max-width: 560px) { .title { font-size: 20px; } .bar { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Knots labelling</h1>
+  <div class="tabs" role="tablist">
+    <button class="tab" id="tab-picks" role="tab" data-mode="picks">Picks</button>
+    <button class="tab" id="tab-themes" role="tab" data-mode="themes">Themes</button>
+  </div>
+  <div class="grow"></div>
+  <label class="toggle" id="mock-toggle" title="Offline mock rows come from the fixed fallback data, not the live catalogs">
+    <input type="checkbox" id="mock"> include offline mock rows
+  </label>
+  <div class="bar"><i id="bar"></i></div>
+  <div class="progress" id="progress"></div>
+</header>
+
+<main id="main"></main>
+
+<footer>
+  <kbd>Y</kbd> yes &nbsp; <kbd>N</kbd> no &nbsp; <kbd>S</kbd> skip &nbsp; <kbd>B</kbd> or <kbd>←</kbd> back
+  &nbsp; <kbd>C</kbd> clear &nbsp; <kbd>/</kbd> note &nbsp; <kbd>Esc</kbd> leave note
+</footer>
+
+<script>
+const $ = (s) => document.querySelector(s);
+let data = { picks: [], themes: [] };
+let mode = 'picks';
+let idx = 0;
+let includeMock = false;
+let saveTimer = null;
+
+const field = () => (mode === 'picks' ? 'good' : 'supported');
+const rows = () => {
+  const all = data[mode];
+  return mode === 'picks' && !includeMock ? all.filter((r) => r.live === 'yes') : all;
+};
+
+function el(tag, attrs = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') e.className = v;
+    else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, '');
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const k of kids.flat()) if (k != null) e.append(k.nodeType ? k : document.createTextNode(k));
+  return e;
+}
+
+async function api(path, body) {
+  const res = await fetch(path, body ? {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+  } : undefined);
+  if (!res.ok) throw new Error((await res.text()) || res.statusText);
+  return res.json();
+}
+
+function firstUnlabeled() {
+  const i = rows().findIndex((r) => !r[field()]);
+  return i === -1 ? 0 : i;
+}
+
+function setStatus(text, err = false) {
+  const s = $('#status');
+  if (!s) return;
+  s.textContent = text;
+  s.className = 'status' + (err ? ' err' : '');
+}
+
+async function save(row) {
+  setStatus('Saving…');
+  try {
+    await api('/api/label', {
+      kind: mode === 'picks' ? 'pick' : 'theme', id: row.id,
+      value: row[field()] || '', note: row.note || '',
+    });
+    setStatus('Saved ✓');
+  } catch (e) {
+    setStatus('NOT SAVED: ' + e.message, true);
+  }
+  updateProgress();
+}
+
+function updateProgress() {
+  const r = rows();
+  const done = r.filter((x) => x[field()]).length;
+  $('#progress').textContent = r.length ? `${done} / ${r.length} labelled` : '';
+  $('#bar').style.width = r.length ? (100 * done / r.length) + '%' : '0';
+  $('#tab-picks').setAttribute('aria-selected', mode === 'picks');
+  $('#tab-themes').setAttribute('aria-selected', mode === 'themes');
+  $('#mock-toggle').style.display = mode === 'picks' ? '' : 'none';
+}
+
+function label(value) {
+  const r = rows()[idx];
+  if (!r) return;
+  r[field()] = value;
+  save(r);
+  if (value) idx += 1;
+  render();
+}
+
+function go(delta) {
+  idx = Math.max(0, Math.min(rows().length, idx + delta));
+  render();
+}
+
+function rubric() {
+  const items = mode === 'picks'
+    ? ['Good = I would genuinely watch or read this for that session, and the stated reason holds up.',
+       'Not good = wrong topic, a stretch, a generic title, or a reason that overclaims.',
+       'Judge against what the person said, not against how famous the title is.',
+       'Session s10 is deliberately vague: if the text gave no real signal, picks are not good.']
+    : ['Supported = the session text genuinely implies this theme, even though it was never said.',
+       'Not supported = invented, or a stretch beyond what two or three questions can show.'];
+  return el('details', { class: 'rubric' }, el('summary', {}, 'Labelling rubric'),
+            el('ul', {}, items.map((t) => el('li', {}, t))));
+}
+
+function sessionBlock(r) {
+  return [
+    el('p', { class: 'eyebrow' }, `Session ${r.session_id} · what the person said`),
+    el('ul', { class: 'said' }, r.session_text.split(' / ').map((t) => el('li', {}, t))),
+  ];
+}
+
+function actions(r) {
+  const cur = r[field()];
+  const yes = mode === 'picks' ? 'Good' : 'Supported';
+  const no = mode === 'picks' ? 'Not good' : 'Not supported';
+  return el('div', { class: 'actions' },
+    el('button', { class: 'act good' + (cur === 'y' ? ' on' : ''), onclick: () => label('y') }, yes, el('kbd', {}, 'Y')),
+    el('button', { class: 'act bad' + (cur === 'n' ? ' on' : ''), onclick: () => label('n') }, no, el('kbd', {}, 'N')),
+    el('button', { class: 'act plain', onclick: () => go(1) }, 'Skip', el('kbd', {}, 'S')),
+    el('button', { class: 'act plain', onclick: () => go(-1) }, 'Back', el('kbd', {}, 'B')),
+    el('span', { class: 'status', id: 'status' }, cur ? 'Labelled' : ''));
+}
+
+function noteBox(r) {
+  const input = el('input', {
+    type: 'text', id: 'note', placeholder: 'Optional note (quotable later, e.g. why it failed)', value: r.note || '',
+  });
+  input.addEventListener('input', () => {
+    r.note = input.value;
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => save(r), 600);
+  });
+  return el('div', { class: 'note' }, input);
+}
+
+function pickCard(r) {
+  const link = r.url ? el('a', { href: r.url, target: '_blank', rel: 'noopener noreferrer' }, 'open page ↗') : null;
+  return el('div', { class: 'card' },
+    rubric(), sessionBlock(r), el('hr'),
+    el('p', { class: 'eyebrow' }, `Recommended to ${r.kind === 'read' ? 'read' : r.kind === 'explore' ? 'explore' : 'watch'}`),
+    el('h2', { class: 'title' }, r.title),
+    el('div', { class: 'meta' },
+      el('span', { class: 'badge' }, r.type), r.year ? el('span', { class: 'badge' }, r.year) : null,
+      r.live === 'yes' ? null : el('span', { class: 'badge mock' }, 'offline mock'), link),
+    el('p', { class: 'eyebrow' }, 'Why Knots says so'),
+    el('p', { class: 'why' }, r.reasoning),
+    r.evidence ? [el('p', { class: 'eyebrow' }, 'Matched on'),
+                  el('div', { class: 'chips' }, r.evidence.split(', ').filter(Boolean).map((t) => el('span', { class: 'chip' }, t)))] : null,
+    el('p', { class: 'question' }, 'Would you genuinely watch/read this for this session?'),
+    noteBox(r), actions(r));
+}
+
+function themeCard(r) {
+  return el('div', { class: 'card' },
+    rubric(), sessionBlock(r), el('hr'),
+    el('p', { class: 'eyebrow' }, `Knots thinks they are circling: ${r.topic}`),
+    el('p', { class: 'eyebrow' }, 'Claimed unstated theme'),
+    el('p', { class: 'claim' }, r.theme),
+    r.rationale ? [el('p', { class: 'eyebrow' }, "The model's reasoning"), el('p', { class: 'quiet' }, r.rationale)] : null,
+    el('p', { class: 'question' }, 'Does the session text genuinely imply this theme?'),
+    noteBox(r), actions(r));
+}
+
+function render() {
+  updateProgress();
+  const main = $('#main');
+  main.replaceChildren();
+  const list = rows();
+  if (!list.length) {
+    const hint = mode === 'picks' && data.picks.length && !includeMock
+      ? 'All picks are offline mock items (usually: no TMDB key). Tick "include offline mock rows" to label them anyway, or add a TMDB key and re-run the eval.'
+      : 'Nothing to label here. Run `python eval/run_eval.py run` first.';
+    main.append(el('div', { class: 'card center' }, el('h2', {}, 'No rows'), el('p', { class: 'quiet' }, hint)));
+    return;
+  }
+  if (idx >= list.length) {
+    const done = list.filter((r) => r[field()]).length;
+    main.append(el('div', { class: 'card center' },
+      el('h2', {}, done === list.length ? 'All labelled 🎉' : 'End of list'),
+      el('p', { class: 'quiet' }, `${done} of ${list.length} labelled. ` + (done === list.length
+        ? 'Switch tabs if you have not done the other set, then run: python eval/run_eval.py score'
+        : 'Go back or skip to the unlabelled ones.')),
+      el('div', { class: 'actions', style: 'justify-content:center' },
+        el('button', { class: 'act', onclick: () => { idx = firstUnlabeled(); render(); } }, 'Jump to first unlabelled'),
+        el('button', { class: 'act plain', onclick: () => go(-1) }, 'Back'))));
+    return;
+  }
+  const r = list[idx];
+  main.append(mode === 'picks' ? pickCard(r) : themeCard(r));
+  main.prepend(el('p', { class: 'progress', style: 'margin:0 0 10px' }, `Row ${idx + 1} of ${list.length}`));
+}
+
+function setMode(m) {
+  mode = m;
+  idx = firstUnlabeled();
+  render();
+}
+
+document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => setMode(t.dataset.mode)));
+$('#mock').addEventListener('change', (e) => { includeMock = e.target.checked; idx = firstUnlabeled(); render(); });
+
+document.addEventListener('keydown', (e) => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const typing = e.target.tagName === 'INPUT' && e.target.type === 'text';
+  if (typing) {
+    if (e.key === 'Escape' || e.key === 'Enter') { e.target.blur(); clearTimeout(saveTimer); const r = rows()[idx]; if (r) save(r); }
+    return;
+  }
+  const k = e.key.toLowerCase();
+  if (k === 'y') label('y');
+  else if (k === 'n') label('n');
+  else if (k === 's' || k === 'arrowright') go(1);
+  else if (k === 'b' || k === 'arrowleft') go(-1);
+  else if (k === 'c') label('');
+  else if (k === '/') { e.preventDefault(); const n = $('#note'); if (n) n.focus(); }
+});
+
+(async function init() {
+  try {
+    data = await api('/api/data');
+  } catch (e) {
+    $('#main').append(el('div', { class: 'card center' }, el('h2', {}, 'Cannot reach the labelling server'),
+      el('p', { class: 'quiet' }, 'This page saves into your CSV files, so it must be opened through the server. In a terminal, from the repo root, run:'),
+      el('p', {}, el('code', {}, 'python eval/run_eval.py label')),
+      el('p', { class: 'quiet' }, String(e.message || e))));
+    return;
+  }
+  setMode(data.picks.some((r) => r.live === 'yes') || !data.themes.length ? 'picks' : 'themes');
+})();
+</script>
+</body>
+</html>

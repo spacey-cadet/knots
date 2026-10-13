@@ -15,6 +15,7 @@ Usage (from the repo root, venv active):
   python eval/run_eval.py run                              # heuristic + bedrock
   python eval/run_eval.py run --extractors heuristic       # offline only
   python eval/run_eval.py run --extractors "heuristic,bedrock=us.anthropic.claude-sonnet-4-6"
+  python eval/run_eval.py label                            # label in the browser
   python eval/run_eval.py score
 
 `bedrock` runs in strict mode here, so a failure is recorded as an error
@@ -27,6 +28,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import csv
+import hashlib
 import json
 import os
 import random
@@ -277,6 +279,129 @@ def cmd_score(args) -> int:
     return 0
 
 
+# ---------------------------------------------------------------------------
+# label: a small local web tool that writes your labels straight into the CSVs
+# ---------------------------------------------------------------------------
+
+LABEL_HTML = HERE / "label.html"
+# kind -> (csv path, columns, row key fields, label field)
+SHEETS = {
+    "pick": (LABELS, LABEL_COLS, ("session_id", "extractor", "url"), "good"),
+    "theme": (THEMES, THEME_COLS, ("session_id", "extractor", "topic", "theme"), "supported"),
+}
+
+
+def row_id(kind: str, row: dict) -> str:
+    _, _, key, _ = SHEETS[kind]
+    return hashlib.sha1("\x1f".join(row.get(k, "") for k in key).encode()).hexdigest()[:12]
+
+
+def cmd_label(args) -> int:
+    import http.server
+    import threading
+    import webbrowser
+
+    if not LABELS.exists() and not THEMES.exists():
+        print("No labels.csv / themes.csv yet. Run `python eval/run_eval.py run` first.")
+        return 1
+
+    lock = threading.Lock()
+    port = args.port
+    allowed_hosts = {f"127.0.0.1:{port}", f"localhost:{port}"}
+
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def log_message(self, *a):  # keep the terminal quiet
+            pass
+
+        def _send(self, code: int, body: bytes, ctype: str = "application/json") -> None:
+            self.send_response(code)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(body)
+
+        def _guard(self) -> bool:
+            # localhost only, and no cross-site writes
+            if self.headers.get("Host", "") not in allowed_hosts:
+                self._send(403, b"forbidden", "text/plain")
+                return False
+            origin = self.headers.get("Origin")
+            if origin and origin.split("://", 1)[-1] not in allowed_hosts:
+                self._send(403, b"forbidden", "text/plain")
+                return False
+            return True
+
+        def do_GET(self):
+            if not self._guard():
+                return
+            if self.path in ("/", "/label.html"):
+                self._send(200, LABEL_HTML.read_bytes(), "text/html; charset=utf-8")
+            elif self.path == "/api/data":
+                out = {}
+                with lock:
+                    for kind, name in (("pick", "picks"), ("theme", "themes")):
+                        path, _, _, _ = SHEETS[kind]
+                        rows = []
+                        for r in read_csv(path):
+                            r = dict(r)
+                            r["id"] = row_id(kind, r)
+                            r.pop("extractor", None)   # blind labelling: never sent to the page
+                            rows.append(r)
+                        out[name] = rows
+                self._send(200, json.dumps(out).encode())
+            elif self.path == "/favicon.ico":
+                self._send(204, b"", "image/x-icon")
+            else:
+                self._send(404, b"not found", "text/plain")
+
+        def do_POST(self):
+            if not self._guard():
+                return
+            if self.path != "/api/label" or self.headers.get("Content-Type", "").split(";")[0] != "application/json":
+                self._send(400, b"bad request", "text/plain")
+                return
+            try:
+                body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", "0"))))
+                kind, rid = body["kind"], body["id"]
+                value, note = str(body.get("value", "")), str(body.get("note", ""))[:500]
+                if kind not in SHEETS or value not in ("", "y", "n"):
+                    raise ValueError("bad kind or value")
+            except Exception as e:  # noqa: BLE001
+                self._send(400, f"bad request: {e}".encode(), "text/plain")
+                return
+            path, cols, _, label_col = SHEETS[kind]
+            with lock:
+                rows = read_csv(path)
+                for r in rows:
+                    if row_id(kind, r) == rid:
+                        r[label_col], r["note"] = value, note
+                        break
+                else:
+                    self._send(404, b"row not found (did you re-run the eval? reload the page)", "text/plain")
+                    return
+                tmp = path.with_suffix(".tmp")
+                write_csv(tmp, cols, rows)
+                tmp.replace(path)          # atomic: a crash can never leave a half-written CSV
+            self._send(200, json.dumps({"ok": True}).encode())
+
+    try:
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    except OSError as e:
+        print(f"Cannot use port {port}: {e}. Try --port 8766.")
+        return 1
+    url = f"http://127.0.0.1:{port}/"
+    print(f"Labelling tool running at {url}\nLabels save straight into eval/labels.csv and eval/themes.csv.")
+    print("Press Ctrl+C here when you are done.")
+    if not args.no_browser:
+        webbrowser.open(url)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nStopped. Run `python eval/run_eval.py score` to see results.")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -285,6 +410,10 @@ def main() -> int:
                    help="comma list: heuristic, bedrock, or bedrock=<model id> (default: heuristic,bedrock)")
     r.add_argument("--videos", action="store_true", help="also query YouTube (needs YOUTUBE_API_KEY)")
     r.set_defaults(fn=cmd_run)
+    lb = sub.add_parser("label", help="open the local labelling tool (saves into the CSVs)")
+    lb.add_argument("--port", type=int, default=8765)
+    lb.add_argument("--no-browser", action="store_true", help="do not open a browser tab automatically")
+    lb.set_defaults(fn=cmd_label)
     s = sub.add_parser("score", help="turn your labels into a results table")
     s.add_argument("--include-mock", action="store_true", help="count offline mock picks too")
     s.set_defaults(fn=cmd_score)
