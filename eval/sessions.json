@@ -1,0 +1,102 @@
+[
+  {
+    "id": "s01",
+    "note": "Your demo case. Finance + belief + bubbles.",
+    "texts": [
+      "Alexa, what's a memecoin and why do people buy them?",
+      "Can you explain memecoin tokenomics, like liquidity pools and market cap?",
+      "I keep seeing memecoin threads on my Reddit feed, is this all just a bubble?",
+      "Tell me more about the research behind speculative crypto assets."
+    ]
+  },
+  {
+    "id": "s02",
+    "note": "Abstract philosophy. Should find concepts the person never named (determinism, moral responsibility).",
+    "texts": [
+      "Alexa, is free will an illusion?",
+      "What did that neuroscience experiment say about decisions being made before we're aware of them?",
+      "If everything is determined, how can anyone be held responsible for what they do?",
+      "I've been reading about compatibilism, explain it simply."
+    ]
+  },
+  {
+    "id": "s03",
+    "note": "AI minds. Technical vocabulary; tests whether keywords stay film-tag-like.",
+    "texts": [
+      "Could a large language model ever be conscious?",
+      "What's the difference between an AI that seems to understand and one that actually does?",
+      "Explain the alignment problem. Why is it hard to specify what we want?",
+      "I keep reading threads about AI systems behaving differently when they know they are being tested."
+    ]
+  },
+  {
+    "id": "s04",
+    "note": "Climate. Emotional undercurrent (helplessness) is implied, not stated.",
+    "texts": [
+      "How close are we to climate tipping points?",
+      "Explain the Atlantic current collapse thing I saw on the news.",
+      "Why does it feel like nothing gets done even though we know what the problem is?",
+      "What does research say about how societies react to slow-moving disasters?"
+    ]
+  },
+  {
+    "id": "s05",
+    "note": "Loneliness and online life. Strongly implicit themes.",
+    "texts": [
+      "Why do I feel more lonely the more time I spend online?",
+      "Is there research on social media and mental health?",
+      "My feed is mostly strangers arguing. Why does outrage spread faster than anything else?",
+      "What happened to the idea that the internet would bring people together?"
+    ]
+  },
+  {
+    "id": "s06",
+    "note": "Reality and simulation. Lots of well-tagged films exist; checks for obvious picks.",
+    "texts": [
+      "Alexa, explain the simulation hypothesis.",
+      "How would anyone even test whether we live in a simulation?",
+      "What's the Boltzmann brain problem? I keep seeing it mentioned.",
+      "If I can't tell the difference, does it matter?"
+    ]
+  },
+  {
+    "id": "s07",
+    "note": "Surveillance and privacy.",
+    "texts": [
+      "What data do companies actually collect about me?",
+      "I read about predictive policing and facial recognition being used in cities.",
+      "Is privacy dead or just changing?",
+      "Explain the chilling effect of knowing you're being watched."
+    ]
+  },
+  {
+    "id": "s08",
+    "note": "Memory and grief. Personal detail; tests tact and whether themes stay supported by the text.",
+    "texts": [
+      "How does the brain store memories of people who have died?",
+      "My grandmother had dementia. Why do some memories survive and others vanish?",
+      "Can memories be edited or implanted?",
+      "I've been reading about how remembering changes the memory itself."
+    ]
+  },
+  {
+    "id": "s09",
+    "note": "Meritocracy and inequality. Easy to over-read political themes; check support strictly.",
+    "texts": [
+      "Is meritocracy a myth?",
+      "How much of success is luck versus effort?",
+      "I keep seeing threads about wealth inequality and inherited advantage.",
+      "What does research say about social mobility in different countries?"
+    ]
+  },
+  {
+    "id": "s10",
+    "note": "STRESS TEST. Vague and noisy on purpose. A good system finds little or low confidence. Label picks strictly: if the session gave no real signal, picks are not good.",
+    "texts": [
+      "Alexa, what's the weather like later?",
+      "Play something relaxing. Also what time is it in Tokyo?",
+      "I've been kind of curious lately, not sure about what though.",
+      "Maybe something with time travel? Or not."
+    ]
+  }
+]

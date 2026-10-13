@@ -1,0 +1,34 @@
+{
+  "extractor": "bedrock",
+  "model": "us.anthropic.claude-sonnet-4-6",
+  "interests": [
+    {
+      "topic": "memecoins and why people buy them",
+      "depth": "casual",
+      "sentiment": "skeptical",
+      "mentions": 1,
+      "concepts": [
+        "collective belief as value creation",
+        "speculative bubbles",
+        "greater fool theory",
+        "trust without institutions"
+      ],
+      "implicit_themes": [
+        "fear of missing out",
+        "crowd psychology",
+        "value without fundamentals",
+        "internet culture as financial force"
+      ],
+      "keywords": [
+        "financial bubble",
+        "speculation",
+        "cryptocurrency",
+        "crowd psychology",
+        "get rich quick",
+        "viral markets"
+      ],
+      "rationale": "Asking what memecoins are and whether they constitute a bubble signals curiosity about how shared belief and social momentum can drive financial value, and whether that value is real or illusory.",
+      "confidence": 0.82
+    }
+  ]
+}
