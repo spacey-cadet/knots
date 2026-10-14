@@ -1,121 +1,42 @@
 # Evaluation
 
-Measures whether Knots' picks and "unstated themes" are actually good, by
-running 10 fixed sessions through each extractor and scoring your hand labels.
+Measures whether Knots' picks and "unstated themes" are actually good: 10 fixed
+sessions go through each extractor, you label the results blind, and `score`
+turns the labels into a table.
 
-## Run it
+Needs `TMDB_API_KEY` in `.env` (without it films are a fixed offline mock set
+and the run is meaningless), plus Bedrock settings if you include Bedrock.
 
-Prerequisites: `TMDB_API_KEY` in `.env` (otherwise films are the fixed offline
-mock set and the run is meaningless), plus Bedrock settings if you include it.
-# Evaluation
-
-Measures whether Knots' picks and "unstated themes" are actually good, by
-running 10 fixed sessions through each extractor and scoring your hand labels.
-
-## Run it
-
-Prerequisites: `TMDB_API_KEY` in `.env` (otherwise films are the fixed offline
-mock set and the run is meaningless), plus Bedrock settings if you include it.
+## 1. Run
 
 ```bash
 python eval/run_eval.py run --extractors "heuristic,bedrock=us.anthropic.claude-sonnet-4-6"
 ```
 
-Optional: add more models to compare, e.g.
-`"heuristic,bedrock=us.anthropic.claude-sonnet-4-6,bedrock=us.meta.llama3-3-70b-instruct-v1:0"`.
-Bedrock runs in strict mode here, so a failure shows as `FAIL` and is never
-quietly replaced by the heuristic.
+Add more models to compare, e.g. `...,bedrock=us.meta.llama3-3-70b-instruct-v1:0`.
+Bedrock runs in strict mode, so a failure shows as `FAIL` and is never quietly
+replaced by the heuristic. Re-running keeps labels you already entered.
 
-## Label (about 1 hour)
-
-Easiest: use the labelling tool.
+## 2. Label (about 1 hour)
 
 ```bash
-python eval/run_eval.py label        # opens http://127.0.0.1:8765/ ; Ctrl+C when done
+python eval/run_eval.py label     # http://127.0.0.1:8765/  (Ctrl+C when done)
 ```
 
-One row at a time, keyboard driven: `Y` yes, `N` no, `S` skip, `B` back,
-`C` clear, `/` to type a note. Every label is written straight into the CSV
-the moment you press the key, so you can stop and resume any time. The tool
-never shows which extractor produced a row, so your labels stay blind. It runs
-only on your own machine (127.0.0.1). Tabs switch between **Picks** and **Themes**.
+Keys: `Y` yes, `N` no, `S` skip, `B` back, `C` clear, `/` note. Labels save into
+the CSVs instantly, and the page never shows which extractor made a row. The
+rubric is on each card. Use the **Picks** and **Themes** tabs. Rows marked
+"offline mock" are hidden by default and ignored by `score`.
 
-Prefer a spreadsheet? Open both CSVs directly and **hide the last column
-(`extractor`) while you label**. Rows are shuffled within each session for the
-same reason. The rules below apply either way.
+Prefer a spreadsheet? Edit `labels.csv` (`good`) and `themes.csv` (`supported`)
+with `y`/`n`, and hide the last column (`extractor`) while you do.
 
-`eval/labels.csv`, one row per pick. Fill `good` with `y` or `n`:
-- `y` = I would genuinely watch or read this for that session, and the stated
-  reason holds up.
-- `n` = wrong topic, a stretch, a generic title, or a reason that overclaims.
-- Judge against `session_text`, not against what the film is famous for.
-- Session `s10` is deliberately vague. If the text gave no real signal, picks
-  are not good.
-- Rows with `live = no` are offline mock items. They are skipped by `score`.
-
-`eval/themes.csv`, one row per "unstated theme". Fill `supported` with `y` or `n`:
-- `y` = the session text genuinely implies this, even if never said.
-- `n` = invented or a stretch (for example "distrust of traditional finance"
-  from two questions about memecoins).
-
-Use the `note` column for anything worth quoting later. Failures and
-surprises go straight into the write-up's "what didn't work" section.
-
-## Score
+## 3. Score
 
 ```bash
-python eval/run_eval.py score
+python eval/run_eval.py score     # writes eval/RESULTS.md
 ```
 
-Writes `eval/RESULTS.md`. Re-running `run` keeps the labels you already entered
-(rows are matched by session, extractor and URL/theme).
+## Commit as evidence
 
-## Commit these
-
-`sessions.json`, `labels.csv`, `themes.csv`, `results/results.json` and
-`RESULTS.md` are the evidence. Commit them so reviewers can check the numbers.
-```bash
-python eval/run_eval.py run --extractors "heuristic,bedrock=us.anthropic.claude-sonnet-4-6"
-```
-
-Optional: add more models to compare, e.g.
-`"heuristic,bedrock=us.anthropic.claude-sonnet-4-6,bedrock=us.meta.llama3-3-70b-instruct-v1:0"`.
-Bedrock runs in strict mode here, so a failure shows as `FAIL` and is never
-quietly replaced by the heuristic.
-
-## Label (about 1 hour)
-
-Open both CSVs in a spreadsheet. **Hide the last column (`extractor`) while you
-label**, so you judge each row without knowing which extractor produced it.
-Rows are shuffled within each session for the same reason.
-
-`eval/labels.csv`, one row per pick. Fill `good` with `y` or `n`:
-- `y` = I would genuinely watch or read this for that session, and the stated
-  reason holds up.
-- `n` = wrong topic, a stretch, a generic title, or a reason that overclaims.
-- Judge against `session_text`, not against what the film is famous for.
-- Session `s10` is deliberately vague. If the text gave no real signal, picks
-  are not good.
-- Rows with `live = no` are offline mock items. They are skipped by `score`.
-
-`eval/themes.csv`, one row per "unstated theme". Fill `supported` with `y` or `n`:
-- `y` = the session text genuinely implies this, even if never said.
-- `n` = invented or a stretch (for example "distrust of traditional finance"
-  from two questions about memecoins).
-
-Use the `note` column for anything worth quoting later. Failures and
-surprises go straight into the write-up's "what didn't work" section.
-
-## Score
-
-```bash
-python eval/run_eval.py score
-```
-
-Writes `eval/RESULTS.md`. Re-running `run` keeps the labels you already entered
-(rows are matched by session, extractor and URL/theme).
-
-## Commit these
-
-`sessions.json`, `labels.csv`, `themes.csv`, `results/results.json` and
-`RESULTS.md` are the evidence. Commit them so reviewers can check the numbers.
+`sessions.json`, `labels.csv`, `themes.csv`, `results/results.json`, `RESULTS.md`.
