@@ -52,8 +52,8 @@ async def extract_interests(session_texts: list[str]) -> dict:
 async def search_content(topics: list[str]) -> list[dict]:
     """
     Match plain topic strings against TMDB (films and documentaries), arXiv
-    (papers) and optionally YouTube. Falls back to small offline mock results
-    per source if no key is set or a live call fails.
+    (papers) and optionally YouTube. A missing key or failed call returns nothing
+    for that source (mock results only when KNOTS_OFFLINE=1).
     """
     interests = [Interest(topic=t, depth="casual", sentiment="curious", mentions=1,
                           concepts=[t], keywords=[t]) for t in topics if t.strip()]

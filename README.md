@@ -10,8 +10,15 @@ The goal is to help people who think hard about abstract ideas find the films
 that make those ideas concrete: entertainment that sits close to the research,
 not a random feed.
 
-It runs fully offline with zero keys (heuristic extractor, mock catalogs) and
-upgrades as you add Bedrock access and TMDB / YouTube keys.
+The extractor runs with zero keys (heuristic fallback). Catalog results are always
+real: with no TMDB key, or when a live call fails, the catalogs return nothing
+rather than made-up titles. Set `KNOTS_OFFLINE=1` to use small fixed mock
+catalogs for a no-network demo or tests.
+
+Ranking: relevance (shared film-tag keywords) decides. Quality is a floor
+(TMDB rating >= 6.5 with >= 100 votes; films before 1990 need 7.5+ and 1,000+
+votes), not a score, and popularity is not a signal. One slot per session is
+reserved for a lesser-known (<= 3,000 votes), highly rated (>= 7.0) pick.
 
 ## How it works
 
@@ -90,8 +97,8 @@ asyncio.run(main())
   and arXiv are covered offline (fake Bedrock client, mock transports) but have
   not been called live from the build environment. Smoke-test with real keys
   before recording the demo.
-- **Offline mock data is fixed** (a memecoin-themed set), so without a TMDB key
-  every topic returns the same films.
+- **Offline mock data is fixed** (a memecoin-themed set) and only used with
+  `KNOTS_OFFLINE=1`. Without a TMDB key and without that flag, no films are returned.
 - **The heuristic fallback is weak** (frequency-based; it can pick words like
   "buy" as topics). It exists to keep the server answering, not to demo.
 - **No Reddit source yet.** `session_texts` expects Alexa+ conversation strings.

@@ -4,8 +4,8 @@ Measures whether Knots' picks and "unstated themes" are actually good: 10 fixed
 sessions go through each extractor, you label the results blind, and `score`
 turns the labels into a table.
 
-Needs `TMDB_API_KEY` in `.env` (without it films are a fixed offline mock set
-and the run is meaningless), plus Bedrock settings if you include Bedrock.
+Needs `TMDB_API_KEY` in `.env` (without it no films are returned, so the run is
+meaningless; do not set `KNOTS_OFFLINE` for an eval), plus Bedrock settings if you include Bedrock.
 
 ## 1. Run
 
@@ -40,3 +40,7 @@ python eval/run_eval.py score     # writes eval/RESULTS.md
 ## Commit as evidence
 
 `sessions.json`, `labels.csv`, `themes.csv`, `results/results.json`, `RESULTS.md`.
+When you mark a pick **Not good**, the tool asks why (keys `1`/`2`/`3`/`4`):
+relevance (wrong or loose topic), quality (low rated or obscure), repeat, other.
+`score` adds a table of those reasons per extractor, so a score change can be
+attributed (e.g. "quality failures fell from 5 to 1 after the gate").

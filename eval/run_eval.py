@@ -5,7 +5,8 @@ Evaluation harness for Knots.
 Runs the same sessions (eval/sessions.json) through one or more extractors,
 saves the raw outputs, and builds two spreadsheets for you to label by hand:
 
-  eval/labels.csv   one row per recommended pick  -> label `good` (y/n)
+  eval/labels.csv   one row per recommended pick  -> label `good` (y/n), and when n,
+                    a `reason`: relevance / quality / repeat / other
   eval/themes.csv   one row per "unstated theme"  -> label `supported` (y/n)
 
 Then `score` turns your labels into a results table (eval/RESULTS.md).
@@ -55,7 +56,7 @@ THEMES = HERE / "themes.csv"
 REPORT = HERE / "RESULTS.md"
 
 LABEL_COLS = ["session_id", "session_text", "thread", "kind", "type", "title", "year",
-              "url", "evidence", "reasoning", "live", "good", "note", "extractor"]
+              "url", "evidence", "reasoning", "live", "good", "reason", "note", "extractor"]
 THEME_COLS = ["session_id", "session_text", "topic", "theme", "rationale",
               "supported", "note", "extractor"]
 
@@ -181,7 +182,8 @@ def build_label_sheets(results: list[dict]) -> None:
                     "kind": kind, "type": c["type"], "title": c["title"], "year": c["year"],
                     "url": c["url"], "evidence": ", ".join(c.get("evidence", [])),
                     "reasoning": c["reasoning"], "live": "yes" if is_live(c) else "no",
-                    "good": prev.get("good", ""), "note": prev.get("note", ""),
+                    "good": prev.get("good", ""), "reason": prev.get("reason", ""),
+                    "note": prev.get("note", ""),
                     "extractor": e["extractor"],
                 })
         for it in e["interests"]:
@@ -238,6 +240,8 @@ def cmd_score(args) -> int:
         for key in ("all", r["kind"]):
             s[f"{key}_n"] += 1
             s[f"{key}_good"] += int(g)
+        if not g:
+            s[f"why_{(r.get('reason') or '').strip() or 'unspecified'}"] += 1
     for r in themes:
         s = stats[r["extractor"]]
         s["themes_found"] += 1
@@ -260,6 +264,14 @@ def cmd_score(args) -> int:
             f"| {x} | {pct(s['all_good'], s['all_n'])} | {pct(s['watch_good'], s['watch_n'])} | "
             f"{pct(s['read_good'], s['read_n'])} | {s['themes_found']} | "
             f"{pct(s['themes_good'], s['themes_n'])} |")
+    lines.append("")
+    lines += ["Why picks were not good (counts):", "",
+              "| Extractor | Relevance | Quality | Repeat | Other | No reason given |",
+              "| --- | --- | --- | --- | --- | --- |"]
+    for x in extractors:
+        s = stats[x]
+        lines.append(f"| {x} | {s['why_relevance']} | {s['why_quality']} | {s['why_repeat']} | "
+                     f"{s['why_other']} | {s['why_unspecified']} |")
     lines.append("")
     for x in extractors:
         s = stats[x]
@@ -284,6 +296,7 @@ def cmd_score(args) -> int:
 # ---------------------------------------------------------------------------
 
 LABEL_HTML = HERE / "label.html"
+REASONS = ("", "relevance", "quality", "repeat", "other")   # why a pick was "not good"
 # kind -> (csv path, columns, row key fields, label field)
 SHEETS = {
     "pick": (LABELS, LABEL_COLS, ("session_id", "extractor", "url"), "good"),
@@ -365,8 +378,11 @@ def cmd_label(args) -> int:
                 body = json.loads(self.rfile.read(int(self.headers.get("Content-Length", "0"))))
                 kind, rid = body["kind"], body["id"]
                 value, note = str(body.get("value", "")), str(body.get("note", ""))[:500]
+                reason = str(body.get("reason", ""))
                 if kind not in SHEETS or value not in ("", "y", "n"):
                     raise ValueError("bad kind or value")
+                if reason not in REASONS or (reason and (kind != "pick" or value != "n")):
+                    raise ValueError("bad reason")
             except Exception as e:  # noqa: BLE001
                 self._send(400, f"bad request: {e}".encode(), "text/plain")
                 return
@@ -376,6 +392,8 @@ def cmd_label(args) -> int:
                 for r in rows:
                     if row_id(kind, r) == rid:
                         r[label_col], r["note"] = value, note
+                        if kind == "pick":
+                            r["reason"] = reason
                         break
                 else:
                     self._send(404, b"row not found (did you re-run the eval? reload the page)", "text/plain")

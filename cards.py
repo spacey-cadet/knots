@@ -11,7 +11,7 @@ assert what a film "is about" beyond its tags, so a reason can't hallucinate.
 
 from __future__ import annotations
 
-from catalogs import ContentItem
+from catalogs import ContentItem, is_gem
 from interests import Interest
 
 # What the person does with each type. Used to group output for a screen/voice.
@@ -48,6 +48,8 @@ def explain_recommendation(item: ContentItem, interest: Interest) -> str:
         parts.append(f"Matched on: {', '.join(item.matched_keywords[:3])}.")
     if interest.depth == "deep" and item.content_type in ("movie", "doc"):
         parts.append("Since you're going deep on this, there's a paper that pairs with it.")
+    if is_gem(item):
+        parts.append(f"Lesser-known, but well rated ({item.rating:.1f}/10 from {item.popularity:,} votes).")
     return " ".join(parts)
 
 
@@ -64,24 +66,40 @@ def render_card(item: ContentItem, interest: Interest) -> dict:
         "concept": _concept(interest),
         "evidence": item.matched_keywords[:5],
         "relevance": round(item.topic_overlap_score, 2),
+        "rating": item.rating or None,          # TMDB vote_average, films/docs only
+        "votes": item.popularity or None,
+        "gem": is_gem(item),
     }
 
 
-def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: int = 6) -> list[dict]:
-    """Pick the top-scoring items across all topics/types and render cards.
-    At most one item per (topic, type), so a topic yields one documentary
-    (literal), one film (lateral), one paper, not three near-identical films."""
-    interest_by_topic = {i.topic: i for i in interests}
-    scored = sorted(items, key=lambda i: (i.topic_overlap_score, i.popularity), reverse=True)
+GEM_POSITION = 2   # insert the reserved lesser-known pick at most this deep (index), so it survives any cap
 
-    cards, seen = [], set()
+
+def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: int = 6) -> list[dict]:
+    """Pick the top items across all topics/types and render cards.
+
+    Relevance decides the order; rating is only a tie-break (items already passed
+    the quality gate in catalogs). Popularity is deliberately not a signal, or
+    the same famous films win every session. At most one item per
+    (topic, type), so a topic yields one documentary (literal), one film
+    (lateral), one paper. One slot is reserved for a lesser-known, highly rated
+    film or doc when one exists."""
+    interest_by_topic = {i.topic: i for i in interests}
+    scored = sorted(items, key=lambda i: (i.topic_overlap_score, i.rating), reverse=True)
+
+    cards, seen, used_urls = [], set(), set()
     for item in scored:
         interest = interest_by_topic.get(item.topic)
         key = (item.topic, item.content_type)
         if interest is None or key in seen:
             continue
         seen.add(key)
+        used_urls.add(item.source_url)
         cards.append(render_card(item, interest))
-        if len(cards) >= limit:
-            break
-    return cards
+
+    if not any(c["gem"] for c in cards):
+        gem = next((i for i in scored if is_gem(i) and i.source_url not in used_urls
+                    and i.topic in interest_by_topic), None)
+        if gem is not None:
+            cards.insert(min(GEM_POSITION, len(cards)), render_card(gem, interest_by_topic[gem.topic]))
+    return cards[:limit]

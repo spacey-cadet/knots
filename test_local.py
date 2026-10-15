@@ -14,8 +14,10 @@ import json
 
 import httpx
 
+import catalogs as C
 import interests as I
-from catalogs import search_content
+from cards import rank_and_render
+from catalogs import ContentItem, passes_quality, search_content
 from partner import build_session_plan
 
 SAMPLE_SESSION = [
@@ -56,10 +58,22 @@ def _use(monkeypatch, fake, mode="auto"):
 
 
 def _offline_catalogs(monkeypatch):
+    """Explicit offline mode: the fixed mock catalogs are allowed, nothing else is."""
+    monkeypatch.setenv("KNOTS_OFFLINE", "1")
     monkeypatch.delenv("TMDB_API_KEY", raising=False)
     monkeypatch.delenv("YOUTUBE_API_KEY", raising=False)
-    # arXiv has no key, so give it a transport that always fails -> mock fallback
     return httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(503)))
+
+
+def _topic(name="memecoins"):
+    return I.Interest(topic=name, depth="casual", sentiment="curious", mentions=1,
+                      concepts=[name], keywords=[name])
+
+
+def _film(title, rating, votes, year="2015", score=0.8, topic="memecoins"):
+    return ContentItem(title=title, content_type="movie", source_url=f"https://x/{title}",
+                       topic=topic, topic_overlap_score=score, year=year,
+                       popularity=votes, rating=rating)
 
 
 def test_heuristic_only(monkeypatch):
@@ -119,6 +133,146 @@ def test_partner_plan_groups_picks_with_reasons(monkeypatch):
     assert len(urls) == len(set(urls))                      # no title offered twice
 
 
+def test_live_failure_returns_nothing_not_fake_items(monkeypatch):
+    # keys present, every request fails, NOT in offline mode -> no mock titles may appear
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("TMDB_API_KEY", "k")
+    monkeypatch.setenv("YOUTUBE_API_KEY", "k")
+    client = httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(503)))
+    items = asyncio.run(search_content([_topic()], client=client, include_videos=True))
+    assert items == []
+
+
+def test_missing_keys_return_nothing_unless_offline(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.delenv("TMDB_API_KEY", raising=False)
+    monkeypatch.delenv("YOUTUBE_API_KEY", raising=False)
+    client = httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(503)))
+    assert asyncio.run(search_content([_topic()], client=client, include_videos=True)) == []
+    monkeypatch.setenv("KNOTS_OFFLINE", "1")
+    assert asyncio.run(search_content([_topic()], client=client, include_videos=True))
+
+
+def test_arxiv_follows_http_redirect(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    atom = ('<feed xmlns="http://www.w3.org/2005/Atom"><entry><id>http://arxiv.org/abs/2301.00001v1</id>'
+            '<title>Reflexivity in markets</title><summary>A real paper.</summary></entry></feed>')
+    hits = []
+
+    def handler(request):
+        hits.append(str(request.url))
+        if request.url.scheme == "http":
+            return httpx.Response(301, headers={"location": str(request.url).replace("http://", "https://", 1)})
+        return httpx.Response(200, text=atom)
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    assert C.ARXIV_API_URL.startswith("https://")      # the shipped default needs no redirect
+    # and even if it were http://, the redirect must be followed rather than swallowed
+    monkeypatch.setattr(C, "ARXIV_API_URL", "http://export.arxiv.org/api/query")
+    items = asyncio.run(C._search_arxiv(_topic(), client))
+    assert [i.title for i in items] == ["Reflexivity in markets"] and len(hits) == 2
+
+
+def test_quality_gate_and_age_rule():
+    assert passes_quality(7.0, 500, "2015")
+    assert not passes_quality(5.9, 50_000, "2015")        # famous but poorly rated
+    assert not passes_quality(8.0, 40, "2015")            # too few votes to trust
+    assert not passes_quality(7.0, 5_000, "1975")         # old films need 7.5+
+    assert not passes_quality(8.0, 600, "1975")           # ... and 1,000+ votes
+    assert passes_quality(7.6, 1_200, "1975")
+    assert passes_quality(7.0, 500, "")                   # unknown year = no old-film penalty
+
+
+def test_tmdb_drops_films_below_the_gate(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("TMDB_API_KEY", "k")
+
+    def film(i, title, rating, votes, date):
+        return {"id": i, "title": title, "vote_average": rating, "vote_count": votes,
+                "release_date": date, "overview": ""}
+
+    def handler(request):
+        path = request.url.path
+        if path.endswith("/search/keyword"):
+            return httpx.Response(200, json={"results": [{"id": 1, "name": "memecoins"}]})
+        if "99" in request.url.params.get("with_genres", ""):
+            return httpx.Response(200, json={"results": []})
+        return httpx.Response(200, json={"results": [
+            film(1, "Good Modern", 7.4, 800, "2018-01-01"),
+            film(2, "Famous Flop", 4.8, 90_000, "2016-01-01"),
+            film(3, "Tiny Cult", 8.0, 30, "2019-01-01"),
+            film(4, "Old Meh", 7.0, 9_000, "1971-01-01"),
+        ]})
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    items = asyncio.run(C._search_tmdb(_topic(), client))
+    assert [i.title for i in items] == ["Good Modern"]
+    assert items[0].rating == 7.4 and items[0].popularity == 800
+
+
+def test_relevance_decides_not_popularity():
+    famous = _film("Famous", rating=7.0, votes=90_000, score=0.5)
+    fitting = _film("Fitting", rating=7.0, votes=400, score=0.9, topic="grief")
+    cards = rank_and_render([famous, fitting], [_topic(), _topic("grief")], limit=6)
+    assert cards[0]["title"] == "Fitting"
+
+
+def test_one_slot_is_reserved_for_a_lesser_known_gem():
+    popular = [_film(f"Big{i}", rating=7.8, votes=50_000, score=0.9 - i * 0.01, topic=f"t{i}") for i in range(4)]
+    gem = _film("Hidden", rating=7.6, votes=600, score=0.6, topic="t0")
+    topics = [_topic(f"t{i}") for i in range(4)]
+    cards = rank_and_render(popular + [gem], topics, limit=4)
+    assert any(c["title"] == "Hidden" and c["gem"] for c in cards)
+    assert [c["title"] for c in cards].index("Hidden") <= 2
+    # no gem available -> nothing forced in
+    assert not any(c["gem"] for c in rank_and_render(popular, topics, limit=4))
+
+
+def test_empty_catalogs_yield_an_honest_note(monkeypatch):
+    plan = build_session_plan([_topic()], [], extractor="heuristic")
+    assert not any(plan["picks"].values()) and "not guessing" in plan["note"]
+
+
+def test_label_server_accepts_reason_only_on_not_good_picks(monkeypatch, tmp_path):
+    import importlib.util
+    import threading
+    import urllib.request
+    from pathlib import Path
+
+    spec = importlib.util.spec_from_file_location("run_eval", Path(__file__).parent / "eval" / "run_eval.py")
+    ev = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(ev)
+    labels = tmp_path / "labels.csv"
+    row = {c: "" for c in ev.LABEL_COLS} | {"session_id": "s1", "extractor": "x", "url": "u", "title": "T"}
+    ev.write_csv(labels, ev.LABEL_COLS, [row])
+    monkeypatch.setattr(ev, "LABELS", labels)
+    monkeypatch.setitem(ev.SHEETS, "pick", (labels, ev.LABEL_COLS, ("session_id", "extractor", "url"), "good"))
+    monkeypatch.setattr(ev, "THEMES", tmp_path / "themes.csv")
+
+    # drive the handler through a real server on a free port
+    port = 8799
+    args = type("A", (), {"port": port, "no_browser": True})()
+    t = threading.Thread(target=ev.cmd_label, args=(args,), daemon=True)
+    t.start()
+    import time
+    time.sleep(0.5)
+    rid = ev.row_id("pick", row)
+
+    def post(body):
+        req = urllib.request.Request(f"http://127.0.0.1:{port}/api/label", json.dumps(body).encode(),
+                                     {"Content-Type": "application/json"})
+        try:
+            return urllib.request.urlopen(req).status
+        except urllib.error.HTTPError as e:
+            return e.code
+
+    assert post({"kind": "pick", "id": rid, "value": "y", "reason": "quality"}) == 400   # y has no reason
+    assert post({"kind": "pick", "id": rid, "value": "n", "reason": "bogus"}) == 400
+    assert post({"kind": "pick", "id": rid, "value": "n", "reason": "quality"}) == 200
+    saved = ev.read_csv(labels)[0]
+    assert saved["good"] == "n" and saved["reason"] == "quality"
+
+
 def test_server_exposes_tools():
     import server
     names = {t.name for t in asyncio.run(server.mcp.list_tools())}
@@ -133,6 +287,7 @@ if __name__ == "__main__":
     code = pytest.main(["-q", __file__])
     if code == 0:
         os.environ["EXTRACTOR"] = "heuristic"
+        os.environ["KNOTS_OFFLINE"] = "1"   # sample output uses the explicit offline mock catalogs
         os.environ.pop("TMDB_API_KEY", None)
         found, used = I.extract_sync(SAMPLE_SESSION)
         client = httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(503)))

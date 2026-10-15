@@ -81,6 +81,9 @@
   button.bad { color: var(--bad); border-color: var(--bad); }
   button.good.on { background: var(--good); color: #fff; }
   button.bad.on { background: var(--bad); color: #fff; }
+  button.reason { font-size: 14px; padding: 8px 14px; }
+  button.reason.on { background: var(--bad); color: #fff; border-color: var(--bad); }
+  .reasons { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; font-size: 14px; color: var(--muted); }
   button.plain { border-color: transparent; color: var(--muted); font-weight: 500; padding: 11px 12px; }
   kbd {
     font: 12px ui-monospace, Menlo, Consolas, monospace; padding: 1px 6px; border-radius: 5px;
@@ -120,7 +123,7 @@
 
 <footer>
   <kbd>Y</kbd> yes &nbsp; <kbd>N</kbd> no &nbsp; <kbd>S</kbd> skip &nbsp; <kbd>B</kbd> or <kbd>←</kbd> back
-  &nbsp; <kbd>C</kbd> clear &nbsp; <kbd>/</kbd> note &nbsp; <kbd>Esc</kbd> leave note
+  &nbsp; after <kbd>N</kbd>: <kbd>1</kbd> relevance <kbd>2</kbd> quality <kbd>3</kbd> repeat &nbsp; <kbd>C</kbd> clear &nbsp; <kbd>/</kbd> note &nbsp; <kbd>Esc</kbd> leave note
 </footer>
 
 <script>
@@ -175,6 +178,7 @@ async function save(row) {
     await api('/api/label', {
       kind: mode === 'picks' ? 'pick' : 'theme', id: row.id,
       value: row[field()] || '', note: row.note || '',
+      reason: mode === 'picks' && row[field()] === 'n' ? (row.reason || '') : '',
     });
     setStatus('Saved ✓');
   } catch (e) {
@@ -197,8 +201,23 @@ function label(value) {
   const r = rows()[idx];
   if (!r) return;
   r[field()] = value;
+  if (value !== 'n') r.reason = '';
   save(r);
-  if (value) idx += 1;
+  // a "not good" pick waits for its reason (1/2/3), so the score can say why it failed
+  const waitForReason = mode === 'picks' && value === 'n';
+  if (value && !waitForReason) idx += 1;
+  render();
+}
+
+const REASONS = [['relevance', 'Wrong / loose topic'], ['quality', 'Low rated / obscure'],
+                 ['repeat', 'Repeat'], ['other', 'Other']];
+
+function setReason(reason) {
+  const r = rows()[idx];
+  if (!r || mode !== 'picks' || r.good !== 'n') return;
+  r.reason = reason;
+  save(r);
+  idx += 1;
   render();
 }
 
@@ -212,7 +231,8 @@ function rubric() {
     ? ['Good = I would genuinely watch or read this for that session, and the stated reason holds up.',
        'Not good = wrong topic, a stretch, a generic title, or a reason that overclaims.',
        'Judge against what the person said, not against how famous the title is.',
-       'Session s10 is deliberately vague: if the text gave no real signal, picks are not good.']
+       'Session s10 is deliberately vague: if the text gave no real signal, picks are not good.',
+       'When you mark Not good, pick a reason: wrong/loose topic, low rated or obscure, or a repeat.']
     : ['Supported = the session text genuinely implies this theme, even though it was never said.',
        'Not supported = invented, or a stretch beyond what two or three questions can show.'];
   return el('details', { class: 'rubric' }, el('summary', {}, 'Labelling rubric'),
@@ -224,6 +244,14 @@ function sessionBlock(r) {
     el('p', { class: 'eyebrow' }, `Session ${r.session_id} · what the person said`),
     el('ul', { class: 'said' }, r.session_text.split(' / ').map((t) => el('li', {}, t))),
   ];
+}
+
+function reasonRow(r) {
+  if (mode !== 'picks' || r.good !== 'n') return null;
+  return el('div', { class: 'reasons' }, 'Why not good?',
+    REASONS.map(([key, text], i) => el('button', {
+      class: 'act reason' + (r.reason === key ? ' on' : ''), onclick: () => setReason(key),
+    }, text, el('kbd', {}, String(i + 1)))));
 }
 
 function actions(r) {
@@ -264,7 +292,7 @@ function pickCard(r) {
     r.evidence ? [el('p', { class: 'eyebrow' }, 'Matched on'),
                   el('div', { class: 'chips' }, r.evidence.split(', ').filter(Boolean).map((t) => el('span', { class: 'chip' }, t)))] : null,
     el('p', { class: 'question' }, 'Would you genuinely watch/read this for this session?'),
-    noteBox(r), actions(r));
+    noteBox(r), actions(r), reasonRow(r));
 }
 
 function themeCard(r) {
@@ -329,6 +357,7 @@ document.addEventListener('keydown', (e) => {
   else if (k === 's' || k === 'arrowright') go(1);
   else if (k === 'b' || k === 'arrowleft') go(-1);
   else if (k === 'c') label('');
+  else if (k >= '1' && k <= String(REASONS.length)) setReason(REASONS[Number(k) - 1][0]);
   else if (k === '/') { e.preventDefault(); const n = $('#note'); if (n) n.focus(); }
 });
 

@@ -70,10 +70,13 @@ def build_session_plan(interests: list[Interest], items: list[ContentItem],
             continue
         seen_urls.add(c["url"])
         bucket.append(c)
+    note = "" if any(picks.values()) else (
+        "No catalog results right now (catalogs unavailable or no keys set), so I'm not guessing.")
     return {
         "extractor": extractor,
         "threads": _threads(interests),
         "picks": picks,
+        "note": note,
         "spoken": _spoken(interests, picks),
         "ask": _ask(interests),
     }
