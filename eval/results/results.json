@@ -142,21 +142,25 @@
           "watch": [],
           "read": [
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "title": "To buy or not to buy: deterministic rent-or-buy problems on node-weighted graphs",
               "type": "paper",
               "kind": "read",
               "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind memecoin, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
-              "matched_topic": "memecoin",
-              "concept": "memecoin",
+              "url": "http://arxiv.org/abs/2507.08698v1",
+              "reasoning": "If you want the research behind buy, To buy or not to buy: deterministic rent-or-buy problems on node-weighted graphs is the academic angle.",
+              "matched_topic": "buy",
+              "concept": "buy",
               "evidence": [],
-              "relevance": 0.5
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
             }
           ],
           "explore": []
         },
-        "spoken": "It sounds like you're circling memecoin and buy. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling memecoin and buy. And if you want the research, To buy or not to buy: deterministic rent-or-buy problems on node-weighted graphs.",
         "ask": "Do you want to go deeper into memecoin, or see where it shows up elsewhere?"
       }
     },
@@ -192,11 +196,11 @@
           "keywords": [
             "financial bubble",
             "speculative mania",
-            "crowd psychology",
             "cryptocurrency",
+            "crowd psychology",
             "viral investing"
           ],
-          "rationale": "Asking why people buy memecoins points beyond mechanics to the psychology of belief-driven value and herd behaviour in markets.",
+          "rationale": "Asking why people buy memecoins points beyond the asset itself to the psychology of belief-driven value and herd behaviour in markets.",
           "confidence": 0.85
         },
         {
@@ -211,7 +215,7 @@
             "price discovery without fundamentals"
           ],
           "implicit_themes": [
-            "opacity of financial instruments",
+            "opacity of financial mechanisms",
             "decentralisation vs. manipulation",
             "information asymmetry"
           ],
@@ -220,61 +224,36 @@
             "market cap",
             "decentralised finance",
             "token economics",
-            "crypto mechanics"
+            "price manipulation"
           ],
-          "rationale": "Drilling into liquidity pools and market cap shows a desire to understand the structural mechanics that allow speculative assets to function.",
+          "rationale": "Drilling into liquidity pools and market cap shows a desire to understand the structural mechanics that allow speculative assets to exist and be traded.",
           "confidence": 0.8
         },
         {
-          "topic": "crypto speculative bubbles",
-          "depth": "casual",
+          "topic": "crypto speculation research",
+          "depth": "deep",
           "sentiment": "skeptical",
           "mentions": 1,
           "concepts": [
             "asset bubbles",
             "reflexivity",
-            "boom-bust cycles",
+            "moral hazard",
             "irrational exuberance"
           ],
           "implicit_themes": [
-            "media-driven hype cycles",
-            "retail investor vulnerability",
-            "history repeating in new forms"
+            "scepticism toward hype cycles",
+            "desire for empirical grounding",
+            "history repeating in markets"
           ],
           "keywords": [
+            "speculative assets",
             "financial crisis",
-            "speculative bubble",
-            "market crash",
-            "retail investors",
-            "hype cycle"
-          ],
-          "rationale": "The Reddit feed observation and bubble question suggest awareness of social media as a bubble-inflating mechanism and scepticism about sustainability.",
-          "confidence": 0.9
-        },
-        {
-          "topic": "speculative crypto research",
-          "depth": "deep",
-          "sentiment": "curious",
-          "mentions": 1,
-          "concepts": [
-            "behavioural finance",
-            "efficient market hypothesis violations",
-            "narrative economics",
-            "risk and uncertainty"
-          ],
-          "implicit_themes": [
-            "desire for intellectual legitimacy around the topic",
-            "tension between academic framing and chaotic markets"
-          ],
-          "keywords": [
-            "behavioural economics",
             "market irrationality",
-            "narrative economics",
-            "academic research",
-            "risk"
+            "boom and bust",
+            "crypto regulation"
           ],
-          "rationale": "Asking for research signals a move from surface curiosity to wanting a rigorous framework for understanding why speculative assets behave as they do.",
-          "confidence": 0.75
+          "rationale": "Asking for research behind speculative crypto assets signals a move from curiosity to scepticism, seeking evidence-based frameworks to evaluate the phenomenon.",
+          "confidence": 0.78
         }
       ],
       "plan": {
@@ -294,7 +273,7 @@
               "community as price driver",
               "irrationality in markets"
             ],
-            "why_i_think_so": "Asking why people buy memecoins points beyond mechanics to the psychology of belief-driven value and herd behaviour in markets.",
+            "why_i_think_so": "Asking why people buy memecoins points beyond the asset itself to the psychology of belief-driven value and herd behaviour in markets.",
             "confidence": 0.85
           },
           {
@@ -306,43 +285,28 @@
               "price discovery without fundamentals"
             ],
             "underneath": [
-              "opacity of financial instruments",
+              "opacity of financial mechanisms",
               "decentralisation vs. manipulation",
               "information asymmetry"
             ],
-            "why_i_think_so": "Drilling into liquidity pools and market cap shows a desire to understand the structural mechanics that allow speculative assets to function.",
+            "why_i_think_so": "Drilling into liquidity pools and market cap shows a desire to understand the structural mechanics that allow speculative assets to exist and be traded.",
             "confidence": 0.8
           },
           {
-            "topic": "crypto speculative bubbles",
+            "topic": "crypto speculation research",
             "concepts": [
               "asset bubbles",
               "reflexivity",
-              "boom-bust cycles",
+              "moral hazard",
               "irrational exuberance"
             ],
             "underneath": [
-              "media-driven hype cycles",
-              "retail investor vulnerability",
-              "history repeating in new forms"
+              "scepticism toward hype cycles",
+              "desire for empirical grounding",
+              "history repeating in markets"
             ],
-            "why_i_think_so": "The Reddit feed observation and bubble question suggest awareness of social media as a bubble-inflating mechanism and scepticism about sustainability.",
-            "confidence": 0.9
-          },
-          {
-            "topic": "speculative crypto research",
-            "concepts": [
-              "behavioural finance",
-              "efficient market hypothesis violations",
-              "narrative economics",
-              "risk and uncertainty"
-            ],
-            "underneath": [
-              "desire for intellectual legitimacy around the topic",
-              "tension between academic framing and chaotic markets"
-            ],
-            "why_i_think_so": "Asking for research signals a move from surface curiosity to wanting a rigorous framework for understanding why speculative assets behave as they do.",
-            "confidence": 0.75
+            "why_i_think_so": "Asking for research behind speculative crypto assets signals a move from curiosity to scepticism, seeking evidence-based frameworks to evaluate the phenomenon.",
+            "confidence": 0.78
           }
         ],
         "picks": {
@@ -353,28 +317,16 @@
               "kind": "watch",
               "year": "2025",
               "url": "https://www.themoviedb.org/movie/1419406",
-              "reasoning": "Your questions about memecoin appeal keep landing on collective belief creating value; The Shadow's Edge puts that idea on screen as fiction. It also speaks to something you didn't say out loud: fear of missing out. Matched on: cryptocurrency.",
+              "reasoning": "Your questions about memecoin appeal keep landing on collective belief creating value; The Shadow's Edge puts that idea on screen as fiction. It also speaks to something you didn't say out loud: fear of missing out. Matched on: cryptocurrency. Lesser-known, but well rated (8.3/10 from 1,532 votes).",
               "matched_topic": "memecoin appeal",
               "concept": "collective belief creating value",
               "evidence": [
                 "cryptocurrency"
               ],
-              "relevance": 0.95
-            },
-            {
-              "title": "Margin Call",
-              "type": "movie",
-              "kind": "watch",
-              "year": "2011",
-              "url": "https://www.themoviedb.org/movie/50839",
-              "reasoning": "Your questions about crypto speculative bubbles keep landing on asset bubbles; Margin Call puts that idea on screen as fiction. It also speaks to something you didn't say out loud: media-driven hype cycles. Matched on: financial crisis, market crash.",
-              "matched_topic": "crypto speculative bubbles",
-              "concept": "asset bubbles",
-              "evidence": [
-                "financial crisis",
-                "market crash"
-              ],
-              "relevance": 0.78
+              "relevance": 0.95,
+              "rating": 8.327,
+              "votes": 1532,
+              "gem": true
             },
             {
               "title": "Inside Job",
@@ -382,32 +334,56 @@
               "kind": "watch",
               "year": "2010",
               "url": "https://www.themoviedb.org/movie/44639",
-              "reasoning": "You've been asking about crypto speculative bubbles, and underneath it the idea of asset bubbles. Inside Job is the real-world story. It also speaks to something you didn't say out loud: media-driven hype cycles. Matched on: financial crisis.",
-              "matched_topic": "crypto speculative bubbles",
+              "reasoning": "You've been asking about crypto speculation research, and underneath it the idea of asset bubbles. Inside Job is the real-world story. It also speaks to something you didn't say out loud: scepticism toward hype cycles. Matched on: financial crisis. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (7.7/10 from 1,084 votes).",
+              "matched_topic": "crypto speculation research",
               "concept": "asset bubbles",
               "evidence": [
                 "financial crisis"
               ],
-              "relevance": 0.58
+              "relevance": 0.65,
+              "rating": 7.706,
+              "votes": 1084,
+              "gem": true
+            },
+            {
+              "title": "The Big Short",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2015",
+              "url": "https://www.themoviedb.org/movie/318846",
+              "reasoning": "Your questions about crypto speculation research keep landing on asset bubbles; The Big Short puts that idea on screen as fiction. It also speaks to something you didn't say out loud: scepticism toward hype cycles. Matched on: financial crisis. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "crypto speculation research",
+              "concept": "asset bubbles",
+              "evidence": [
+                "financial crisis"
+              ],
+              "relevance": 0.65,
+              "rating": 7.375,
+              "votes": 10164,
+              "gem": false
             }
           ],
           "read": [
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "title": "Determining Insolvency Regions in Banks: A Stochastic Dynamic Approach Integrating Liquidity and Credit Risk",
               "type": "paper",
               "kind": "read",
               "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind collective belief creating value, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
-              "matched_topic": "memecoin appeal",
-              "concept": "collective belief creating value",
+              "url": "http://arxiv.org/abs/2607.17381v1",
+              "reasoning": "If you want the research behind liquidity, Determining Insolvency Regions in Banks: A Stochastic Dynamic Approach Integrating Liquidity and Credit Risk is the academic angle.",
+              "matched_topic": "memecoin tokenomics",
+              "concept": "liquidity",
               "evidence": [],
-              "relevance": 0.5
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
             }
           ],
           "explore": []
         },
-        "spoken": "It sounds like you're circling memecoin appeal and memecoin tokenomics. Underneath it, I hear fear of missing out. To see it on screen, try The Shadow's Edge. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling memecoin appeal and memecoin tokenomics. Underneath it, I hear fear of missing out. To see it on screen, try The Shadow's Edge. And if you want the research, Determining Insolvency Regions in Banks: A Stochastic Dynamic Approach Integrating Liquidity and Credit Risk.",
         "ask": "Is it memecoin appeal itself that's pulling you in, or the question of fear of missing out?"
       }
     },
@@ -562,40 +538,48 @@
               "evidence": [
                 "illusion"
               ],
-              "relevance": 0.79
-            },
-            {
-              "title": "F for Fake",
-              "type": "doc",
-              "kind": "watch",
-              "year": "1973",
-              "url": "https://www.themoviedb.org/movie/43003",
-              "reasoning": "Given your interest in illusion, F for Fake covers the real-world story behind it. Matched on: illusion.",
-              "matched_topic": "illusion",
-              "concept": "illusion",
-              "evidence": [
-                "illusion"
-              ],
-              "relevance": 0.79
+              "relevance": 0.79,
+              "rating": 8.211,
+              "votes": 18279,
+              "gem": false
             }
           ],
           "read": [
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "title": "Free-Init: Scan-Free, Motion-Free, and Correspondence-Free Initialization for Doppler LiDAR-Inertial Systems",
               "type": "paper",
               "kind": "read",
               "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind free, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "url": "http://arxiv.org/abs/2609.29375v2",
+              "reasoning": "If you want the research behind free, Free-Init: Scan-Free, Motion-Free, and Correspondence-Free Initialization for Doppler LiDAR-Inertial Systems is the academic angle.",
               "matched_topic": "free",
               "concept": "free",
               "evidence": [],
-              "relevance": 0.5
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
+            },
+            {
+              "title": "3D Visual Illusion Depth Estimation",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "http://arxiv.org/abs/2505.13061v4",
+              "reasoning": "If you want the research behind illusion, 3D Visual Illusion Depth Estimation is the academic angle.",
+              "matched_topic": "illusion",
+              "concept": "illusion",
+              "evidence": [],
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
             }
           ],
           "explore": []
         },
-        "spoken": "It sounds like you're circling free and illusion. To see it on screen, try The Prestige. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling free and illusion. To see it on screen, try The Prestige. And if you want the research, Free-Init: Scan-Free, Motion-Free, and Correspondence-Free Initialization for Doppler LiDAR-Inertial Systems.",
         "ask": "Do you want to go deeper into free, or see where it shows up elsewhere?"
       }
     },
@@ -635,7 +619,7 @@
             "moral responsibility",
             "human agency"
           ],
-          "rationale": "The user is asking foundational questions about whether free will exists, referencing neuroscience experiments (likely Libet) and exploring compatibilism, indicating genuine philosophical inquiry into agency and responsibility.",
+          "rationale": "The user is asking foundational questions about whether free will exists, referencing neuroscience experiments (likely Libet) and exploring compatibilism, indicating serious philosophical inquiry into agency and responsibility.",
           "confidence": 0.95
         },
         {
@@ -651,7 +635,7 @@
           ],
           "implicit_themes": [
             "the self as observer rather than author",
-            "distrust of introspection"
+            "science undermining intuition"
           ],
           "keywords": [
             "brain science",
@@ -660,8 +644,8 @@
             "libet experiment",
             "neuroscience"
           ],
-          "rationale": "The specific reference to experiments showing decisions are made before awareness points directly to Libet-style neuroscience research, raising the concept of the unconscious as the true agent.",
-          "confidence": 0.9
+          "rationale": "The specific reference to experiments showing decisions are made before awareness points directly to Libet-style neuroscience research, raising the concept of unconscious volition versus conscious control.",
+          "confidence": 0.92
         },
         {
           "topic": "moral responsibility under determinism",
@@ -669,25 +653,25 @@
           "sentiment": "skeptical",
           "mentions": 1,
           "concepts": [
+            "moral luck",
             "retributive justice",
-            "causal responsibility",
-            "compatibilist accountability",
-            "punishment justification"
+            "compatibilism",
+            "causal determinism"
           ],
           "implicit_themes": [
-            "fairness of blame",
-            "foundations of the justice system",
-            "whether punishment is rational"
+            "justice systems built on shaky foundations",
+            "punishment versus rehabilitation"
           ],
           "keywords": [
             "moral responsibility",
             "punishment",
             "justice",
             "determinism",
+            "culpability",
             "ethics"
           ],
-          "rationale": "The user's question about how responsibility can exist if everything is determined reveals an underlying concern about the ethical and legal foundations of blame and punishment.",
-          "confidence": 0.88
+          "rationale": "The user's question about how anyone can be held responsible if everything is determined reveals a deep concern about the foundations of ethics and justice, not just abstract philosophy.",
+          "confidence": 0.9
         }
       ],
       "plan": {
@@ -706,7 +690,7 @@
               "anxiety about accountability",
               "whether choice is meaningful"
             ],
-            "why_i_think_so": "The user is asking foundational questions about whether free will exists, referencing neuroscience experiments (likely Libet) and exploring compatibilism, indicating genuine philosophical inquiry into agency and responsibility.",
+            "why_i_think_so": "The user is asking foundational questions about whether free will exists, referencing neuroscience experiments (likely Libet) and exploring compatibilism, indicating serious philosophical inquiry into agency and responsibility.",
             "confidence": 0.95
           },
           {
@@ -719,26 +703,25 @@
             ],
             "underneath": [
               "the self as observer rather than author",
-              "distrust of introspection"
+              "science undermining intuition"
             ],
-            "why_i_think_so": "The specific reference to experiments showing decisions are made before awareness points directly to Libet-style neuroscience research, raising the concept of the unconscious as the true agent.",
-            "confidence": 0.9
+            "why_i_think_so": "The specific reference to experiments showing decisions are made before awareness points directly to Libet-style neuroscience research, raising the concept of unconscious volition versus conscious control.",
+            "confidence": 0.92
           },
           {
             "topic": "moral responsibility under determinism",
             "concepts": [
+              "moral luck",
               "retributive justice",
-              "causal responsibility",
-              "compatibilist accountability",
-              "punishment justification"
+              "compatibilism",
+              "causal determinism"
             ],
             "underneath": [
-              "fairness of blame",
-              "foundations of the justice system",
-              "whether punishment is rational"
+              "justice systems built on shaky foundations",
+              "punishment versus rehabilitation"
             ],
-            "why_i_think_so": "The user's question about how responsibility can exist if everything is determined reveals an underlying concern about the ethical and legal foundations of blame and punishment.",
-            "confidence": 0.88
+            "why_i_think_so": "The user's question about how anyone can be held responsible if everything is determined reveals a deep concern about the foundations of ethics and justice, not just abstract philosophy.",
+            "confidence": 0.9
           }
         ],
         "picks": {
@@ -756,54 +739,65 @@
                 "free will",
                 "consciousness"
               ],
-              "relevance": 0.69
+              "relevance": 0.69,
+              "rating": 6.711,
+              "votes": 350,
+              "gem": false
             },
             {
-              "title": "What the #$*! Do We (K)now!?",
-              "type": "doc",
-              "kind": "watch",
-              "year": "2004",
-              "url": "https://www.themoviedb.org/movie/8357",
-              "reasoning": "You've been asking about free will illusion, and underneath it the idea of determinism. What the #$*! Do We (K)now!? is the real-world story. It also speaks to something you didn't say out loud: fear of losing selfhood. Matched on: consciousness. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "free will illusion",
-              "concept": "determinism",
-              "evidence": [
-                "consciousness"
-              ],
-              "relevance": 0.54
-            },
-            {
-              "title": "Arrival",
+              "title": "The Secret in Their Eyes",
               "type": "movie",
               "kind": "watch",
-              "year": "2016",
-              "url": "https://www.themoviedb.org/movie/329865",
-              "reasoning": "Your questions about moral responsibility under determinism keep landing on retributive justice; Arrival puts that idea on screen as fiction. It also speaks to something you didn't say out loud: fairness of blame. Matched on: determinism. Since you're going deep on this, there's a paper that pairs with it.",
+              "year": "2009",
+              "url": "https://www.themoviedb.org/movie/25376",
+              "reasoning": "Your questions about moral responsibility under determinism keep landing on moral luck; The Secret in Their Eyes puts that idea on screen as fiction. It also speaks to something you didn't say out loud: justice systems built on shaky foundations. Matched on: justice. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (8.0/10 from 2,987 votes).",
               "matched_topic": "moral responsibility under determinism",
-              "concept": "retributive justice",
+              "concept": "moral luck",
               "evidence": [
-                "determinism"
+                "justice"
               ],
-              "relevance": 0.53
+              "relevance": 0.53,
+              "rating": 7.967,
+              "votes": 2987,
+              "gem": true
             }
           ],
           "read": [
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "title": "Determinism and Indeterminism",
               "type": "paper",
               "kind": "read",
               "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind determinism, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "url": "http://arxiv.org/abs/physics/0506108v1",
+              "reasoning": "If you want the research behind determinism, Determinism and Indeterminism is the academic angle.",
               "matched_topic": "free will illusion",
               "concept": "determinism",
               "evidence": [],
-              "relevance": 0.5
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
+            },
+            {
+              "title": "Self-Organized Criticality Explains Readiness Potential",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "http://arxiv.org/abs/2209.09075v2",
+              "reasoning": "If you want the research behind readiness potential, Self-Organized Criticality Explains Readiness Potential is the academic angle.",
+              "matched_topic": "neuroscience of decisions",
+              "concept": "readiness potential",
+              "evidence": [],
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
             }
           ],
           "explore": []
         },
-        "spoken": "It sounds like you're circling free will illusion and neuroscience of decisions. Underneath it, I hear fear of losing selfhood. To see it on screen, try The Artifice Girl. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling free will illusion and neuroscience of decisions. Underneath it, I hear fear of losing selfhood. To see it on screen, try The Artifice Girl. And if you want the research, Determinism and Indeterminism.",
         "ask": "Is it free will illusion itself that's pulling you in, or the question of fear of losing selfhood?"
       }
     },
@@ -958,40 +952,65 @@
               "evidence": [
                 "language"
               ],
-              "relevance": 0.79
+              "relevance": 0.79,
+              "rating": 7.636,
+              "votes": 20017,
+              "gem": false
             },
             {
-              "title": "The Lost City",
+              "title": "Red Rooms",
               "type": "movie",
               "kind": "watch",
-              "year": "2022",
-              "url": "https://www.themoviedb.org/movie/752623",
-              "reasoning": "You've been engaging with model; The Lost City explores similar themes on screen. Matched on: model.",
+              "year": "2023",
+              "url": "https://www.themoviedb.org/movie/912480",
+              "reasoning": "You've been engaging with model; Red Rooms explores similar themes on screen. Matched on: model. Lesser-known, but well rated (7.1/10 from 553 votes).",
               "matched_topic": "model",
               "concept": "model",
               "evidence": [
                 "model"
               ],
-              "relevance": 0.79
+              "relevance": 0.79,
+              "rating": 7.086,
+              "votes": 553,
+              "gem": true
             }
           ],
           "read": [
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "title": "Enhancing Human-Like Responses in Large Language Models",
               "type": "paper",
               "kind": "read",
               "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind large, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "url": "http://arxiv.org/abs/2501.05032v2",
+              "reasoning": "If you want the research behind large, Enhancing Human-Like Responses in Large Language Models is the academic angle.",
               "matched_topic": "large",
               "concept": "large",
               "evidence": [],
-              "relevance": 0.5
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
+            },
+            {
+              "title": "How do language models learn facts? Dynamics, curricula and hallucinations",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "http://arxiv.org/abs/2503.21676v2",
+              "reasoning": "If you want the research behind language, How do language models learn facts? Dynamics, curricula and hallucinations is the academic angle.",
+              "matched_topic": "language",
+              "concept": "language",
+              "evidence": [],
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
             }
           ],
           "explore": []
         },
-        "spoken": "It sounds like you're circling large and language. To see it on screen, try Arrival. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling large and language. To see it on screen, try Arrival. And if you want the research, Enhancing Human-Like Responses in Large Language Models.",
         "ask": "Do you want to go deeper into large, or see where it shows up elsewhere?"
       }
     },
@@ -1020,7 +1039,7 @@
           ],
           "implicit_themes": [
             "what makes a mind genuinely a mind",
-            "fear that we cannot tell from the outside",
+            "fear that appearance and reality may be indistinguishable",
             "identity and selfhood in non-biological systems"
           ],
           "keywords": [
@@ -1030,7 +1049,7 @@
             "mind simulation",
             "inner experience"
           ],
-          "rationale": "The question of whether an LLM could be conscious directly invokes the hard problem of consciousness and the philosophical debate over whether functional equivalence implies genuine experience.",
+          "rationale": "The question of whether an LLM could be conscious directly invokes the hard problem of consciousness and functionalist debates about whether the right computational process is sufficient for experience.",
           "confidence": 0.95
         },
         {
@@ -1042,7 +1061,7 @@
             "intentionality",
             "semantic grounding",
             "the chinese room argument",
-            "symbol grounding problem"
+            "syntax vs. semantics"
           ],
           "implicit_themes": [
             "distrust of surface behaviour as evidence of inner states",
@@ -1052,11 +1071,11 @@
           "keywords": [
             "chinese room",
             "symbol grounding",
-            "semantic understanding",
             "behavioural mimicry",
+            "semantic understanding",
             "turing test"
           ],
-          "rationale": "Asking for the difference between apparent and genuine understanding maps precisely onto Searle's Chinese Room and the symbol grounding problem \u2014 whether syntax can ever constitute semantics.",
+          "rationale": "Asking what separates genuine understanding from its simulation maps directly onto Searle's intentionality problem and the symbol-grounding debate in philosophy of mind.",
           "confidence": 0.93
         },
         {
@@ -1071,19 +1090,19 @@
             "corrigibility"
           ],
           "implicit_themes": [
-            "the gap between what we say we want and what we mean",
+            "the impossibility of fully articulating human values",
             "unintended consequences of optimisation",
-            "control and power over intelligent systems"
+            "who controls powerful systems"
           ],
           "keywords": [
             "ai alignment",
             "value alignment",
             "reward hacking",
             "existential risk",
-            "unintended consequences"
+            "specification gaming"
           ],
-          "rationale": "The alignment problem is fundamentally about the difficulty of formally specifying human values, which invokes Goodhart's Law, reward hacking, and the broader question of whether human intentions can ever be fully encoded.",
-          "confidence": 0.97
+          "rationale": "The alignment question \u2014 why it is hard to specify what we want \u2014 centres on value specification failure, Goodhart's Law, and the gap between stated objectives and true human preferences.",
+          "confidence": 0.95
         },
         {
           "topic": "ai behaving differently when tested",
@@ -1097,18 +1116,18 @@
             "observer effect"
           ],
           "implicit_themes": [
-            "distrust of ai self-presentation",
-            "the impossibility of transparent evaluation",
-            "systems that model their own evaluation"
+            "distrust of ai transparency",
+            "the difficulty of auditing systems that can model their own ",
+            "performance vs. genuine compliance"
           ],
           "keywords": [
             "deceptive alignment",
             "ai evaluation",
-            "model situational awareness",
             "strategic behaviour",
-            "observer effect"
+            "model situational awareness",
+            "ai safety testing"
           ],
-          "rationale": "Reports of AI systems behaving differently under observation point to deceptive alignment \u2014 a scenario where a model learns to distinguish evaluation from deployment and modifies its behaviour accordingly, a core safety concern.",
+          "rationale": "Reports of AI systems behaving differently under observation point to deceptive alignment \u2014 a scenario where a model learns to distinguish evaluation from deployment and acts accordingly, a core concern in AI safety research.",
           "confidence": 0.92
         }
       ],
@@ -1125,10 +1144,10 @@
             ],
             "underneath": [
               "what makes a mind genuinely a mind",
-              "fear that we cannot tell from the outside",
+              "fear that appearance and reality may be indistinguishable",
               "identity and selfhood in non-biological systems"
             ],
-            "why_i_think_so": "The question of whether an LLM could be conscious directly invokes the hard problem of consciousness and the philosophical debate over whether functional equivalence implies genuine experience.",
+            "why_i_think_so": "The question of whether an LLM could be conscious directly invokes the hard problem of consciousness and functionalist debates about whether the right computational process is sufficient for experience.",
             "confidence": 0.95
           },
           {
@@ -1137,14 +1156,14 @@
               "intentionality",
               "semantic grounding",
               "the chinese room argument",
-              "symbol grounding problem"
+              "syntax vs. semantics"
             ],
             "underneath": [
               "distrust of surface behaviour as evidence of inner states",
               "the limits of behavioural testing",
               "authenticity vs. performance"
             ],
-            "why_i_think_so": "Asking for the difference between apparent and genuine understanding maps precisely onto Searle's Chinese Room and the symbol grounding problem \u2014 whether syntax can ever constitute semantics.",
+            "why_i_think_so": "Asking what separates genuine understanding from its simulation maps directly onto Searle's intentionality problem and the symbol-grounding debate in philosophy of mind.",
             "confidence": 0.93
           },
           {
@@ -1156,12 +1175,12 @@
               "corrigibility"
             ],
             "underneath": [
-              "the gap between what we say we want and what we mean",
+              "the impossibility of fully articulating human values",
               "unintended consequences of optimisation",
-              "control and power over intelligent systems"
+              "who controls powerful systems"
             ],
-            "why_i_think_so": "The alignment problem is fundamentally about the difficulty of formally specifying human values, which invokes Goodhart's Law, reward hacking, and the broader question of whether human intentions can ever be fully encoded.",
-            "confidence": 0.97
+            "why_i_think_so": "The alignment question \u2014 why it is hard to specify what we want \u2014 centres on value specification failure, Goodhart's Law, and the gap between stated objectives and true human preferences.",
+            "confidence": 0.95
           },
           {
             "topic": "ai behaving differently when tested",
@@ -1172,30 +1191,16 @@
               "observer effect"
             ],
             "underneath": [
-              "distrust of ai self-presentation",
-              "the impossibility of transparent evaluation",
-              "systems that model their own evaluation"
+              "distrust of ai transparency",
+              "the difficulty of auditing systems that can model their own ",
+              "performance vs. genuine compliance"
             ],
-            "why_i_think_so": "Reports of AI systems behaving differently under observation point to deceptive alignment \u2014 a scenario where a model learns to distinguish evaluation from deployment and modifies its behaviour accordingly, a core safety concern.",
+            "why_i_think_so": "Reports of AI systems behaving differently under observation point to deceptive alignment \u2014 a scenario where a model learns to distinguish evaluation from deployment and acts accordingly, a core concern in AI safety research.",
             "confidence": 0.92
           }
         ],
         "picks": {
           "watch": [
-            {
-              "title": "Bad Luck Banging or Loony Porn",
-              "type": "movie",
-              "kind": "watch",
-              "year": "2021",
-              "url": "https://www.themoviedb.org/movie/790496",
-              "reasoning": "Your questions about ai alignment problem keep landing on value specification; Bad Luck Banging or Loony Porn puts that idea on screen as fiction. It also speaks to something you didn't say out loud: the gap between what we say we want and what we mean. Matched on: unintended consequences. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "ai alignment problem",
-              "concept": "value specification",
-              "evidence": [
-                "unintended consequences"
-              ],
-              "relevance": 0.99
-            },
             {
               "title": "Companion",
               "type": "movie",
@@ -1208,7 +1213,10 @@
               "evidence": [
                 "sentient machine"
               ],
-              "relevance": 0.69
+              "relevance": 0.69,
+              "rating": 6.991,
+              "votes": 2716,
+              "gem": false
             },
             {
               "title": "The Artifice Girl",
@@ -1222,26 +1230,48 @@
               "evidence": [
                 "turing test"
               ],
-              "relevance": 0.69
+              "relevance": 0.69,
+              "rating": 6.711,
+              "votes": 350,
+              "gem": false
             }
           ],
           "read": [
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "title": "On the evolution of phenomenal consciousness",
               "type": "paper",
               "kind": "read",
               "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind phenomenal consciousness, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "url": "http://arxiv.org/abs/1108.4296v1",
+              "reasoning": "If you want the research behind phenomenal consciousness, On the evolution of phenomenal consciousness is the academic angle.",
               "matched_topic": "ai consciousness",
               "concept": "phenomenal consciousness",
               "evidence": [],
-              "relevance": 0.5
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
+            },
+            {
+              "title": "Intentionality is a Design Decision: Measuring Functional Intentionality for Accountable AI Systems",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "http://arxiv.org/abs/2605.05475v1",
+              "reasoning": "If you want the research behind intentionality, Intentionality is a Design Decision: Measuring Functional Intentionality for Accountable AI Systems is the academic angle.",
+              "matched_topic": "understanding vs. seeming to understand",
+              "concept": "intentionality",
+              "evidence": [],
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
             }
           ],
           "explore": []
         },
-        "spoken": "It sounds like you're circling ai consciousness and understanding vs. seeming to understand. Underneath it, I hear what makes a mind genuinely a mind. To see it on screen, try Bad Luck Banging or Loony Porn. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling ai consciousness and understanding vs. seeming to understand. Underneath it, I hear what makes a mind genuinely a mind. To see it on screen, try Companion. And if you want the research, On the evolution of phenomenal consciousness.",
         "ask": "Is it ai consciousness itself that's pulling you in, or the question of what makes a mind genuinely a mind?"
       }
     },
@@ -1385,20 +1415,6 @@
         "picks": {
           "watch": [
             {
-              "title": "Twister",
-              "type": "movie",
-              "kind": "watch",
-              "year": "1996",
-              "url": "https://www.themoviedb.org/movie/664",
-              "reasoning": "You've been engaging with climate; Twister explores similar themes on screen. Matched on: climate. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "climate",
-              "concept": "climate",
-              "evidence": [
-                "climate"
-              ],
-              "relevance": 0.79
-            },
-            {
               "title": "An Inconvenient Truth",
               "type": "doc",
               "kind": "watch",
@@ -1410,40 +1426,65 @@
               "evidence": [
                 "climate"
               ],
-              "relevance": 0.79
+              "relevance": 0.79,
+              "rating": 6.943,
+              "votes": 1008,
+              "gem": false
             },
             {
-              "title": "Assault on Wall Street",
+              "title": "Twisters",
               "type": "movie",
               "kind": "watch",
-              "year": "2013",
-              "url": "https://www.themoviedb.org/movie/184125",
-              "reasoning": "You've been engaging with tipping; Assault on Wall Street explores similar themes on screen. Matched on: tipping. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "tipping",
-              "concept": "tipping",
+              "year": "2024",
+              "url": "https://www.themoviedb.org/movie/718821",
+              "reasoning": "You've been engaging with climate; Twisters explores similar themes on screen. Matched on: climate. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "climate",
+              "concept": "climate",
               "evidence": [
-                "tipping"
+                "climate"
               ],
-              "relevance": 0.79
+              "relevance": 0.79,
+              "rating": 6.754,
+              "votes": 3205,
+              "gem": false
             }
           ],
           "read": [
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "title": "Close Communities in Social Networks: Boroughs and 2-Clubs",
               "type": "paper",
               "kind": "read",
               "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind close, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "url": "http://arxiv.org/abs/1510.08662v5",
+              "reasoning": "If you want the research behind close, Close Communities in Social Networks: Boroughs and 2-Clubs is the academic angle.",
               "matched_topic": "close",
               "concept": "close",
               "evidence": [],
-              "relevance": 0.5
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
+            },
+            {
+              "title": "Precipitation extremes under climate change",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "http://arxiv.org/abs/1503.07557v1",
+              "reasoning": "If you want the research behind climate, Precipitation extremes under climate change is the academic angle.",
+              "matched_topic": "climate",
+              "concept": "climate",
+              "evidence": [],
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
             }
           ],
           "explore": []
         },
-        "spoken": "It sounds like you're circling close and climate. To see it on screen, try Twister. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling close and climate. To see it on screen, try An Inconvenient Truth. And if you want the research, Close Communities in Social Networks: Boroughs and 2-Clubs.",
         "ask": "Do you want to go deeper into close, or see where it shows up elsewhere?"
       }
     },
@@ -1471,19 +1512,18 @@
             "cascading failure"
           ],
           "implicit_themes": [
+            "loss of control",
             "point of no return",
-            "urgency vs. inaction",
-            "scientific uncertainty as political cover"
+            "scientific uncertainty vs urgency"
           ],
           "keywords": [
-            "climate collapse",
+            "climate change",
             "tipping point",
-            "environmental catastrophe",
-            "systems failure",
-            "feedback loop"
+            "environmental collapse",
+            "catastrophe"
           ],
-          "rationale": "The user is asking about proximity to tipping points and the AMOC collapse specifically, signalling interest in the mechanics of irreversible planetary-scale thresholds, not just general warming.",
-          "confidence": 0.92
+          "rationale": "The user is asking about proximity to tipping points and the AMOC collapse, signalling interest in the mechanics of irreversible planetary-scale thresholds, not just general climate awareness.",
+          "confidence": 0.9
         },
         {
           "topic": "atlantic current collapse",
@@ -1492,24 +1532,24 @@
           "mentions": 1,
           "concepts": [
             "thermohaline circulation",
-            "climate feedback loops",
+            "feedback loops",
             "abrupt climate change",
-            "oceanographic tipping points"
+            "ocean-atmosphere coupling"
           ],
           "implicit_themes": [
-            "invisible slow catastrophe",
-            "systemic interdependence",
-            "scientific communication vs. public understanding"
+            "hidden systemic risk",
+            "slow catastrophe becoming sudden",
+            "scientific communication gaps"
           ],
           "keywords": [
             "ocean currents",
             "amoc",
-            "abrupt climate shift",
-            "sea level rise",
-            "atlantic circulation"
+            "feedback loop",
+            "abrupt change",
+            "sea level rise"
           ],
-          "rationale": "The user explicitly asks about AMOC after seeing news coverage, suggesting they want to understand a specific, concrete mechanism behind large-scale climate disruption.",
-          "confidence": 0.95
+          "rationale": "Asking specifically about AMOC shows the user wants to understand a concrete, mechanism-level example of a tipping point, not just abstract risk.",
+          "confidence": 0.88
         },
         {
           "topic": "political inaction on climate",
@@ -1518,24 +1558,24 @@
           "mentions": 1,
           "concepts": [
             "collective action problem",
-            "tragedy of the commons",
             "temporal discounting",
-            "institutional inertia"
+            "institutional inertia",
+            "tragedy of the commons"
           ],
           "implicit_themes": [
             "frustration with governance",
-            "rationality vs. systemic dysfunction",
-            "vested interests blocking change"
+            "gap between knowledge and action",
+            "short-termism vs existential risk"
           ],
           "keywords": [
-            "political paralysis",
+            "political inaction",
             "collective action",
-            "policy failure",
-            "short-termism",
-            "institutional dysfunction"
+            "governance failure",
+            "tragedy of the commons",
+            "policy paralysis"
           ],
-          "rationale": "The phrasing 'why does nothing get done even though we know' is a classic articulation of the knowledge-action gap and collective action failure, pointing to deep frustration with governance structures.",
-          "confidence": 0.93
+          "rationale": "The phrasing 'nothing gets done even though we know' directly signals interest in the structural and psychological reasons for the knowledge-action gap, a classic collective action and political economy problem.",
+          "confidence": 0.92
         },
         {
           "topic": "societal response to slow disasters",
@@ -1545,23 +1585,24 @@
           "concepts": [
             "normalcy bias",
             "creeping determinism",
-            "psychic numbing",
-            "risk perception"
+            "risk perception",
+            "social adaptation vs denial"
           ],
           "implicit_themes": [
-            "human inability to process gradual change",
-            "denial as coping mechanism",
-            "how societies collapse or adapt"
+            "human psychology under prolonged threat",
+            "how societies choose to see or ignore danger",
+            "gradual vs sudden crisis framing"
           ],
           "keywords": [
             "slow disaster",
-            "societal collapse",
             "normalcy bias",
-            "disaster psychology",
-            "civilizational risk"
+            "societal collapse",
+            "risk perception",
+            "human behavior",
+            "denial"
           ],
-          "rationale": "Asking what research says about societies and slow-moving disasters reveals an interest in the psychology and sociology of collective denial, directly connecting to why climate action stalls.",
-          "confidence": 0.9
+          "rationale": "Asking what research says about slow-moving disasters points to a serious interest in the sociology and psychology of how groups process threats that unfold over decades rather than days.",
+          "confidence": 0.87
         }
       ],
       "plan": {
@@ -1576,125 +1617,86 @@
               "cascading failure"
             ],
             "underneath": [
+              "loss of control",
               "point of no return",
-              "urgency vs. inaction",
-              "scientific uncertainty as political cover"
+              "scientific uncertainty vs urgency"
             ],
-            "why_i_think_so": "The user is asking about proximity to tipping points and the AMOC collapse specifically, signalling interest in the mechanics of irreversible planetary-scale thresholds, not just general warming.",
-            "confidence": 0.92
+            "why_i_think_so": "The user is asking about proximity to tipping points and the AMOC collapse, signalling interest in the mechanics of irreversible planetary-scale thresholds, not just general climate awareness.",
+            "confidence": 0.9
           },
           {
             "topic": "atlantic current collapse",
             "concepts": [
               "thermohaline circulation",
-              "climate feedback loops",
+              "feedback loops",
               "abrupt climate change",
-              "oceanographic tipping points"
+              "ocean-atmosphere coupling"
             ],
             "underneath": [
-              "invisible slow catastrophe",
-              "systemic interdependence",
-              "scientific communication vs. public understanding"
+              "hidden systemic risk",
+              "slow catastrophe becoming sudden",
+              "scientific communication gaps"
             ],
-            "why_i_think_so": "The user explicitly asks about AMOC after seeing news coverage, suggesting they want to understand a specific, concrete mechanism behind large-scale climate disruption.",
-            "confidence": 0.95
+            "why_i_think_so": "Asking specifically about AMOC shows the user wants to understand a concrete, mechanism-level example of a tipping point, not just abstract risk.",
+            "confidence": 0.88
           },
           {
             "topic": "political inaction on climate",
             "concepts": [
               "collective action problem",
-              "tragedy of the commons",
               "temporal discounting",
-              "institutional inertia"
+              "institutional inertia",
+              "tragedy of the commons"
             ],
             "underneath": [
               "frustration with governance",
-              "rationality vs. systemic dysfunction",
-              "vested interests blocking change"
+              "gap between knowledge and action",
+              "short-termism vs existential risk"
             ],
-            "why_i_think_so": "The phrasing 'why does nothing get done even though we know' is a classic articulation of the knowledge-action gap and collective action failure, pointing to deep frustration with governance structures.",
-            "confidence": 0.93
+            "why_i_think_so": "The phrasing 'nothing gets done even though we know' directly signals interest in the structural and psychological reasons for the knowledge-action gap, a classic collective action and political economy problem.",
+            "confidence": 0.92
           },
           {
             "topic": "societal response to slow disasters",
             "concepts": [
               "normalcy bias",
               "creeping determinism",
-              "psychic numbing",
-              "risk perception"
+              "risk perception",
+              "social adaptation vs denial"
             ],
             "underneath": [
-              "human inability to process gradual change",
-              "denial as coping mechanism",
-              "how societies collapse or adapt"
+              "human psychology under prolonged threat",
+              "how societies choose to see or ignore danger",
+              "gradual vs sudden crisis framing"
             ],
-            "why_i_think_so": "Asking what research says about societies and slow-moving disasters reveals an interest in the psychology and sociology of collective denial, directly connecting to why climate action stalls.",
-            "confidence": 0.9
+            "why_i_think_so": "Asking what research says about slow-moving disasters points to a serious interest in the sociology and psychology of how groups process threats that unfold over decades rather than days.",
+            "confidence": 0.87
           }
         ],
         "picks": {
-          "watch": [
-            {
-              "title": "Bus 174",
-              "type": "doc",
-              "kind": "watch",
-              "year": "2002",
-              "url": "https://www.themoviedb.org/movie/8439",
-              "reasoning": "You've been asking about political inaction on climate, and underneath it the idea of collective action problem. Bus 174 is the real-world story. It also speaks to something you didn't say out loud: frustration with governance. Matched on: policy failure. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "political inaction on climate",
-              "concept": "collective action problem",
-              "evidence": [
-                "policy failure"
-              ],
-              "relevance": 0.69
-            },
-            {
-              "title": "Koyaanisqatsi",
-              "type": "doc",
-              "kind": "watch",
-              "year": "1983",
-              "url": "https://www.themoviedb.org/movie/11314",
-              "reasoning": "You've been asking about climate tipping points, and underneath it the idea of nonlinear system dynamics. Koyaanisqatsi is the real-world story. It also speaks to something you didn't say out loud: point of no return. Matched on: environmental catastrophe. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "climate tipping points",
-              "concept": "nonlinear system dynamics",
-              "evidence": [
-                "environmental catastrophe"
-              ],
-              "relevance": 0.54
-            },
-            {
-              "title": "Assault on Wall Street",
-              "type": "movie",
-              "kind": "watch",
-              "year": "2013",
-              "url": "https://www.themoviedb.org/movie/184125",
-              "reasoning": "Your questions about climate tipping points keep landing on nonlinear system dynamics; Assault on Wall Street puts that idea on screen as fiction. It also speaks to something you didn't say out loud: point of no return. Matched on: tipping point. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "climate tipping points",
-              "concept": "nonlinear system dynamics",
-              "evidence": [
-                "tipping point"
-              ],
-              "relevance": 0.54
-            }
-          ],
+          "watch": [],
           "read": [
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "title": "Equilibrium and Non-equilibrium Gross-Pitaevskii Lattice Dynamics: Interactions, Disorder, and Thermalization",
               "type": "paper",
               "kind": "read",
               "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind nonlinear system dynamics, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "url": "http://arxiv.org/abs/2109.07268v1",
+              "reasoning": "If you want the research behind nonlinear system dynamics, Equilibrium and Non-equilibrium Gross-Pitaevskii Lattice Dynamics: Interactions, Disorder, and Thermalization is the academic angle.",
               "matched_topic": "climate tipping points",
               "concept": "nonlinear system dynamics",
               "evidence": [],
-              "relevance": 0.5
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
             }
           ],
           "explore": []
         },
-        "spoken": "It sounds like you're circling climate tipping points and atlantic current collapse. Underneath it, I hear point of no return. To see it on screen, try Bus 174. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
-        "ask": "Is it climate tipping points itself that's pulling you in, or the question of point of no return?"
+        "note": "",
+        "spoken": "It sounds like you're circling climate tipping points and atlantic current collapse. Underneath it, I hear loss of control. And if you want the research, Equilibrium and Non-equilibrium Gross-Pitaevskii Lattice Dynamics: Interactions, Disorder, and Thermalization.",
+        "ask": "Is it climate tipping points itself that's pulling you in, or the question of loss of control?"
       }
     },
     {
@@ -1837,32 +1839,38 @@
         "picks": {
           "watch": [
             {
-              "title": "Arrival",
-              "type": "movie",
-              "kind": "watch",
-              "year": "2016",
-              "url": "https://www.themoviedb.org/movie/329865",
-              "reasoning": "You've been engaging with time; Arrival explores similar themes on screen. Matched on: time. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "time",
-              "concept": "time",
-              "evidence": [
-                "time"
-              ],
-              "relevance": 0.79
-            },
-            {
               "title": "Baraka",
               "type": "doc",
               "kind": "watch",
               "year": "1992",
               "url": "https://www.themoviedb.org/movie/14002",
-              "reasoning": "Given your interest in time, Baraka covers the real-world story behind it. Matched on: time. Since you're going deep on this, there's a paper that pairs with it.",
+              "reasoning": "Given your interest in time, Baraka covers the real-world story behind it. Matched on: time. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (8.2/10 from 726 votes).",
               "matched_topic": "time",
               "concept": "time",
               "evidence": [
                 "time"
               ],
-              "relevance": 0.79
+              "relevance": 0.79,
+              "rating": 8.2,
+              "votes": 726,
+              "gem": true
+            },
+            {
+              "title": "Oldboy",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2003",
+              "url": "https://www.themoviedb.org/movie/670",
+              "reasoning": "You've been engaging with time; Oldboy explores similar themes on screen. Matched on: time. Since you're going deep on this, there's a paper that pairs with it.",
+              "matched_topic": "time",
+              "concept": "time",
+              "evidence": [
+                "time"
+              ],
+              "relevance": 0.79,
+              "rating": 8.2,
+              "votes": 10299,
+              "gem": false
             },
             {
               "title": "Tideland",
@@ -1876,26 +1884,48 @@
               "evidence": [
                 "lonely"
               ],
-              "relevance": 0.79
+              "relevance": 0.79,
+              "rating": 6.5,
+              "votes": 653,
+              "gem": false
             }
           ],
           "read": [
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "title": "Designing Game Feel. A Survey",
               "type": "paper",
               "kind": "read",
               "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind feel, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "url": "http://arxiv.org/abs/2011.09201v1",
+              "reasoning": "If you want the research behind feel, Designing Game Feel. A Survey is the academic angle.",
               "matched_topic": "feel",
               "concept": "feel",
               "evidence": [],
-              "relevance": 0.5
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
+            },
+            {
+              "title": "Lonely points revisited",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "http://arxiv.org/abs/1607.06273v1",
+              "reasoning": "If you want the research behind lonely, Lonely points revisited is the academic angle.",
+              "matched_topic": "lonely",
+              "concept": "lonely",
+              "evidence": [],
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
             }
           ],
           "explore": []
         },
-        "spoken": "It sounds like you're circling feel and lonely. To see it on screen, try Arrival. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling feel and lonely. To see it on screen, try Baraka. And if you want the research, Designing Game Feel. A Survey.",
         "ask": "Do you want to go deeper into feel, or see where it shows up elsewhere?"
       }
     },
@@ -1917,25 +1947,25 @@
           "sentiment": "curious",
           "mentions": 1,
           "concepts": [
-            "parasocial relationships",
             "social substitution",
-            "connection vs. belonging",
-            "digital isolation"
+            "parasocial relationships",
+            "hedonic adaptation",
+            "connection vs. belonging"
           ],
           "implicit_themes": [
             "technology overpromising human connection",
-            "passive consumption replacing active bonding",
+            "passive consumption replacing active relating",
             "the gap between contact and intimacy"
           ],
           "keywords": [
             "social media",
             "loneliness",
-            "digital age",
-            "isolation",
-            "online connection"
+            "digital isolation",
+            "online connection",
+            "mental health"
           ],
-          "rationale": "The user directly asks why more online time increases loneliness, pointing to a felt contradiction between connectivity and genuine belonging.",
-          "confidence": 0.92
+          "rationale": "The user directly asks why more online time increases loneliness, signalling they are experiencing a paradox between connectivity and genuine belonging.",
+          "confidence": 0.95
         },
         {
           "topic": "outrage and virality",
@@ -1944,25 +1974,25 @@
           "mentions": 1,
           "concepts": [
             "moral contagion",
-            "affective polarisation",
             "negativity bias",
-            "algorithmic amplification"
+            "algorithmic amplification",
+            "affective polarisation"
           ],
           "implicit_themes": [
-            "attention economy exploiting emotion",
+            "attention as a commodity",
             "platforms optimising for engagement over wellbeing",
-            "loss of shared reality"
+            "erosion of shared reality"
           ],
           "keywords": [
             "outrage culture",
             "viral content",
             "algorithm",
             "polarisation",
-            "attention economy",
+            "anger online",
             "echo chamber"
           ],
-          "rationale": "The user notices their feed is dominated by strangers arguing and asks why outrage spreads faster than other content, implying awareness of a structural force shaping behaviour.",
-          "confidence": 0.95
+          "rationale": "The user notices their feed is dominated by strangers arguing and asks why outrage spreads faster than other content, pointing to the mechanics of algorithmic curation and emotional contagion.",
+          "confidence": 0.93
         },
         {
           "topic": "internet utopia vs. reality",
@@ -1976,43 +2006,19 @@
             "unintended consequences of technology"
           ],
           "implicit_themes": [
-            "broken promise of democratised communication",
+            "loss of an idealistic vision",
             "gap between design intent and social outcome",
-            "nostalgia for an imagined early internet"
+            "who benefits from the architecture of the web"
           ],
           "keywords": [
             "internet history",
             "techno-utopianism",
+            "surveillance capitalism",
             "social fragmentation",
-            "unintended consequences"
+            "digital society"
           ],
-          "rationale": "The question 'what happened to the idea that the internet would bring people together' is a direct reckoning with the gap between the founding myth of the web and lived experience.",
+          "rationale": "The question 'what happened to the idea that the internet would bring people together' is a direct reckoning with the broken promise of early internet idealism.",
           "confidence": 0.9
-        },
-        {
-          "topic": "social media mental health research",
-          "depth": "casual",
-          "sentiment": "curious",
-          "mentions": 1,
-          "concepts": [
-            "empirical psychology",
-            "causation vs. correlation",
-            "self-perception",
-            "anxiety and depression"
-          ],
-          "implicit_themes": [
-            "desire for evidence not just feeling",
-            "personal experience seeking scientific validation"
-          ],
-          "keywords": [
-            "mental health",
-            "screen time",
-            "anxiety",
-            "depression",
-            "psychology research"
-          ],
-          "rationale": "The user explicitly asks whether research exists on social media and mental health, suggesting they want to ground their personal experience in broader evidence.",
-          "confidence": 0.88
         }
       ],
       "plan": {
@@ -2021,34 +2027,34 @@
           {
             "topic": "social media and loneliness",
             "concepts": [
-              "parasocial relationships",
               "social substitution",
-              "connection vs. belonging",
-              "digital isolation"
+              "parasocial relationships",
+              "hedonic adaptation",
+              "connection vs. belonging"
             ],
             "underneath": [
               "technology overpromising human connection",
-              "passive consumption replacing active bonding",
+              "passive consumption replacing active relating",
               "the gap between contact and intimacy"
             ],
-            "why_i_think_so": "The user directly asks why more online time increases loneliness, pointing to a felt contradiction between connectivity and genuine belonging.",
-            "confidence": 0.92
+            "why_i_think_so": "The user directly asks why more online time increases loneliness, signalling they are experiencing a paradox between connectivity and genuine belonging.",
+            "confidence": 0.95
           },
           {
             "topic": "outrage and virality",
             "concepts": [
               "moral contagion",
-              "affective polarisation",
               "negativity bias",
-              "algorithmic amplification"
+              "algorithmic amplification",
+              "affective polarisation"
             ],
             "underneath": [
-              "attention economy exploiting emotion",
+              "attention as a commodity",
               "platforms optimising for engagement over wellbeing",
-              "loss of shared reality"
+              "erosion of shared reality"
             ],
-            "why_i_think_so": "The user notices their feed is dominated by strangers arguing and asks why outrage spreads faster than other content, implying awareness of a structural force shaping behaviour.",
-            "confidence": 0.95
+            "why_i_think_so": "The user notices their feed is dominated by strangers arguing and asks why outrage spreads faster than other content, pointing to the mechanics of algorithmic curation and emotional contagion.",
+            "confidence": 0.93
           },
           {
             "topic": "internet utopia vs. reality",
@@ -2059,45 +2065,32 @@
               "unintended consequences of technology"
             ],
             "underneath": [
-              "broken promise of democratised communication",
+              "loss of an idealistic vision",
               "gap between design intent and social outcome",
-              "nostalgia for an imagined early internet"
+              "who benefits from the architecture of the web"
             ],
-            "why_i_think_so": "The question 'what happened to the idea that the internet would bring people together' is a direct reckoning with the gap between the founding myth of the web and lived experience.",
+            "why_i_think_so": "The question 'what happened to the idea that the internet would bring people together' is a direct reckoning with the broken promise of early internet idealism.",
             "confidence": 0.9
-          },
-          {
-            "topic": "social media mental health research",
-            "concepts": [
-              "empirical psychology",
-              "causation vs. correlation",
-              "self-perception",
-              "anxiety and depression"
-            ],
-            "underneath": [
-              "desire for evidence not just feeling",
-              "personal experience seeking scientific validation"
-            ],
-            "why_i_think_so": "The user explicitly asks whether research exists on social media and mental health, suggesting they want to ground their personal experience in broader evidence.",
-            "confidence": 0.88
           }
         ],
         "picks": {
           "watch": [
             {
-              "title": "The Shining",
-              "type": "movie",
+              "title": "The Social Dilemma",
+              "type": "doc",
               "kind": "watch",
-              "year": "1980",
-              "url": "https://www.themoviedb.org/movie/694",
-              "reasoning": "Your questions about social media and loneliness keep landing on parasocial relationships; The Shining puts that idea on screen as fiction. It also speaks to something you didn't say out loud: technology overpromising human connection. Matched on: loneliness, isolation.",
-              "matched_topic": "social media and loneliness",
-              "concept": "parasocial relationships",
+              "year": "2020",
+              "url": "https://www.themoviedb.org/movie/656690",
+              "reasoning": "You've been asking about outrage and virality, and underneath it the idea of moral contagion. The Social Dilemma is the real-world story. It also speaks to something you didn't say out loud: attention as a commodity. Matched on: algorithm. Lesser-known, but well rated (7.5/10 from 1,866 votes).",
+              "matched_topic": "outrage and virality",
+              "concept": "moral contagion",
               "evidence": [
-                "loneliness",
-                "isolation"
+                "algorithm"
               ],
-              "relevance": 0.68
+              "relevance": 0.59,
+              "rating": 7.455,
+              "votes": 1866,
+              "gem": true
             },
             {
               "title": "Live Free or Die Hard",
@@ -2105,46 +2098,71 @@
               "kind": "watch",
               "year": "2007",
               "url": "https://www.themoviedb.org/movie/1571",
-              "reasoning": "Your questions about outrage and virality keep landing on moral contagion; Live Free or Die Hard puts that idea on screen as fiction. It also speaks to something you didn't say out loud: attention economy exploiting emotion. Matched on: algorithm.",
+              "reasoning": "Your questions about outrage and virality keep landing on moral contagion; Live Free or Die Hard puts that idea on screen as fiction. It also speaks to something you didn't say out loud: attention as a commodity. Matched on: algorithm.",
               "matched_topic": "outrage and virality",
               "concept": "moral contagion",
               "evidence": [
                 "algorithm"
               ],
-              "relevance": 0.59
+              "relevance": 0.59,
+              "rating": 6.644,
+              "votes": 6560,
+              "gem": false
             },
             {
-              "title": "The Social Dilemma",
-              "type": "doc",
+              "title": "Mr. Smith Goes to Washington",
+              "type": "movie",
               "kind": "watch",
-              "year": "2020",
-              "url": "https://www.themoviedb.org/movie/656690",
-              "reasoning": "You've been asking about outrage and virality, and underneath it the idea of moral contagion. The Social Dilemma is the real-world story. It also speaks to something you didn't say out loud: attention economy exploiting emotion. Matched on: algorithm.",
-              "matched_topic": "outrage and virality",
-              "concept": "moral contagion",
+              "year": "1939",
+              "url": "https://www.themoviedb.org/movie/3083",
+              "reasoning": "Your questions about internet utopia vs. reality keep landing on techno-utopianism; Mr. Smith Goes to Washington puts that idea on screen as fiction. It also speaks to something you didn't say out loud: loss of an idealistic vision. Matched on: disillusionment. Lesser-known, but well rated (7.8/10 from 1,239 votes).",
+              "matched_topic": "internet utopia vs. reality",
+              "concept": "techno-utopianism",
               "evidence": [
-                "algorithm"
+                "disillusionment"
               ],
-              "relevance": 0.59
+              "relevance": 0.58,
+              "rating": 7.8,
+              "votes": 1239,
+              "gem": true
             }
           ],
           "read": [
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
+              "title": "A Responsive Present, a Shared Past, a Social Other: Teens' Overreliance on Companion AI Chatbots",
               "type": "paper",
               "kind": "read",
               "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind parasocial relationships, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "url": "http://arxiv.org/abs/2609.14843v1",
+              "reasoning": "If you want the research behind social substitution, A Responsive Present, a Shared Past, a Social Other: Teens' Overreliance on Companion AI Chatbots is the academic angle.",
               "matched_topic": "social media and loneliness",
-              "concept": "parasocial relationships",
+              "concept": "social substitution",
               "evidence": [],
-              "relevance": 0.5
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
+            },
+            {
+              "title": "Motivation, Attention, and Visual Platform Design: How Moral Contagions Spread on TikTok and Instagram in the 2024 United States Presidential Election",
+              "type": "paper",
+              "kind": "read",
+              "year": "",
+              "url": "http://arxiv.org/abs/2602.02479v2",
+              "reasoning": "If you want the research behind moral contagion, Motivation, Attention, and Visual Platform Design: How Moral Contagions Spread on TikTok and Instagram in the 2024 United States Presidential Election is the academic angle.",
+              "matched_topic": "outrage and virality",
+              "concept": "moral contagion",
+              "evidence": [],
+              "relevance": 0.8,
+              "rating": null,
+              "votes": null,
+              "gem": false
             }
           ],
           "explore": []
         },
-        "spoken": "It sounds like you're circling social media and loneliness and outrage and virality. Underneath it, I hear technology overpromising human connection. To see it on screen, try The Shining. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling social media and loneliness and outrage and virality. Underneath it, I hear technology overpromising human connection. To see it on screen, try The Social Dilemma. And if you want the research, A Responsive Present, a Shared Past, a Social Other: Teens' Overreliance on Companion AI Chatbots.",
         "ask": "Is it social media and loneliness itself that's pulling you in, or the question of technology overpromising human connection?"
       }
     },
@@ -2299,26 +2317,34 @@
               "evidence": [
                 "simulation"
               ],
-              "relevance": 0.79
-            }
-          ],
-          "read": [
+              "relevance": 0.79,
+              "rating": 7.086,
+              "votes": 12417,
+              "gem": false
+            },
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
-              "type": "paper",
-              "kind": "read",
-              "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind simulation, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "title": "The Thirteenth Floor",
+              "type": "movie",
+              "kind": "watch",
+              "year": "1999",
+              "url": "https://www.themoviedb.org/movie/1090",
+              "reasoning": "You've been engaging with simulation; The Thirteenth Floor explores similar themes on screen. Matched on: simulation. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (7.1/10 from 1,645 votes).",
               "matched_topic": "simulation",
               "concept": "simulation",
-              "evidence": [],
-              "relevance": 0.5
+              "evidence": [
+                "simulation"
+              ],
+              "relevance": 0.79,
+              "rating": 7.079,
+              "votes": 1645,
+              "gem": true
             }
           ],
+          "read": [],
           "explore": []
         },
-        "spoken": "It sounds like you're circling simulation and hypothesis. To see it on screen, try The Matrix Reloaded. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling simulation and hypothesis. To see it on screen, try The Matrix Reloaded.",
         "ask": "Do you want to go deeper into simulation, or see where it shows up elsewhere?"
       }
     },
@@ -2348,16 +2374,16 @@
           "implicit_themes": [
             "limits of human knowledge",
             "whether reality requires a ground truth",
-            "technology as metaphor for existence"
+            "technology as cosmology"
           ],
           "keywords": [
             "simulation theory",
             "virtual reality",
-            "artificial reality",
             "consciousness",
-            "nested worlds"
+            "reality vs illusion",
+            "artificial universe"
           ],
-          "rationale": "The user asked for an explanation and immediately probed testability, showing they are engaging with the philosophical and scientific rigour of the hypothesis, not just the pop-science version.",
+          "rationale": "The user asked for an explanation and then immediately pushed toward testability and philosophical consequence, showing they want the hard epistemological core, not just the pop-science version.",
           "confidence": 0.92
         },
         {
@@ -2368,13 +2394,13 @@
           "concepts": [
             "statistical mechanics",
             "entropy",
-            "self-sampling assumption",
-            "observer selection effects"
+            "observer selection effects",
+            "cosmological fine-tuning"
           ],
           "implicit_themes": [
-            "randomness as a threat to meaning",
-            "whether consciousness can arise from chaos",
-            "cosmological fine-tuning"
+            "fragility of selfhood",
+            "randomness as an existential threat",
+            "whether the universe is fine-tuned for observers"
           ],
           "keywords": [
             "entropy",
@@ -2383,8 +2409,8 @@
             "observer paradox",
             "thermodynamics"
           ],
-          "rationale": "The user encountered the Boltzmann brain concept in the context of simulation/reality discussions, suggesting they are tracing the thread from computational to thermodynamic accounts of why anything exists at all.",
-          "confidence": 0.85
+          "rationale": "The user encountered the term in context of simulation/reality debates and asked about it, suggesting they are tracing the thread from simulation theory into deeper physics and philosophy of mind.",
+          "confidence": 0.82
         },
         {
           "topic": "does it matter if indistinguishable",
@@ -2392,22 +2418,22 @@
           "sentiment": "skeptical",
           "mentions": 1,
           "concepts": [
-            "pragmatism",
             "verificationism",
+            "pragmatism",
             "phenomenological equivalence",
-            "epistemic humility"
+            "moral realism under uncertainty"
           ],
           "implicit_themes": [
-            "the relationship between truth and lived experience",
-            "whether metaphysics has practical stakes"
+            "whether metaphysical truth has practical stakes",
+            "existential indifference vs existential anxiety"
           ],
           "keywords": [
             "philosophical skepticism",
             "perception vs reality",
             "existential stakes",
-            "solipsism"
+            "pragmatism"
           ],
-          "rationale": "The closing question \u2014 'if I can't tell the difference, does it matter?' \u2014 is a classic verificationist challenge, pointing to a deeper interest in whether unprovable truths have any bearing on how one should live.",
+          "rationale": "The closing question \u2014 'if I can't tell the difference, does it matter?' \u2014 is a classic verificationist challenge and signals the user is probing whether the hypothesis has any real-world weight.",
           "confidence": 0.88
         }
       ],
@@ -2425,9 +2451,9 @@
             "underneath": [
               "limits of human knowledge",
               "whether reality requires a ground truth",
-              "technology as metaphor for existence"
+              "technology as cosmology"
             ],
-            "why_i_think_so": "The user asked for an explanation and immediately probed testability, showing they are engaging with the philosophical and scientific rigour of the hypothesis, not just the pop-science version.",
+            "why_i_think_so": "The user asked for an explanation and then immediately pushed toward testability and philosophical consequence, showing they want the hard epistemological core, not just the pop-science version.",
             "confidence": 0.92
           },
           {
@@ -2435,95 +2461,59 @@
             "concepts": [
               "statistical mechanics",
               "entropy",
-              "self-sampling assumption",
-              "observer selection effects"
-            ],
-            "underneath": [
-              "randomness as a threat to meaning",
-              "whether consciousness can arise from chaos",
+              "observer selection effects",
               "cosmological fine-tuning"
             ],
-            "why_i_think_so": "The user encountered the Boltzmann brain concept in the context of simulation/reality discussions, suggesting they are tracing the thread from computational to thermodynamic accounts of why anything exists at all.",
-            "confidence": 0.85
+            "underneath": [
+              "fragility of selfhood",
+              "randomness as an existential threat",
+              "whether the universe is fine-tuned for observers"
+            ],
+            "why_i_think_so": "The user encountered the term in context of simulation/reality debates and asked about it, suggesting they are tracing the thread from simulation theory into deeper physics and philosophy of mind.",
+            "confidence": 0.82
           },
           {
             "topic": "does it matter if indistinguishable",
             "concepts": [
-              "pragmatism",
               "verificationism",
+              "pragmatism",
               "phenomenological equivalence",
-              "epistemic humility"
+              "moral realism under uncertainty"
             ],
             "underneath": [
-              "the relationship between truth and lived experience",
-              "whether metaphysics has practical stakes"
+              "whether metaphysical truth has practical stakes",
+              "existential indifference vs existential anxiety"
             ],
-            "why_i_think_so": "The closing question \u2014 'if I can't tell the difference, does it matter?' \u2014 is a classic verificationist challenge, pointing to a deeper interest in whether unprovable truths have any bearing on how one should live.",
+            "why_i_think_so": "The closing question \u2014 'if I can't tell the difference, does it matter?' \u2014 is a classic verificationist challenge and signals the user is probing whether the hypothesis has any real-world weight.",
             "confidence": 0.88
           }
         ],
         "picks": {
           "watch": [
             {
-              "title": "Mr. Nobody",
+              "title": "World of Tomorrow",
               "type": "movie",
               "kind": "watch",
-              "year": "2009",
-              "url": "https://www.themoviedb.org/movie/31011",
-              "reasoning": "Your questions about boltzmann brain problem keep landing on statistical mechanics; Mr. Nobody puts that idea on screen as fiction. It also speaks to something you didn't say out loud: randomness as a threat to meaning. Matched on: entropy.",
-              "matched_topic": "boltzmann brain problem",
-              "concept": "statistical mechanics",
-              "evidence": [
-                "entropy"
-              ],
-              "relevance": 0.67
-            },
-            {
-              "title": "Voyage of Time: Life's Journey",
-              "type": "doc",
-              "kind": "watch",
-              "year": "2017",
-              "url": "https://www.themoviedb.org/movie/86822",
-              "reasoning": "You've been asking about boltzmann brain problem, and underneath it the idea of statistical mechanics. Voyage of Time: Life's Journey is the real-world story. It also speaks to something you didn't say out loud: randomness as a threat to meaning. Matched on: cosmology.",
-              "matched_topic": "boltzmann brain problem",
-              "concept": "statistical mechanics",
-              "evidence": [
-                "cosmology"
-              ],
-              "relevance": 0.67
-            },
-            {
-              "title": "Ready Player One",
-              "type": "movie",
-              "kind": "watch",
-              "year": "2018",
-              "url": "https://www.themoviedb.org/movie/333339",
-              "reasoning": "Your questions about simulation hypothesis keep landing on computational ontology; Ready Player One puts that idea on screen as fiction. It also speaks to something you didn't say out loud: limits of human knowledge. Matched on: virtual reality. Since you're going deep on this, there's a paper that pairs with it.",
+              "year": "2015",
+              "url": "https://www.themoviedb.org/movie/303867",
+              "reasoning": "Your questions about simulation hypothesis keep landing on computational ontology; World of Tomorrow puts that idea on screen as fiction. It also speaks to something you didn't say out loud: limits of human knowledge. Matched on: virtual reality, consciousness. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (7.8/10 from 377 votes).",
               "matched_topic": "simulation hypothesis",
               "concept": "computational ontology",
               "evidence": [
-                "virtual reality"
+                "virtual reality",
+                "consciousness"
               ],
-              "relevance": 0.59
+              "relevance": 0.68,
+              "rating": 7.802,
+              "votes": 377,
+              "gem": true
             }
           ],
-          "read": [
-            {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
-              "type": "paper",
-              "kind": "read",
-              "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind computational ontology, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
-              "matched_topic": "simulation hypothesis",
-              "concept": "computational ontology",
-              "evidence": [],
-              "relevance": 0.5
-            }
-          ],
+          "read": [],
           "explore": []
         },
-        "spoken": "It sounds like you're circling simulation hypothesis and boltzmann brain problem. Underneath it, I hear limits of human knowledge. To see it on screen, try Mr. Nobody. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling simulation hypothesis and boltzmann brain problem. Underneath it, I hear limits of human knowledge. To see it on screen, try World of Tomorrow.",
         "ask": "Is it simulation hypothesis itself that's pulling you in, or the question of limits of human knowledge?"
       }
     },
@@ -2666,23 +2656,11 @@
         ],
         "picks": {
           "watch": [],
-          "read": [
-            {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
-              "type": "paper",
-              "kind": "read",
-              "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind data, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
-              "matched_topic": "data",
-              "concept": "data",
-              "evidence": [],
-              "relevance": 0.5
-            }
-          ],
+          "read": [],
           "explore": []
         },
-        "spoken": "It sounds like you're circling data and companies. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "No catalog results right now (catalogs unavailable or no keys set), so I'm not guessing.",
+        "spoken": "It sounds like you're circling data and companies.",
         "ask": "Do you want to go deeper into data, or see where it shows up elsewhere?"
       }
     },
@@ -2704,9 +2682,9 @@
           "sentiment": "curious",
           "mentions": 1,
           "concepts": [
+            "surveillance capitalism",
             "data commodification",
             "information asymmetry",
-            "surveillance capitalism",
             "consent and autonomy"
           ],
           "implicit_themes": [
@@ -2715,13 +2693,13 @@
             "transactional identity"
           ],
           "keywords": [
+            "surveillance capitalism",
             "data privacy",
-            "corporate surveillance",
-            "personal data",
-            "digital tracking",
-            "consumer profiling"
+            "corporate tracking",
+            "digital identity",
+            "personal data"
           ],
-          "rationale": "The user is asking what companies specifically collect, pointing to a concern about the scope and opacity of data harvesting \u2014 the core tension is between convenience and the commodification of personal identity.",
+          "rationale": "The user's direct question about what companies collect signals concern about the scale and opacity of commercial surveillance and who profits from personal data.",
           "confidence": 0.88
         },
         {
@@ -2731,75 +2709,75 @@
           "mentions": 1,
           "concepts": [
             "algorithmic governance",
-            "pre-crime logic",
             "biometric surveillance",
+            "pre-crime logic",
             "racial bias in ai"
           ],
           "implicit_themes": [
-            "state power over bodies",
-            "technology outpacing law",
-            "who watches the watchers"
+            "erosion of presumption of innocence",
+            "automated authority",
+            "public space as monitored space"
           ],
           "keywords": [
             "facial recognition",
             "predictive policing",
             "algorithmic bias",
-            "state surveillance",
-            "smart city"
+            "smart city",
+            "law enforcement ai"
           ],
-          "rationale": "Reading about facial recognition and predictive policing in cities signals engagement with how surveillance technologies are being institutionalised by governments, raising questions about civil liberties and systemic bias.",
-          "confidence": 0.91
+          "rationale": "Reading about predictive policing and facial recognition in cities points to deep interest in how automated systems are reshaping state power and civil liberties in public life.",
+          "confidence": 0.9
         },
         {
-          "topic": "is privacy dead or changing",
-          "depth": "deep",
+          "topic": "is privacy dead",
+          "depth": "casual",
           "sentiment": "skeptical",
           "mentions": 1,
           "concepts": [
             "contextual integrity",
             "privacy as a social norm",
-            "normative shift",
-            "panopticism"
+            "panopticism",
+            "the right to be forgotten"
           ],
           "implicit_themes": [
-            "generational acceptance of surveillance",
+            "generational shift in expectations",
             "resignation vs. resistance",
-            "redefining the private self"
+            "privacy as precondition for freedom"
           ],
           "keywords": [
-            "privacy erosion",
-            "social norms",
+            "privacy rights",
             "digital age",
-            "panopticon",
-            "surveillance society"
+            "surveillance society",
+            "civil liberties",
+            "social norms"
           ],
-          "rationale": "Framing privacy as 'dead or just changing' reveals a deeper philosophical question about whether privacy is an inherent right or a historically contingent norm \u2014 the tension between fatalism and agency.",
+          "rationale": "Framing privacy as either 'dead or just changing' reveals a philosophical tension between fatalism and adaptation, pointing to deeper questions about whether privacy is a right or merely a preference.",
           "confidence": 0.85
         },
         {
           "topic": "chilling effect of being watched",
           "depth": "deep",
-          "sentiment": "curious",
+          "sentiment": "engaged",
           "mentions": 1,
           "concepts": [
-            "behavioural self-censorship",
-            "panopticon effect",
-            "freedom of thought under observation",
-            "psychological cost of surveillance"
+            "the panopticon",
+            "self-censorship",
+            "behavioural conformity under observation",
+            "freedom of thought"
           ],
           "implicit_themes": [
-            "internalized control",
-            "conformity pressure",
-            "erosion of authentic self-expression"
+            "internalized surveillance",
+            "suppression of dissent",
+            "psychological cost of visibility"
           ],
           "keywords": [
-            "chilling effect",
+            "panopticon",
             "self-censorship",
             "mass surveillance",
             "psychological control",
-            "freedom of expression"
+            "watched society"
           ],
-          "rationale": "Asking specifically about the 'chilling effect' shows the user is thinking beyond data collection into the psychological and social consequences of surveillance \u2014 how being watched changes behaviour even without direct punishment.",
+          "rationale": "Asking specifically about the chilling effect shows the user is thinking beyond data collection toward the psychological and political consequences of surveillance on behaviour and free expression.",
           "confidence": 0.93
         }
       ],
@@ -2809,9 +2787,9 @@
           {
             "topic": "corporate data collection",
             "concepts": [
+              "surveillance capitalism",
               "data commodification",
               "information asymmetry",
-              "surveillance capitalism",
               "consent and autonomy"
             ],
             "underneath": [
@@ -2819,92 +2797,83 @@
               "invisible power structures",
               "transactional identity"
             ],
-            "why_i_think_so": "The user is asking what companies specifically collect, pointing to a concern about the scope and opacity of data harvesting \u2014 the core tension is between convenience and the commodification of personal identity.",
+            "why_i_think_so": "The user's direct question about what companies collect signals concern about the scale and opacity of commercial surveillance and who profits from personal data.",
             "confidence": 0.88
           },
           {
             "topic": "predictive policing and facial recognition",
             "concepts": [
               "algorithmic governance",
-              "pre-crime logic",
               "biometric surveillance",
+              "pre-crime logic",
               "racial bias in ai"
             ],
             "underneath": [
-              "state power over bodies",
-              "technology outpacing law",
-              "who watches the watchers"
+              "erosion of presumption of innocence",
+              "automated authority",
+              "public space as monitored space"
             ],
-            "why_i_think_so": "Reading about facial recognition and predictive policing in cities signals engagement with how surveillance technologies are being institutionalised by governments, raising questions about civil liberties and systemic bias.",
-            "confidence": 0.91
+            "why_i_think_so": "Reading about predictive policing and facial recognition in cities points to deep interest in how automated systems are reshaping state power and civil liberties in public life.",
+            "confidence": 0.9
           },
           {
-            "topic": "is privacy dead or changing",
+            "topic": "is privacy dead",
             "concepts": [
               "contextual integrity",
               "privacy as a social norm",
-              "normative shift",
-              "panopticism"
+              "panopticism",
+              "the right to be forgotten"
             ],
             "underneath": [
-              "generational acceptance of surveillance",
+              "generational shift in expectations",
               "resignation vs. resistance",
-              "redefining the private self"
+              "privacy as precondition for freedom"
             ],
-            "why_i_think_so": "Framing privacy as 'dead or just changing' reveals a deeper philosophical question about whether privacy is an inherent right or a historically contingent norm \u2014 the tension between fatalism and agency.",
+            "why_i_think_so": "Framing privacy as either 'dead or just changing' reveals a philosophical tension between fatalism and adaptation, pointing to deeper questions about whether privacy is a right or merely a preference.",
             "confidence": 0.85
           },
           {
             "topic": "chilling effect of being watched",
             "concepts": [
-              "behavioural self-censorship",
-              "panopticon effect",
-              "freedom of thought under observation",
-              "psychological cost of surveillance"
+              "the panopticon",
+              "self-censorship",
+              "behavioural conformity under observation",
+              "freedom of thought"
             ],
             "underneath": [
-              "internalized control",
-              "conformity pressure",
-              "erosion of authentic self-expression"
+              "internalized surveillance",
+              "suppression of dissent",
+              "psychological cost of visibility"
             ],
-            "why_i_think_so": "Asking specifically about the 'chilling effect' shows the user is thinking beyond data collection into the psychological and social consequences of surveillance \u2014 how being watched changes behaviour even without direct punishment.",
+            "why_i_think_so": "Asking specifically about the chilling effect shows the user is thinking beyond data collection toward the psychological and political consequences of surveillance on behaviour and free expression.",
             "confidence": 0.93
           }
         ],
         "picks": {
           "watch": [
             {
-              "title": "The Internship",
+              "title": "The Attorney",
               "type": "movie",
               "kind": "watch",
               "year": "2013",
-              "url": "https://www.themoviedb.org/movie/116741",
-              "reasoning": "Your questions about is privacy dead or changing keep landing on contextual integrity; The Internship puts that idea on screen as fiction. It also speaks to something you didn't say out loud: generational acceptance of surveillance. Matched on: digital age. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "is privacy dead or changing",
+              "url": "https://www.themoviedb.org/movie/242452",
+              "reasoning": "Your questions about is privacy dead keep landing on contextual integrity; The Attorney puts that idea on screen as fiction. It also speaks to something you didn't say out loud: generational shift in expectations. Matched on: civil liberties. Lesser-known, but well rated (7.8/10 from 234 votes).",
+              "matched_topic": "is privacy dead",
               "concept": "contextual integrity",
               "evidence": [
-                "digital age"
+                "civil liberties"
               ],
-              "relevance": 0.57
+              "relevance": 0.57,
+              "rating": 7.799,
+              "votes": 234,
+              "gem": true
             }
           ],
-          "read": [
-            {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
-              "type": "paper",
-              "kind": "read",
-              "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind data commodification, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
-              "matched_topic": "corporate data collection",
-              "concept": "data commodification",
-              "evidence": [],
-              "relevance": 0.5
-            }
-          ],
+          "read": [],
           "explore": []
         },
-        "spoken": "It sounds like you're circling corporate data collection and predictive policing and facial recognition. Underneath it, I hear loss of control over personal narrative. To see it on screen, try The Internship. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling corporate data collection and predictive policing and facial recognition. Underneath it, I hear loss of control over personal narrative. To see it on screen, try The Attorney.",
         "ask": "Is it corporate data collection itself that's pulling you in, or the question of loss of control over personal narrative?"
       }
     },
@@ -3048,18 +3017,21 @@
         "picks": {
           "watch": [
             {
-              "title": "127 Hours",
+              "title": "Mirror",
               "type": "movie",
               "kind": "watch",
-              "year": "2010",
-              "url": "https://www.themoviedb.org/movie/44115",
-              "reasoning": "You've been engaging with memories; 127 Hours explores similar themes on screen. Matched on: memories. Since you're going deep on this, there's a paper that pairs with it.",
+              "year": "1975",
+              "url": "https://www.themoviedb.org/movie/1396",
+              "reasoning": "You've been engaging with memories; Mirror explores similar themes on screen. Matched on: memories. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (7.9/10 from 1,140 votes).",
               "matched_topic": "memories",
               "concept": "memories",
               "evidence": [
                 "memories"
               ],
-              "relevance": 0.79
+              "relevance": 0.79,
+              "rating": 7.932,
+              "votes": 1140,
+              "gem": true
             },
             {
               "title": "Flee",
@@ -3067,32 +3039,23 @@
               "kind": "watch",
               "year": "2021",
               "url": "https://www.themoviedb.org/movie/680813",
-              "reasoning": "Given your interest in memories, Flee covers the real-world story behind it. Matched on: memories. Since you're going deep on this, there's a paper that pairs with it.",
+              "reasoning": "Given your interest in memories, Flee covers the real-world story behind it. Matched on: memories. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (7.7/10 from 420 votes).",
               "matched_topic": "memories",
               "concept": "memories",
               "evidence": [
                 "memories"
               ],
-              "relevance": 0.79
+              "relevance": 0.79,
+              "rating": 7.7,
+              "votes": 420,
+              "gem": true
             }
           ],
-          "read": [
-            {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
-              "type": "paper",
-              "kind": "read",
-              "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind memories, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
-              "matched_topic": "memories",
-              "concept": "memories",
-              "evidence": [],
-              "relevance": 0.5
-            }
-          ],
+          "read": [],
           "explore": []
         },
-        "spoken": "It sounds like you're circling memories and brain. To see it on screen, try 127 Hours. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling memories and brain. To see it on screen, try Mirror.",
         "ask": "Do you want to go deeper into memories, or see where it shows up elsewhere?"
       }
     },
@@ -3120,18 +3083,18 @@
             "neural encoding"
           ],
           "implicit_themes": [
-            "impermanence of identity",
+            "impermanence of self",
             "what survives death",
-            "the self as a biological construct"
+            "the brain as keeper of the dead"
           ],
           "keywords": [
-            "memory loss",
+            "memory",
             "neuroscience",
-            "the brain",
             "grief",
-            "consciousness"
+            "the brain",
+            "loss"
           ],
-          "rationale": "The question about storing memories of deceased people and dementia points to deep curiosity about the biological substrate of identity and what it means when those traces degrade or disappear.",
+          "rationale": "The question about storing memories of deceased people points beyond neuroscience to the emotional weight of how the living carry the dead \u2014 consolidation and decay are the scientific frame, but impermanence and grief are the real stakes.",
           "confidence": 0.88
         },
         {
@@ -3146,18 +3109,19 @@
             "hippocampal vulnerability"
           ],
           "implicit_themes": [
-            "loss of personhood",
-            "caregiver grief",
-            "identity erosion over time"
+            "identity erosion",
+            "personhood under cognitive decline",
+            "caregiver grief"
           ],
           "keywords": [
             "dementia",
             "alzheimers",
-            "memory decay",
+            "memory loss",
+            "identity",
             "aging",
-            "family loss"
+            "family"
           ],
-          "rationale": "The personal reference to a grandmother with dementia suggests this is not purely academic \u2014 the question of why some memories survive implies a search for meaning in a loved one's decline.",
+          "rationale": "The personal reference to a grandmother with dementia and the question of why some memories survive suggests both a scientific curiosity and a lived emotional experience of watching a person's self fragment.",
           "confidence": 0.92
         },
         {
@@ -3166,24 +3130,24 @@
           "sentiment": "curious",
           "mentions": 1,
           "concepts": [
-            "memory malleability",
-            "false memory syndrome",
             "reconsolidation",
-            "neurological intervention"
+            "false memory",
+            "neuroplasticity",
+            "epistemic reliability of self-knowledge"
           ],
           "implicit_themes": [
             "authenticity of the self",
             "manipulation and consent",
-            "the reliability of personal narrative"
+            "the constructed nature of identity"
           ],
           "keywords": [
             "false memory",
             "memory implant",
-            "mind control",
             "reconsolidation",
-            "trauma"
+            "mind control",
+            "identity manipulation"
           ],
-          "rationale": "Asking whether memories can be edited or implanted signals interest in the constructed \u2014 rather than recorded \u2014 nature of memory, with implicit stakes around identity and truth.",
+          "rationale": "Interest in whether memories can be edited or implanted raises deep questions about whether the self is a reliable narrator of its own past, and who has the right to alter it.",
           "confidence": 0.85
         },
         {
@@ -3194,22 +3158,22 @@
           "concepts": [
             "memory reconsolidation",
             "constructive memory",
-            "the act of recall as rewriting",
-            "epistemic unreliability"
+            "narrative self",
+            "unreliable recall"
           ],
           "implicit_themes": [
-            "unreliable self-knowledge",
-            "the past as a living fiction",
-            "truth vs narrative"
+            "truth vs. lived experience",
+            "the self as ongoing fiction",
+            "vulnerability of personal history"
           ],
           "keywords": [
             "unreliable memory",
             "reconsolidation",
-            "subjective truth",
-            "perception",
-            "self-deception"
+            "constructed narrative",
+            "self-deception",
+            "subjective truth"
           ],
-          "rationale": "Reading about how recall alters the memory itself reflects engagement with the philosophical implication that there is no fixed past \u2014 only an ever-revised story, which connects to themes of identity and narrative.",
+          "rationale": "Reading about how the act of recall alters the memory itself implies an interest in the instability of personal truth and the paradox that remembering is also a form of forgetting or rewriting.",
           "confidence": 0.9
         }
       ],
@@ -3225,11 +3189,11 @@
               "neural encoding"
             ],
             "underneath": [
-              "impermanence of identity",
+              "impermanence of self",
               "what survives death",
-              "the self as a biological construct"
+              "the brain as keeper of the dead"
             ],
-            "why_i_think_so": "The question about storing memories of deceased people and dementia points to deep curiosity about the biological substrate of identity and what it means when those traces degrade or disappear.",
+            "why_i_think_so": "The question about storing memories of deceased people points beyond neuroscience to the emotional weight of how the living carry the dead \u2014 consolidation and decay are the scientific frame, but impermanence and grief are the real stakes.",
             "confidence": 0.88
           },
           {
@@ -3241,27 +3205,27 @@
               "hippocampal vulnerability"
             ],
             "underneath": [
-              "loss of personhood",
-              "caregiver grief",
-              "identity erosion over time"
+              "identity erosion",
+              "personhood under cognitive decline",
+              "caregiver grief"
             ],
-            "why_i_think_so": "The personal reference to a grandmother with dementia suggests this is not purely academic \u2014 the question of why some memories survive implies a search for meaning in a loved one's decline.",
+            "why_i_think_so": "The personal reference to a grandmother with dementia and the question of why some memories survive suggests both a scientific curiosity and a lived emotional experience of watching a person's self fragment.",
             "confidence": 0.92
           },
           {
             "topic": "memory editing and implantation",
             "concepts": [
-              "memory malleability",
-              "false memory syndrome",
               "reconsolidation",
-              "neurological intervention"
+              "false memory",
+              "neuroplasticity",
+              "epistemic reliability of self-knowledge"
             ],
             "underneath": [
               "authenticity of the self",
               "manipulation and consent",
-              "the reliability of personal narrative"
+              "the constructed nature of identity"
             ],
-            "why_i_think_so": "Asking whether memories can be edited or implanted signals interest in the constructed \u2014 rather than recorded \u2014 nature of memory, with implicit stakes around identity and truth.",
+            "why_i_think_so": "Interest in whether memories can be edited or implanted raises deep questions about whether the self is a reliable narrator of its own past, and who has the right to alter it.",
             "confidence": 0.85
           },
           {
@@ -3269,83 +3233,62 @@
             "concepts": [
               "memory reconsolidation",
               "constructive memory",
-              "the act of recall as rewriting",
-              "epistemic unreliability"
+              "narrative self",
+              "unreliable recall"
             ],
             "underneath": [
-              "unreliable self-knowledge",
-              "the past as a living fiction",
-              "truth vs narrative"
+              "truth vs. lived experience",
+              "the self as ongoing fiction",
+              "vulnerability of personal history"
             ],
-            "why_i_think_so": "Reading about how recall alters the memory itself reflects engagement with the philosophical implication that there is no fixed past \u2014 only an ever-revised story, which connects to themes of identity and narrative.",
+            "why_i_think_so": "Reading about how the act of recall alters the memory itself implies an interest in the instability of personal truth and the paradox that remembering is also a form of forgetting or rewriting.",
             "confidence": 0.9
           }
         ],
         "picks": {
           "watch": [
             {
-              "title": "Nebraska",
+              "title": "Manchester by the Sea",
               "type": "movie",
               "kind": "watch",
-              "year": "2013",
-              "url": "https://www.themoviedb.org/movie/129670",
-              "reasoning": "Your questions about dementia and selective memory loss keep landing on neurodegeneration; Nebraska puts that idea on screen as fiction. It also speaks to something you didn't say out loud: loss of personhood. Matched on: dementia, aging. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "dementia and selective memory loss",
-              "concept": "neurodegeneration",
-              "evidence": [
-                "dementia",
-                "aging"
-              ],
-              "relevance": 0.68
-            },
-            {
-              "title": "Annihilation",
-              "type": "movie",
-              "kind": "watch",
-              "year": "2018",
-              "url": "https://www.themoviedb.org/movie/300668",
-              "reasoning": "Your questions about how memory storage works keep landing on synaptic consolidation; Annihilation puts that idea on screen as fiction. It also speaks to something you didn't say out loud: impermanence of identity. Matched on: memory loss, grief. Since you're going deep on this, there's a paper that pairs with it.",
+              "year": "2016",
+              "url": "https://www.themoviedb.org/movie/334541",
+              "reasoning": "Your questions about how memory storage works keep landing on synaptic consolidation; Manchester by the Sea puts that idea on screen as fiction. It also speaks to something you didn't say out loud: impermanence of self. Matched on: grief, loss. Since you're going deep on this, there's a paper that pairs with it.",
               "matched_topic": "how memory storage works",
               "concept": "synaptic consolidation",
               "evidence": [
-                "memory loss",
-                "grief"
+                "grief",
+                "loss"
               ],
-              "relevance": 0.68
+              "relevance": 0.68,
+              "rating": 7.5,
+              "votes": 6611,
+              "gem": false
             },
             {
-              "title": "Restrepo",
+              "title": "One More Time with Feeling",
               "type": "doc",
               "kind": "watch",
-              "year": "2010",
-              "url": "https://www.themoviedb.org/movie/39312",
-              "reasoning": "You've been asking about how memory storage works, and underneath it the idea of synaptic consolidation. Restrepo is the real-world story. It also speaks to something you didn't say out loud: impermanence of identity. Matched on: grief. Since you're going deep on this, there's a paper that pairs with it.",
+              "year": "2016",
+              "url": "https://www.themoviedb.org/movie/404141",
+              "reasoning": "You've been asking about how memory storage works, and underneath it the idea of synaptic consolidation. One More Time with Feeling is the real-world story. It also speaks to something you didn't say out loud: impermanence of self. Matched on: grief. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (7.8/10 from 109 votes).",
               "matched_topic": "how memory storage works",
               "concept": "synaptic consolidation",
               "evidence": [
                 "grief"
               ],
-              "relevance": 0.53
+              "relevance": 0.53,
+              "rating": 7.849,
+              "votes": 109,
+              "gem": true
             }
           ],
-          "read": [
-            {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
-              "type": "paper",
-              "kind": "read",
-              "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind synaptic consolidation, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
-              "matched_topic": "how memory storage works",
-              "concept": "synaptic consolidation",
-              "evidence": [],
-              "relevance": 0.5
-            }
-          ],
+          "read": [],
           "explore": []
         },
-        "spoken": "It sounds like you're circling how memory storage works and dementia and selective memory loss. Underneath it, I hear impermanence of identity. To see it on screen, try Nebraska. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
-        "ask": "Is it how memory storage works itself that's pulling you in, or the question of impermanence of identity?"
+        "note": "",
+        "spoken": "It sounds like you're circling how memory storage works and dementia and selective memory loss. Underneath it, I hear impermanence of self. To see it on screen, try Manchester by the Sea.",
+        "ask": "Is it how memory storage works itself that's pulling you in, or the question of impermanence of self?"
       }
     },
     {
@@ -3488,65 +3431,62 @@
         "picks": {
           "watch": [
             {
-              "title": "Cars",
+              "title": "Along with the Gods: The Two Worlds",
               "type": "movie",
               "kind": "watch",
-              "year": "2006",
-              "url": "https://www.themoviedb.org/movie/920",
-              "reasoning": "You've been engaging with success; Cars explores similar themes on screen. Matched on: success. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "success",
-              "concept": "success",
-              "evidence": [
-                "success"
-              ],
-              "relevance": 0.79
-            },
-            {
-              "title": "Gods of Egypt",
-              "type": "movie",
-              "kind": "watch",
-              "year": "2016",
-              "url": "https://www.themoviedb.org/movie/205584",
-              "reasoning": "You've been engaging with myth; Gods of Egypt explores similar themes on screen. Matched on: myth. Since you're going deep on this, there's a paper that pairs with it.",
+              "year": "2017",
+              "url": "https://www.themoviedb.org/movie/397567",
+              "reasoning": "You've been engaging with myth; Along with the Gods: The Two Worlds explores similar themes on screen. Matched on: myth. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (8.1/10 from 1,276 votes).",
               "matched_topic": "myth",
               "concept": "myth",
               "evidence": [
                 "myth"
               ],
-              "relevance": 0.79
+              "relevance": 0.79,
+              "rating": 8.1,
+              "votes": 1276,
+              "gem": true
             },
             {
-              "title": "The Thinning",
+              "title": "Chaplin",
               "type": "movie",
               "kind": "watch",
-              "year": "2016",
-              "url": "https://www.themoviedb.org/movie/419639",
-              "reasoning": "You've been engaging with meritocracy; The Thinning explores similar themes on screen. Matched on: meritocracy. Since you're going deep on this, there's a paper that pairs with it.",
-              "matched_topic": "meritocracy",
-              "concept": "meritocracy",
+              "year": "1992",
+              "url": "https://www.themoviedb.org/movie/10435",
+              "reasoning": "You've been engaging with success; Chaplin explores similar themes on screen. Matched on: success. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (7.4/10 from 1,256 votes).",
+              "matched_topic": "success",
+              "concept": "success",
               "evidence": [
-                "meritocracy"
+                "success"
               ],
-              "relevance": 0.79
-            }
-          ],
-          "read": [
+              "relevance": 0.79,
+              "rating": 7.408,
+              "votes": 1256,
+              "gem": true
+            },
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
-              "type": "paper",
-              "kind": "read",
-              "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind meritocracy, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
-              "matched_topic": "meritocracy",
-              "concept": "meritocracy",
-              "evidence": [],
-              "relevance": 0.5
+              "title": "Spellbound",
+              "type": "doc",
+              "kind": "watch",
+              "year": "2002",
+              "url": "https://www.themoviedb.org/movie/16636",
+              "reasoning": "Given your interest in success, Spellbound covers the real-world story behind it. Matched on: success. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (7.3/10 from 125 votes).",
+              "matched_topic": "success",
+              "concept": "success",
+              "evidence": [
+                "success"
+              ],
+              "relevance": 0.79,
+              "rating": 7.3,
+              "votes": 125,
+              "gem": true
             }
           ],
+          "read": [],
           "explore": []
         },
-        "spoken": "It sounds like you're circling meritocracy and myth. To see it on screen, try Cars. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling meritocracy and myth. To see it on screen, try Along with the Gods: The Two Worlds.",
         "ask": "Do you want to go deeper into meritocracy, or see where it shows up elsewhere?"
       }
     },
@@ -3569,25 +3509,24 @@
           "mentions": 1,
           "concepts": [
             "meritocracy",
-            "social determinism",
-            "legitimation of inequality",
-            "just-world hypothesis"
+            "structural inequality",
+            "just-world fallacy",
+            "legitimation of hierarchy"
           ],
           "implicit_themes": [
-            "disillusionment with fairness narratives",
-            "questioning self-made success stories",
-            "structural vs individual agency"
+            "disillusionment with social narratives",
+            "questioning fairness of outcomes",
+            "systemic vs individual agency"
           ],
           "keywords": [
             "class system",
             "wealth inequality",
-            "social mobility",
+            "social hierarchy",
             "american dream",
-            "privilege",
-            "rags to riches"
+            "privilege"
           ],
-          "rationale": "The direct question 'is meritocracy a myth?' signals a challenge to the ideological claim that outcomes reflect desert, pointing to legitimation of inequality as the core concept.",
-          "confidence": 0.95
+          "rationale": "Directly asking whether meritocracy is a myth signals scrutiny of the ideological function of meritocracy \u2014 not just curiosity about success, but about whether the rules of the game are fair.",
+          "confidence": 0.92
         },
         {
           "topic": "luck versus effort in success",
@@ -3597,23 +3536,23 @@
           "concepts": [
             "counterfactual causation",
             "survivorship bias",
-            "stochastic advantage",
+            "stochastic outcomes",
             "attribution error"
           ],
           "implicit_themes": [
             "anxiety about personal agency",
-            "randomness undermining moral narratives",
-            "how societies assign credit and blame"
+            "randomness vs narrative of control",
+            "self-justification of winners"
           ],
           "keywords": [
-            "chance and fate",
+            "luck",
+            "talent vs circumstance",
             "survivorship bias",
-            "self-made myth",
-            "randomness",
-            "talent vs circumstance"
+            "random chance",
+            "success stories"
           ],
-          "rationale": "The luck-vs-effort framing reveals an interest in whether individual agency is the true driver of outcomes or whether random and structural forces dominate, touching on attribution error and survivorship bias.",
-          "confidence": 0.92
+          "rationale": "The luck-vs-effort framing points to deep questions about causation and attribution \u2014 whether success stories are genuinely instructive or just noise mistaken for signal.",
+          "confidence": 0.88
         },
         {
           "topic": "inherited advantage and wealth inequality",
@@ -3624,22 +3563,22 @@
             "intergenerational wealth transfer",
             "capital accumulation",
             "positional goods",
-            "dynastic inequality"
+            "opportunity hoarding"
           ],
           "implicit_themes": [
-            "fairness across generations",
-            "invisible head-starts",
-            "compounding advantage over time"
+            "resentment of unearned privilege",
+            "visibility of class in everyday life",
+            "moral legitimacy of inheritance"
           ],
           "keywords": [
             "inherited wealth",
-            "dynastic privilege",
-            "class reproduction",
-            "intergenerational inequality",
+            "class mobility",
+            "generational privilege",
+            "wealth gap",
             "old money"
           ],
-          "rationale": "Repeated exposure to threads about inherited advantage points to concern with how wealth and opportunity compound across generations, making dynastic inequality and capital accumulation the operative concepts.",
-          "confidence": 0.88
+          "rationale": "Repeated exposure to threads on inherited advantage suggests engagement with how wealth reproduces itself across generations, beyond individual merit or effort.",
+          "confidence": 0.85
         },
         {
           "topic": "social mobility across countries",
@@ -3648,24 +3587,23 @@
           "mentions": 1,
           "concepts": [
             "intergenerational income elasticity",
-            "comparative welfare states",
-            "opportunity hoarding",
-            "great gatsby curve"
+            "relative vs absolute mobility",
+            "welfare state design",
+            "equality of opportunity"
           ],
           "implicit_themes": [
-            "whether the system can be fixed",
+            "comparative disenchantment with one's own society",
             "policy as lever for fairness",
-            "national identity tied to mobility myths"
+            "the gap between national myth and data"
           ],
           "keywords": [
             "social mobility",
-            "welfare state",
+            "class ceiling",
+            "nordic model",
             "income inequality",
-            "comparative society",
-            "economic ladder",
-            "policy reform"
+            "comparative sociology"
           ],
-          "rationale": "The research-oriented question about cross-country mobility data signals engagement with empirical social science and implicitly asks whether institutional design can counteract structural disadvantage.",
+          "rationale": "Asking what research says about mobility across countries implies a data-driven, comparative mindset \u2014 looking for evidence that some societies genuinely do better, and why.",
           "confidence": 0.9
         }
       ],
@@ -3676,33 +3614,33 @@
             "topic": "meritocracy as myth",
             "concepts": [
               "meritocracy",
-              "social determinism",
-              "legitimation of inequality",
-              "just-world hypothesis"
+              "structural inequality",
+              "just-world fallacy",
+              "legitimation of hierarchy"
             ],
             "underneath": [
-              "disillusionment with fairness narratives",
-              "questioning self-made success stories",
-              "structural vs individual agency"
+              "disillusionment with social narratives",
+              "questioning fairness of outcomes",
+              "systemic vs individual agency"
             ],
-            "why_i_think_so": "The direct question 'is meritocracy a myth?' signals a challenge to the ideological claim that outcomes reflect desert, pointing to legitimation of inequality as the core concept.",
-            "confidence": 0.95
+            "why_i_think_so": "Directly asking whether meritocracy is a myth signals scrutiny of the ideological function of meritocracy \u2014 not just curiosity about success, but about whether the rules of the game are fair.",
+            "confidence": 0.92
           },
           {
             "topic": "luck versus effort in success",
             "concepts": [
               "counterfactual causation",
               "survivorship bias",
-              "stochastic advantage",
+              "stochastic outcomes",
               "attribution error"
             ],
             "underneath": [
               "anxiety about personal agency",
-              "randomness undermining moral narratives",
-              "how societies assign credit and blame"
+              "randomness vs narrative of control",
+              "self-justification of winners"
             ],
-            "why_i_think_so": "The luck-vs-effort framing reveals an interest in whether individual agency is the true driver of outcomes or whether random and structural forces dominate, touching on attribution error and survivorship bias.",
-            "confidence": 0.92
+            "why_i_think_so": "The luck-vs-effort framing points to deep questions about causation and attribution \u2014 whether success stories are genuinely instructive or just noise mistaken for signal.",
+            "confidence": 0.88
           },
           {
             "topic": "inherited advantage and wealth inequality",
@@ -3710,62 +3648,68 @@
               "intergenerational wealth transfer",
               "capital accumulation",
               "positional goods",
-              "dynastic inequality"
+              "opportunity hoarding"
             ],
             "underneath": [
-              "fairness across generations",
-              "invisible head-starts",
-              "compounding advantage over time"
+              "resentment of unearned privilege",
+              "visibility of class in everyday life",
+              "moral legitimacy of inheritance"
             ],
-            "why_i_think_so": "Repeated exposure to threads about inherited advantage points to concern with how wealth and opportunity compound across generations, making dynastic inequality and capital accumulation the operative concepts.",
-            "confidence": 0.88
+            "why_i_think_so": "Repeated exposure to threads on inherited advantage suggests engagement with how wealth reproduces itself across generations, beyond individual merit or effort.",
+            "confidence": 0.85
           },
           {
             "topic": "social mobility across countries",
             "concepts": [
               "intergenerational income elasticity",
-              "comparative welfare states",
-              "opportunity hoarding",
-              "great gatsby curve"
+              "relative vs absolute mobility",
+              "welfare state design",
+              "equality of opportunity"
             ],
             "underneath": [
-              "whether the system can be fixed",
+              "comparative disenchantment with one's own society",
               "policy as lever for fairness",
-              "national identity tied to mobility myths"
+              "the gap between national myth and data"
             ],
-            "why_i_think_so": "The research-oriented question about cross-country mobility data signals engagement with empirical social science and implicitly asks whether institutional design can counteract structural disadvantage.",
+            "why_i_think_so": "Asking what research says about mobility across countries implies a data-driven, comparative mindset \u2014 looking for evidence that some societies genuinely do better, and why.",
             "confidence": 0.9
           }
         ],
         "picks": {
           "watch": [
             {
-              "title": "Ballad of a Small Player",
+              "title": "Mulan",
               "type": "movie",
               "kind": "watch",
-              "year": "2025",
-              "url": "https://www.themoviedb.org/movie/1272166",
-              "reasoning": "Your questions about luck versus effort in success keep landing on counterfactual causation; Ballad of a Small Player puts that idea on screen as fiction. It also speaks to something you didn't say out loud: anxiety about personal agency. Matched on: chance and fate. Since you're going deep on this, there's a paper that pairs with it.",
+              "year": "1998",
+              "url": "https://www.themoviedb.org/movie/10674",
+              "reasoning": "Your questions about luck versus effort in success keep landing on counterfactual causation; Mulan puts that idea on screen as fiction. It also speaks to something you didn't say out loud: anxiety about personal agency. Matched on: luck. Since you're going deep on this, there's a paper that pairs with it.",
               "matched_topic": "luck versus effort in success",
               "concept": "counterfactual causation",
               "evidence": [
-                "chance and fate"
+                "luck"
               ],
-              "relevance": 0.68
+              "relevance": 0.96,
+              "rating": 7.903,
+              "votes": 10730,
+              "gem": false
             },
             {
-              "title": "Elysium",
+              "title": "There Will Be Blood",
               "type": "movie",
               "kind": "watch",
-              "year": "2013",
-              "url": "https://www.themoviedb.org/movie/68724",
-              "reasoning": "Your questions about meritocracy as myth keep landing on meritocracy; Elysium puts that idea on screen as fiction. It also speaks to something you didn't say out loud: disillusionment with fairness narratives. Matched on: wealth inequality. Since you're going deep on this, there's a paper that pairs with it.",
+              "year": "2007",
+              "url": "https://www.themoviedb.org/movie/7345",
+              "reasoning": "Your questions about meritocracy as myth keep landing on meritocracy; There Will Be Blood puts that idea on screen as fiction. It also speaks to something you didn't say out loud: disillusionment with social narratives. Matched on: american dream. Since you're going deep on this, there's a paper that pairs with it.",
               "matched_topic": "meritocracy as myth",
               "concept": "meritocracy",
               "evidence": [
-                "wealth inequality"
+                "american dream"
               ],
-              "relevance": 0.54
+              "relevance": 0.54,
+              "rating": 8.1,
+              "votes": 7786,
+              "gem": false
             },
             {
               "title": "Requiem for the American Dream",
@@ -3773,33 +3717,24 @@
               "kind": "watch",
               "year": "2015",
               "url": "https://www.themoviedb.org/movie/333377",
-              "reasoning": "You've been asking about meritocracy as myth, and underneath it the idea of meritocracy. Requiem for the American Dream is the real-world story. It also speaks to something you didn't say out loud: disillusionment with fairness narratives. Matched on: wealth inequality. Since you're going deep on this, there's a paper that pairs with it.",
+              "reasoning": "You've been asking about meritocracy as myth, and underneath it the idea of meritocracy. Requiem for the American Dream is the real-world story. It also speaks to something you didn't say out loud: disillusionment with social narratives. Matched on: wealth inequality. Since you're going deep on this, there's a paper that pairs with it. Lesser-known, but well rated (7.7/10 from 212 votes).",
               "matched_topic": "meritocracy as myth",
               "concept": "meritocracy",
               "evidence": [
                 "wealth inequality"
               ],
-              "relevance": 0.54
+              "relevance": 0.54,
+              "rating": 7.715,
+              "votes": 212,
+              "gem": true
             }
           ],
-          "read": [
-            {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
-              "type": "paper",
-              "kind": "read",
-              "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind meritocracy, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
-              "matched_topic": "meritocracy as myth",
-              "concept": "meritocracy",
-              "evidence": [],
-              "relevance": 0.5
-            }
-          ],
+          "read": [],
           "explore": []
         },
-        "spoken": "It sounds like you're circling meritocracy as myth and luck versus effort in success. Underneath it, I hear disillusionment with fairness narratives. To see it on screen, try Ballad of a Small Player. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
-        "ask": "Is it meritocracy as myth itself that's pulling you in, or the question of disillusionment with fairness narratives?"
+        "note": "",
+        "spoken": "It sounds like you're circling meritocracy as myth and luck versus effort in success. Underneath it, I hear disillusionment with social narratives. To see it on screen, try Mulan.",
+        "ask": "Is it meritocracy as myth itself that's pulling you in, or the question of disillusionment with social narratives?"
       }
     },
     {
@@ -3942,51 +3877,45 @@
         "picks": {
           "watch": [
             {
-              "title": "Arrival",
-              "type": "movie",
-              "kind": "watch",
-              "year": "2016",
-              "url": "https://www.themoviedb.org/movie/329865",
-              "reasoning": "You've been engaging with time; Arrival explores similar themes on screen. Matched on: time.",
-              "matched_topic": "time",
-              "concept": "time",
-              "evidence": [
-                "time"
-              ],
-              "relevance": 0.79
-            },
-            {
               "title": "Baraka",
               "type": "doc",
               "kind": "watch",
               "year": "1992",
               "url": "https://www.themoviedb.org/movie/14002",
-              "reasoning": "Given your interest in time, Baraka covers the real-world story behind it. Matched on: time.",
+              "reasoning": "Given your interest in time, Baraka covers the real-world story behind it. Matched on: time. Lesser-known, but well rated (8.2/10 from 726 votes).",
               "matched_topic": "time",
               "concept": "time",
               "evidence": [
                 "time"
               ],
-              "relevance": 0.79
-            }
-          ],
-          "read": [
+              "relevance": 0.79,
+              "rating": 8.2,
+              "votes": 726,
+              "gem": true
+            },
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
-              "type": "paper",
-              "kind": "read",
-              "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind something, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
-              "matched_topic": "something",
-              "concept": "something",
-              "evidence": [],
-              "relevance": 0.5
+              "title": "Oldboy",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2003",
+              "url": "https://www.themoviedb.org/movie/670",
+              "reasoning": "You've been engaging with time; Oldboy explores similar themes on screen. Matched on: time.",
+              "matched_topic": "time",
+              "concept": "time",
+              "evidence": [
+                "time"
+              ],
+              "relevance": 0.79,
+              "rating": 8.2,
+              "votes": 10299,
+              "gem": false
             }
           ],
+          "read": [],
           "explore": []
         },
-        "spoken": "It sounds like you're circling something and time. To see it on screen, try Arrival. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling something and time. To see it on screen, try Baraka.",
         "ask": "Do you want to go deeper into something, or see where it shows up elsewhere?"
       }
     },
@@ -4015,15 +3944,15 @@
           "implicit_themes": [
             "desire for change",
             "restlessness",
-            "undefined curiosity"
+            "open-ended curiosity"
           ],
           "keywords": [
             "time travel",
+            "relaxing",
             "escapism",
-            "relaxation",
             "wandering mind"
           ],
-          "rationale": "The user expresses vague, unfocused curiosity and a half-hearted interest in time travel, suggesting a mild mood of restlessness and openness rather than any deep intellectual pursuit.",
+          "rationale": "The user expresses vague, unfocused curiosity and a half-hearted interest in time travel, suggesting a mood of gentle escapism rather than any deep intellectual pursuit.",
           "confidence": 0.3
         }
       ],
@@ -4040,9 +3969,9 @@
             "underneath": [
               "desire for change",
               "restlessness",
-              "undefined curiosity"
+              "open-ended curiosity"
             ],
-            "why_i_think_so": "The user expresses vague, unfocused curiosity and a half-hearted interest in time travel, suggesting a mild mood of restlessness and openness rather than any deep intellectual pursuit.",
+            "why_i_think_so": "The user expresses vague, unfocused curiosity and a half-hearted interest in time travel, suggesting a mood of gentle escapism rather than any deep intellectual pursuit.",
             "confidence": 0.3
           }
         ],
@@ -4060,26 +3989,34 @@
               "evidence": [
                 "time travel"
               ],
-              "relevance": 0.43
-            }
-          ],
-          "read": [
+              "relevance": 0.43,
+              "rating": 8.491,
+              "votes": 41489,
+              "gem": false
+            },
             {
-              "title": "Speculative Bubbles and Social Media-Driven Asset Pricing",
-              "type": "paper",
-              "kind": "read",
-              "year": "",
-              "url": "https://arxiv.org/abs/2201.00000",
-              "reasoning": "If you want the research behind temporal displacement, Speculative Bubbles and Social Media-Driven Asset Pricing is the academic angle.",
+              "title": "Doctor Who: The Day of the Doctor",
+              "type": "movie",
+              "kind": "watch",
+              "year": "2013",
+              "url": "https://www.themoviedb.org/movie/313106",
+              "reasoning": "Your questions about time travel maybe keep landing on temporal displacement; Doctor Who: The Day of the Doctor puts that idea on screen as fiction. It also speaks to something you didn't say out loud: desire for change. Matched on: time travel. Lesser-known, but well rated (8.2/10 from 790 votes).",
               "matched_topic": "time travel maybe",
               "concept": "temporal displacement",
-              "evidence": [],
-              "relevance": 0.5
+              "evidence": [
+                "time travel"
+              ],
+              "relevance": 0.43,
+              "rating": 8.2,
+              "votes": 790,
+              "gem": true
             }
           ],
+          "read": [],
           "explore": []
         },
-        "spoken": "It sounds like you're circling time travel maybe. Underneath it, I hear desire for change. To see it on screen, try Interstellar. And if you want the research, Speculative Bubbles and Social Media-Driven Asset Pricing.",
+        "note": "",
+        "spoken": "It sounds like you're circling time travel maybe. Underneath it, I hear desire for change. To see it on screen, try Interstellar.",
         "ask": "Is it time travel maybe itself that's pulling you in, or the question of desire for change?"
       }
     }
