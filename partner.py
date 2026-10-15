@@ -34,12 +34,17 @@ def _threads(interests: list[Interest]) -> list[dict]:
         "underneath": i.implicit_themes,   # what the text implies but never says
         "why_i_think_so": i.rationale,
         "confidence": round(i.confidence, 2),
+        "conversations": i.conversations,     # how many separate conversations raised it
+        "last_seen": i.last_seen,
+        "in_current": i.in_current,
     } for i in interests]
 
 
 def _spoken(interests: list[Interest], picks: dict[str, list[dict]]) -> str:
     lead = interests[0]
     sentence = f"It sounds like you're circling {_join([i.topic for i in interests[:2]])}."
+    if lead.conversations > 1:
+        sentence += f" You've come back to {lead.topic} across {lead.conversations} conversations."
     if lead.implicit_themes:
         sentence += f" Underneath it, I hear {lead.implicit_themes[0]}."
     if picks["watch"]:

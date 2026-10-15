@@ -72,6 +72,10 @@ class Interest:
     keywords: list[str] = field(default_factory=list)          # short film-metadata-style phrases
     rationale: str = ""             # one line: why these concepts/themes follow from the text
     confidence: float = 0.5
+    # --- filled when several conversations are merged (see history.py) ---
+    conversations: int = 1          # how many separate conversations raised it
+    last_seen: str = ""             # timestamp of the newest conversation that did, if known
+    in_current: bool = True         # raised in the newest conversation
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -304,7 +308,8 @@ def bedrock_extract(session_texts: list[str]) -> list[Interest]:
     if not model_id:
         raise RuntimeError("BEDROCK_MODEL_ID is not set")
 
-    text = "\n".join(t.strip() for t in session_texts if t and t.strip())[:MAX_INPUT_CHARS]
+    # keep the LATEST text if over the cap: what the person asked most recently matters most
+    text = "\n".join(t.strip() for t in session_texts if t and t.strip())[-MAX_INPUT_CHARS:]
     if not text:
         return []
     key = hashlib.sha256((model_id + "\0" + text).encode()).hexdigest()

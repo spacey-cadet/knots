@@ -24,27 +24,47 @@ import os
 
 from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
+from pydantic import BaseModel, Field
 
 load_dotenv()  # before the imports below read any env-driven config
 
 from cards import rank_and_render  # noqa: E402
 from catalogs import search_content as _search_content  # noqa: E402
-from interests import Interest, extract  # noqa: E402
+from history import Conversation, extract_history  # noqa: E402
+from interests import Interest  # noqa: E402
 from partner import build_session_plan  # noqa: E402
 
 mcp = FastMCP("knots", stateless_http=True)
 
 
+class ConversationIn(BaseModel):
+    """One conversation (or one Reddit session) as the assistant remembers it."""
+    turns: list[str] = Field(description="The person's messages in this conversation, oldest first.")
+    timestamp: str | None = Field(default=None, description="When it happened, ISO 8601. Optional.")
+    id: str | None = Field(default=None, description="Any stable id. Optional.")
+
+
+async def _interests(session_texts: list[str] | None, conversations: list[ConversationIn] | None):
+    convs = [Conversation(turns=c.turns, timestamp=c.timestamp, id=c.id or "") for c in conversations or []]
+    return await extract_history(session_texts, convs)
+
+
 @mcp.tool()
-async def extract_interests(session_texts: list[str]) -> dict:
+async def extract_interests(session_texts: list[str] | None = None,
+                            conversations: list[ConversationIn] | None = None) -> dict:
     """
     Extract what the person is really interested in from recent Alexa+
     conversation turns and/or Reddit activity text. For each interest returns
     the surface topic, the abstract concepts at stake, unstated themes the text
     implies, and film-tag-style keywords. Also reports which extractor ran
     ("bedrock" or a heuristic fallback).
+
+    Pass the current conversation as `session_texts`. If you also have earlier
+    conversations, pass them all as `conversations` (newest last, timestamps if
+    known): topics that recur across conversations are weighted up, and the
+    newest conversation still leads.
     """
-    interests, used = await extract(session_texts)
+    interests, used = await _interests(session_texts, conversations)
     return {"extractor": used, "interests": [i.to_dict() for i in interests]}
 
 
@@ -61,16 +81,18 @@ async def search_content(topics: list[str]) -> list[dict]:
 
 
 @mcp.tool()
-async def get_recommendations(session_texts: list[str], limit: int = 6) -> dict:
+async def get_recommendations(session_texts: list[str] | None = None, limit: int = 6,
+                              conversations: list[ConversationIn] | None = None) -> dict:
     """
     Full pipeline: extract interests from session text, match them against
     the content catalogs, rank, and return ready-to-render cards, each with the
-    reason it was chosen.
+    reason it was chosen. Accepts one conversation (`session_texts`) or several
+    (`conversations`), as in extract_interests.
     """
-    interests, used = await extract(session_texts)
+    interests, used = await _interests(session_texts, conversations)
     if not interests:
         return {"extractor": used, "interests": [], "cards": [],
-                "note": "No topics detected in session_texts."}
+                "note": "No topics detected in the conversation text."}
     items = await _search_content(interests)
     return {
         "extractor": used,
@@ -80,7 +102,8 @@ async def get_recommendations(session_texts: list[str], limit: int = 6) -> dict:
 
 
 @mcp.tool()
-async def thinking_partner(session_texts: list[str], include_videos: bool = True) -> dict:
+async def thinking_partner(session_texts: list[str] | None = None, include_videos: bool = True,
+                           conversations: list[ConversationIn] | None = None) -> dict:
     """
     Call this when the person asks things like "what are we doing today?",
     "what should I explore?", "what should I watch or read?", or opens a
@@ -89,8 +112,12 @@ async def thinking_partner(session_texts: list[str], include_videos: bool = True
     and documentaries to watch, papers to read and videos to explore, each with
     its reason. `spoken` is a short line Alexa can read aloud; `ask` is a
     follow-up question to keep the conversation going.
+
+    Pass the current conversation as `session_texts`. If you can also see recent
+    earlier conversations (up to about 8, last 60 days), pass them as
+    `conversations` so recurring interests count for more.
     """
-    interests, used = await extract(session_texts)
+    interests, used = await _interests(session_texts, conversations)
     if not interests:
         return {"extractor": used, "threads": [], "picks": {"watch": [], "read": [], "explore": []},
                 "spoken": "I don't have anything to go on yet. What have you been curious about lately?",

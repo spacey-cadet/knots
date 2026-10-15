@@ -15,6 +15,11 @@ real: with no TMDB key, or when a live call fails, the catalogs return nothing
 rather than made-up titles. Set `KNOTS_OFFLINE=1` to use small fixed mock
 catalogs for a no-network demo or tests.
 
+Catalogs: films and documentaries and scripted TV series (TMDB, by film-tag
+keyword), papers (arXiv) and YouTube explainers (3-60 minutes, title must match the
+concept, 5,000+ views). Series have their own floor (rating >= 7.0, >= 150
+votes).
+
 Ranking: relevance (shared film-tag keywords) decides. Quality is a floor
 (TMDB rating >= 6.5 with >= 100 votes; films before 1990 need 7.5+ and 1,000+
 votes), not a score, and popularity is not a signal. One slot per session is
@@ -90,6 +95,36 @@ async def main():
 
 asyncio.run(main())
 ```
+
+## Input: one conversation or many
+
+The tools take either the current conversation as `session_texts` (a list of
+strings, as before) or several as `conversations`:
+
+```json
+{"conversations": [
+  {"turns": ["what is a memecoin?"],     "timestamp": "2026-10-10T08:00:00Z"},
+  {"turns": ["is crypto just a bubble?"], "timestamp": "2026-10-14T19:30:00Z"},
+  {"turns": ["explain tokenomics"],       "timestamp": "2026-10-15T08:00:00Z"}]}
+```
+
+- **Newest conversation = what they want now.** It gets a weight boost and its
+  strongest thread always stays in the top two.
+- **Recurring topics = what they keep coming back to.** Each conversation is
+  extracted separately (parallel, cached, so only new ones cost a call), then
+  merged by shared topic or concept. Weight halves every 14 days and rises with
+  the number of distinct conversations. Cards say "you've come back to X across
+  N conversations".
+- **Limits:** the last 8 conversations within 60 days, each trimmed to its latest
+  3,000 characters. Without timestamps, order is used (the last one is "now").
+- **Why not concatenate everything into one prompt:** unrelated topics blur into
+  one vague profile, cost and latency grow with history, and old text crowds out
+  new. (A bug of that kind was fixed: over-long input used to drop the NEWEST
+  text; it now keeps the latest.)
+
+Knots does not store anything: the assistant decides what history to pass. A
+server-side profile that accumulates across days is a possible next step; it
+needs a user id and a store, and raises privacy questions.
 
 ## Known limitations
 

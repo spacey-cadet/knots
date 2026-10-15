@@ -19,6 +19,8 @@ import catalogs as C
 import interests as I
 from cards import rank_and_render
 from catalogs import ContentItem, passes_quality, search_content
+import history as H
+from datetime import datetime, timedelta, timezone
 from partner import build_session_plan
 
 SAMPLE_SESSION = [
@@ -473,6 +475,152 @@ def test_label_server_accepts_reason_only_on_not_good_picks(monkeypatch, tmp_pat
     assert post({"kind": "pick", "id": rid, "value": "n", "reason": "quality"}) == 200
     saved = ev.read_csv(labels)[0]
     assert saved["good"] == "n" and saved["reason"] == "quality"
+
+
+# ---------------------------------------------------------------------------
+# input scope: one conversation vs many
+# ---------------------------------------------------------------------------
+
+NOW = datetime(2026, 10, 15, 12, 0, tzinfo=timezone.utc)
+
+
+def _conv(text, days_ago=None, cid=""):
+    ts = (NOW - timedelta(days=days_ago)).isoformat() if days_ago is not None else None
+    return H.Conversation(turns=[text], timestamp=ts, id=cid)
+
+
+def _it(topic, concepts=None, conf=0.8, themes=None, keywords=None):
+    return I.Interest(topic=topic, depth="casual", sentiment="curious", mentions=1,
+                      concepts=concepts or [topic], keywords=keywords or [topic],
+                      implicit_themes=themes or [], confidence=conf)
+
+
+def test_bedrock_input_cap_keeps_the_latest_text(monkeypatch):
+    fake = FakeBedrock(MODEL_OUTPUT)
+    _use(monkeypatch, fake)
+    long = ["OLDEST " + "x" * 5000, "y" * 9000, "NEWEST question about memecoins"]
+    I.bedrock_extract(long)
+    sent = fake.calls[0]["messages"][0]["content"][0]["text"]
+    assert "NEWEST" in sent and "OLDEST" not in sent
+
+
+def test_normalize_orders_trims_and_caps():
+    old = _conv("from long ago", days_ago=200)                    # older than the window: dropped
+    many = [_conv(f"c{i}", days_ago=i + 1) for i in range(12)]    # more than MAX_CONVERSATIONS
+    newest = _conv("right now", days_ago=0)
+    out = H.normalize_input(None, [old, *many, newest], now=NOW)
+    assert len(out) == H.MAX_CONVERSATIONS
+    assert out[-1][0].turns == ["right now"]                       # newest last
+    assert all("long ago" not in c.turns[0] for c, _ in out)
+    ages = [a for _, a in out]
+    assert ages == sorted(ages, reverse=True)                      # oldest -> newest
+
+
+def test_newest_conversation_is_kept_even_if_old_or_untimestamped():
+    out = H.normalize_input(None, [_conv("only one", days_ago=400)], now=NOW)
+    assert len(out) == 1
+    flat = H.normalize_input(["a", "b"], None, now=NOW)            # old flat input = one conversation
+    assert len(flat) == 1 and flat[0][0].turns == ["a", "b"]
+    assert H.normalize_input([], [], now=NOW) == [] and H.normalize_input(["  "], None, now=NOW) == []
+
+
+def test_untimestamped_conversations_age_by_position():
+    out = H.normalize_input(None, [H.Conversation(["a"]), H.Conversation(["b"]), H.Conversation(["c"])], now=NOW)
+    assert [a for _, a in out] == [2.0, 1.0, 0.0]
+
+
+def test_long_conversation_keeps_its_latest_turns():
+    turns = [f"turn {i} " + "z" * 800 for i in range(10)]
+    out = H.normalize_input(None, [H.Conversation(turns)], now=NOW)[0][0].turns
+    assert out[-1].startswith("turn 9") and not any(t.startswith("turn 0") for t in out)
+    assert sum(len(t) for t in out) <= H.MAX_CHARS_PER_CONVERSATION + 800
+
+
+def test_recurring_topic_outweighs_a_one_off_and_is_counted():
+    convs = [(_conv("a", 20), 20.0, [_it("grief", ["loss"]), _it("chess")]),
+             (_conv("b", 10), 10.0, [_it("grief", ["loss"])]),
+             (_conv("c", 3), 3.0, [_it("grief"), _it("memecoins", ["reflexivity"])]),
+             (_conv("d", 0), 0.0, [_it("sourdough")])]
+    merged = H.merge_interests(convs)
+    by = {i.topic: i for i in merged}
+    assert by["grief"].conversations == 3 and by["chess"].conversations == 1
+    assert [i.topic for i in merged].index("grief") < [i.topic for i in merged].index("chess")
+    assert by["grief"].in_current is False and by["sourdough"].in_current is True
+    assert by["grief"].confidence > 0.8                             # recurrence raises confidence
+
+
+def test_newest_conversations_strongest_thread_stays_in_the_top_two():
+    old = [(_conv(str(i), 30), 30.0, [_it("grief", ["loss"], conf=1.0), _it("chess", conf=1.0),
+                                       _it("crypto", ["reflexivity"], conf=1.0)]) for i in range(3)]
+    now = [(_conv("now", 0), 0.0, [_it("sourdough", conf=0.3)])]
+    merged = H.merge_interests(old + now)
+    assert "sourdough" in [i.topic for i in merged[:2]]
+
+
+def test_threads_merge_by_shared_concept_and_keep_the_union_of_detail():
+    a = _it("memecoins", ["reflexivity"], themes=["fear of missing out"], keywords=["financial crisis"])
+    b = _it("crypto bubbles", ["reflexivity", "belief"], themes=["trust without institutions"], keywords=["stock market"])
+    merged = H.merge_interests([(_conv("a", 5), 5.0, [a]), (_conv("b", 0), 0.0, [b])])
+    assert len(merged) == 1 and merged[0].conversations == 2
+    assert set(merged[0].implicit_themes) == {"fear of missing out", "trust without institutions"}
+    assert {"financial crisis", "stock market"} <= set(merged[0].keywords)
+
+
+def test_unrelated_topics_are_not_merged():
+    merged = H.merge_interests([(_conv("a", 5), 5.0, [_it("memory loss", ["dementia"])]),
+                                (_conv("b", 0), 0.0, [_it("memecoins", ["reflexivity"])])])
+    assert len(merged) == 2
+
+
+def test_extract_history_runs_one_call_per_conversation_and_merges(monkeypatch):
+    fake = FakeBedrock(MODEL_OUTPUT)
+    _use(monkeypatch, fake)
+    convs = [_conv("what is a memecoin?", 4), _conv("is crypto just a bubble?", 1), _conv("memecoins again", 0)]
+    found, used = asyncio.run(H.extract_history(None, convs, now=NOW))
+    assert used == "bedrock" and len(fake.calls) == 3
+    assert found[0].topic == "memecoins" and found[0].conversations == 3
+
+
+def test_extract_history_single_conversation_is_the_old_path(monkeypatch):
+    fake = FakeBedrock(MODEL_OUTPUT)
+    _use(monkeypatch, fake)
+    found, used = asyncio.run(H.extract_history(SAMPLE_SESSION))
+    assert used == "bedrock" and len(fake.calls) == 1 and found[0].conversations == 1
+
+
+def test_extract_history_reports_mixed_extractors(monkeypatch):
+    class Flaky(FakeBedrock):
+        def converse(self, **kw):
+            if "second" in kw["messages"][0]["content"][0]["text"]:
+                raise RuntimeError("throttled")
+            return super().converse(**kw)
+
+    _use(monkeypatch, Flaky(MODEL_OUTPUT))
+    found, used = asyncio.run(H.extract_history(None, [_conv("first memecoin chat", 2), _conv("second chat", 0)], now=NOW))
+    assert used.startswith("mixed") and found
+
+
+def test_tools_accept_conversations_and_the_plan_says_it_came_back(monkeypatch):
+    import server
+    fake = FakeBedrock(MODEL_OUTPUT)
+    _use(monkeypatch, fake)
+    _offline_catalogs(monkeypatch)
+    out = asyncio.run(server.mcp.call_tool("thinking_partner", {"conversations": [
+        {"turns": ["what is a memecoin?"], "timestamp": "2026-10-10T08:00:00Z"},
+        {"turns": ["is crypto a bubble?"], "timestamp": "2026-10-14T08:00:00Z"},
+        {"turns": ["tokenomics of memecoins"], "timestamp": "2026-10-15T08:00:00Z"}]}))
+    plan = json.loads(out[0][0].text) if isinstance(out, tuple) else json.loads(out[0].text)
+    assert plan["threads"][0]["conversations"] == 3
+    assert "across 3 conversations" in plan["spoken"]
+
+
+def test_tools_still_accept_the_old_flat_input(monkeypatch):
+    import server
+    _use(monkeypatch, FakeBedrock(MODEL_OUTPUT))
+    _offline_catalogs(monkeypatch)
+    out = asyncio.run(server.mcp.call_tool("extract_interests", {"session_texts": SAMPLE_SESSION}))
+    data = json.loads(out[0][0].text) if isinstance(out, tuple) else json.loads(out[0].text)
+    assert data["extractor"] == "bedrock" and data["interests"]
 
 
 def test_server_exposes_tools():
