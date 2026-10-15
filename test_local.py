@@ -63,6 +63,9 @@ def _fast_arxiv(monkeypatch):
     monkeypatch.setattr(C, "ARXIV_MIN_INTERVAL", 0)
     monkeypatch.setattr(C, "ARXIV_RETRY_AFTER_DEFAULT", 0)
     C._arxiv_cache.clear()
+    C._arxiv_disk_loaded = False
+    C.FAILURES.clear()
+    monkeypatch.delenv("KNOTS_ARXIV_CACHE", raising=False)
 
 
 def _offline_catalogs(monkeypatch):
@@ -225,6 +228,47 @@ def test_arxiv_requests_are_spaced(monkeypatch):
     asyncio.run(go())
     gaps = [b - a for a, b in zip(sorted(times), sorted(times)[1:])]
     assert len(times) == 3 and all(g >= 0.15 for g in gaps)
+
+
+def test_failures_are_recorded_so_incomplete_runs_are_visible(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    client = httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(429)))
+    asyncio.run(C._search_arxiv(_topic(), client))
+    assert C.FAILURES and C.FAILURES[0].startswith("arXiv:memecoins:429")
+
+
+def test_tmdb_retries_connect_timeouts(monkeypatch):
+    monkeypatch.setenv("TMDB_API_KEY", "k")
+    real_sleep = asyncio.sleep
+    monkeypatch.setattr(asyncio, "sleep", lambda s: real_sleep(0))
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        if len(calls) < 3:
+            raise httpx.ConnectTimeout("slow")
+        return httpx.Response(200, json={"results": []})
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    assert asyncio.run(C._tmdb_get(client, "/search/keyword", {"query": "x"})) == {"results": []}
+    assert len(calls) == 3
+
+
+def test_arxiv_disk_cache_survives_restart(monkeypatch, tmp_path):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("KNOTS_ARXIV_CACHE", str(tmp_path / "c.json"))
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        return httpx.Response(200, text=ATOM)
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    asyncio.run(C._search_arxiv(_topic(), client))
+    C._arxiv_cache.clear()
+    C._arxiv_disk_loaded = False                      # simulate a new process
+    again = asyncio.run(C._search_arxiv(_topic(), client))
+    assert len(calls) == 1 and again[0].title == "Reflexivity in markets"
 
 
 def test_quality_gate_and_age_rule():

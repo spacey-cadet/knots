@@ -44,8 +44,12 @@ sys.path.insert(0, str(ROOT))
 from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(ROOT / ".env")
+# An eval can afford to wait; a flaky connection must not silently drop picks.
+os.environ.setdefault("KNOTS_HTTP_TIMEOUT", "25")
+os.environ.setdefault("KNOTS_ARXIV_CACHE", str(HERE / "results" / "arxiv_cache.json"))
 
 import interests as I  # noqa: E402
+import catalogs  # noqa: E402
 from catalogs import search_content  # noqa: E402
 from partner import build_session_plan  # noqa: E402
 
@@ -133,18 +137,23 @@ def cmd_run(args) -> int:
         print("WARNING: TMDB_API_KEY is not set. Films will be the fixed offline mock set, "
               "so every session gets the same films and the labels will not mean much.\n")
 
-    results, errors = [], 0
+    results, errors, incomplete = [], 0, 0
     for sess in sessions:
         for spec in specs:
             mode, model = parse_spec(spec)
             entry = {"session_id": sess["id"], "extractor": spec, "texts": sess["texts"]}
             try:
+                catalogs.FAILURES.clear()
                 found, used = run_extractor(mode, model, sess["texts"])
                 items = asyncio.run(search_content(found, include_videos=args.videos))
                 plan = build_session_plan(found, items, extractor=used)
-                entry.update(ok=True, used=used, interests=[i.to_dict() for i in found], plan=plan)
+                failed = list(catalogs.FAILURES)
+                entry.update(ok=True, used=used, interests=[i.to_dict() for i in found], plan=plan,
+                             catalog_failures=failed)
                 n = sum(len(v) for v in plan["picks"].values())
-                print(f"  {sess['id']}  {spec:<42} ok   {len(found)} interests, {n} picks")
+                warn = f"  INCOMPLETE: {len(failed)} catalog call(s) failed" if failed else ""
+                incomplete += bool(failed)
+                print(f"  {sess['id']}  {spec:<42} ok   {len(found)} interests, {n} picks{warn}")
             except Exception as e:  # noqa: BLE001 - record and keep going
                 errors += 1
                 entry.update(ok=False, error=f"{type(e).__name__}: {e}")
@@ -158,6 +167,10 @@ def cmd_run(args) -> int:
     print(f"\nSaved raw outputs to {RESULTS.relative_to(ROOT)}")
     print(f"Label picks in   {LABELS.relative_to(ROOT)}   (column: good = y/n)")
     print(f"Label themes in  {THEMES.relative_to(ROOT)}   (column: supported = y/n)")
+    if incomplete:
+        print(f"\n{incomplete} run(s) marked INCOMPLETE: catalog calls failed (network or rate limit), "
+              "so those sessions are missing picks. Re-run `run`: arXiv answers are cached, so only "
+              "the failures are retried. Do not label or score until this is 0.")
     if errors:
         print(f"\n{errors} run(s) failed; see FAIL lines above. Fix and re-run: labels you entered are kept.")
     return 0

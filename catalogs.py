@@ -55,12 +55,32 @@ DOCUMENTARY_GENRE = 99
 
 MAX_SEARCH_INTERESTS = 3     # latency cap: only the top interests hit live catalogs
 MAX_KEYWORDS_PER_INTEREST = 4
-HTTP_TIMEOUT = 5
+HTTP_TIMEOUT = 5              # seconds; override with KNOTS_HTTP_TIMEOUT (the eval uses a longer one)
+
+
+def _timeout() -> httpx.Timeout:
+    try:
+        t = float(os.environ.get("KNOTS_HTTP_TIMEOUT", HTTP_TIMEOUT))
+    except ValueError:
+        t = float(HTTP_TIMEOUT)
+    return httpx.Timeout(t, pool=None)      # queueing behind the connection cap is not a failure
+
+
+# Every failed live catalog call is recorded here, so callers (the eval) can tell a
+# session with missing results from one that genuinely had none.
+FAILURES: list[str] = []
+
+
+def _fail(source: str, what: str, err: object) -> None:
+    code = getattr(getattr(err, "response", None), "status_code", None)
+    reason = code or type(err).__name__
+    FAILURES.append(f"{source}:{what}:{reason}")
+    log.warning("%s search failed for %r: %s", source, what, reason)
 
 # arXiv asks for at most one request every ~3 s and answers bursts with 429.
-ARXIV_MIN_INTERVAL = 3.1
+ARXIV_MIN_INTERVAL = 5.0
 ARXIV_MAX_INTERESTS = 2       # papers are anchors; searching every interest only adds wait
-ARXIV_RETRY_AFTER_DEFAULT = 5.0
+ARXIV_RETRY_AFTER_DEFAULT = 20.0
 
 # Quality floor (a gate, not a ranking signal). Fame is not quality, and
 # relevance, not rating, decides order among films that pass.
@@ -157,10 +177,20 @@ def _mock_films(topic: str) -> list[ContentItem]:
 # ---------------------------------------------------------------------------
 
 async def _tmdb_get(client: httpx.AsyncClient, path: str, params: dict) -> dict:
-    resp = await client.get(f"{TMDB_BASE}{path}", params={"api_key": _tmdb_key(), **params},
-                            timeout=HTTP_TIMEOUT)
-    resp.raise_for_status()
-    return resp.json()
+    for attempt in (1, 2, 3):
+        try:
+            resp = await client.get(f"{TMDB_BASE}{path}", params={"api_key": _tmdb_key(), **params},
+                                    timeout=_timeout())
+            if resp.status_code in (429, 500, 502, 503, 504) and attempt < 3:
+                await asyncio.sleep(attempt)       # brief backoff, then retry
+                continue
+            resp.raise_for_status()
+            return resp.json()
+        except (httpx.ConnectTimeout, httpx.ReadTimeout, httpx.ConnectError) as e:
+            if attempt == 3:
+                raise
+            await asyncio.sleep(attempt)
+    raise RuntimeError("unreachable")
 
 
 async def _resolve_keyword(client: httpx.AsyncClient, term: str) -> tuple[str, int] | None:
@@ -232,7 +262,7 @@ async def _search_tmdb(interest: Interest, client: httpx.AsyncClient) -> list[Co
             item.topic_overlap_score = round((0.4 + 0.6 * share) * (0.7 + 0.3 * interest.confidence), 3)
         return list(found.values())
     except Exception as e:  # noqa: BLE001
-        log.warning("TMDB search failed for %r: %s: %s", interest.topic, type(e).__name__, e)
+        _fail("TMDB", interest.topic, e)
         return _mock_films(interest.topic) if offline_mode() else []
 
 
@@ -251,6 +281,42 @@ _ATOM = "{http://www.w3.org/2005/Atom}"
 
 _arxiv_next_slot = 0.0                      # monotonic time the next arXiv request may start
 _arxiv_cache: dict[str, list[ContentItem]] = {}   # query -> parsed result (successes only)
+_arxiv_disk_loaded = False
+
+
+def _arxiv_cache_path() -> str:
+    """Optional on-disk cache (KNOTS_ARXIV_CACHE=path.json) so repeated eval runs do not
+    re-ask arXiv for queries it already answered."""
+    return os.environ.get("KNOTS_ARXIV_CACHE", "")
+
+
+def _arxiv_cache_load() -> None:
+    global _arxiv_disk_loaded
+    path = _arxiv_cache_path()
+    if _arxiv_disk_loaded or not path:
+        return
+    _arxiv_disk_loaded = True
+    try:
+        import json
+        with open(path, encoding="utf-8") as f:
+            for q, rows in json.load(f).items():
+                _arxiv_cache.setdefault(q, [ContentItem(**r) for r in rows])
+    except (OSError, ValueError, TypeError):
+        pass
+
+
+def _arxiv_cache_save() -> None:
+    path = _arxiv_cache_path()
+    if not path:
+        return
+    try:
+        import json
+        tmp = path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump({q: [asdict(i) for i in v] for q, v in _arxiv_cache.items()}, f, indent=1)
+        os.replace(tmp, path)
+    except OSError:
+        pass
 
 
 async def _arxiv_wait_turn() -> None:
@@ -283,6 +349,7 @@ async def _search_arxiv(interest: Interest, client: httpx.AsyncClient) -> list[C
     query = (interest.concepts[0] if interest.concepts else interest.topic)
     if offline_mode():
         return _mock_papers(interest.topic)
+    _arxiv_cache_load()
     cached = _arxiv_cache.get(query)
     if cached is not None:
         return [ContentItem(**{**asdict(i), "topic": interest.topic}) for i in cached]
@@ -292,12 +359,12 @@ async def _search_arxiv(interest: Interest, client: httpx.AsyncClient) -> list[C
             resp = await client.get(
                 ARXIV_API_URL,
                 params={"search_query": f'all:"{query}"', "start": 0, "max_results": 1},
-                timeout=HTTP_TIMEOUT,
+                timeout=_timeout(),
                 follow_redirects=True,
             )
             if resp.status_code == 429 and attempt == 1:     # rate limited: wait once, retry once
                 try:
-                    wait = min(float(resp.headers.get("Retry-After", "")), 30.0)
+                    wait = min(float(resp.headers.get("Retry-After", "")), 60.0)
                 except ValueError:
                     wait = ARXIV_RETRY_AFTER_DEFAULT
                 await asyncio.sleep(wait)
@@ -306,9 +373,10 @@ async def _search_arxiv(interest: Interest, client: httpx.AsyncClient) -> list[C
             break
         items = _parse_arxiv(resp.text, interest.topic)
         _arxiv_cache[query] = items       # a genuine "no match" is cached too
+        _arxiv_cache_save()
         return items
     except Exception as e:  # noqa: BLE001
-        log.warning("arXiv search failed for %r: %s", query, getattr(getattr(e, "response", None), "status_code", None) or type(e).__name__)
+        _fail("arXiv", query, e)
         return []
 
 
@@ -331,7 +399,7 @@ async def _search_youtube(interest: Interest, client: httpx.AsyncClient) -> list
             params={"part": "snippet",
                     "q": f"{(interest.concepts or [interest.topic])[0]} explained",
                     "type": "video", "maxResults": 3, "key": _youtube_key()},
-            timeout=HTTP_TIMEOUT,
+            timeout=_timeout(),
         )
         resp.raise_for_status()
         return [ContentItem(
@@ -340,7 +408,7 @@ async def _search_youtube(interest: Interest, client: httpx.AsyncClient) -> list
             topic=interest.topic, topic_overlap_score=0.7,
             blurb=r["snippet"].get("description", "")[:140]) for r in resp.json().get("items", [])]
     except Exception as e:  # noqa: BLE001
-        log.warning("YouTube search failed for %r: %s: %s", interest.topic, type(e).__name__, e)
+        _fail("YouTube", interest.topic, e)
         return []
 
 
@@ -352,7 +420,7 @@ async def search_content(interests: list[Interest],
     if include_videos is None:
         include_videos = os.environ.get("INCLUDE_VIDEOS") == "1"
     owns = client is None
-    client = client or httpx.AsyncClient()
+    client = client or httpx.AsyncClient(limits=httpx.Limits(max_connections=6))
     try:
         tasks = []
         for n, interest in enumerate(interests[:MAX_SEARCH_INTERESTS]):
