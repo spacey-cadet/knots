@@ -34,6 +34,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import re
 import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field, asdict
@@ -41,15 +42,16 @@ from typing import Literal
 
 import httpx
 
-from interests import Interest
+from interests import STOPWORDS, Interest
 
 log = logging.getLogger("knots.catalogs")
 
-ContentType = Literal["movie", "doc", "video", "paper"]
+ContentType = Literal["movie", "series", "doc", "video", "paper"]
 Role = Literal["recommendation", "anchor"]
 
 TMDB_BASE = "https://api.themoviedb.org/3"
 YOUTUBE_SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
+YOUTUBE_VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos"
 ARXIV_API_URL = "https://export.arxiv.org/api/query"   # http:// 301-redirects to https://
 DOCUMENTARY_GENRE = 99
 
@@ -77,6 +79,15 @@ def _fail(source: str, what: str, err: object) -> None:
     FAILURES.append(f"{source}:{what}:{reason}")
     log.warning("%s search failed for %r: %s", source, what, reason)
 
+# YouTube explainers. A search costs 100 quota units (10,000/day by default), a details
+# lookup 1, so only the top interests are searched and the details are batched.
+YOUTUBE_MAX_INTERESTS = 2
+YOUTUBE_CANDIDATES = 10
+YOUTUBE_PER_INTEREST = 2
+VIDEO_MIN_SECONDS = 180      # no shorts or trailers
+VIDEO_MAX_SECONDS = 3600     # an explainer, not a lecture series
+VIDEO_MIN_VIEWS = 5000       # floor against junk uploads; views are not a ranking signal
+
 # arXiv asks for at most one request every ~3 s and answers bursts with 429.
 ARXIV_MIN_INTERVAL = 5.0
 ARXIV_MAX_INTERESTS = 2       # papers are anchors; searching every interest only adds wait
@@ -92,21 +103,29 @@ OLD_MIN_VOTES = 1000
 DISCOVER_PER_CALL = 20       # TMDB returns 20 per page; gate first, then rank
 GEM_MAX_VOTES = 3000         # "lesser-known": few votes ...
 GEM_MIN_RATING = 7.0         # ... but highly rated
+# TV gets fewer votes than film and skews higher-rated, so its floor differs.
+TV_MIN_VOTE_COUNT = 150
+TV_MIN_RATING = 7.0
+TV_GEM_MAX_VOTES = 1500
 
 
-def passes_quality(rating: float, votes: int, year: str) -> bool:
-    """Floor for a TMDB film: rating plus a minimum vote count, higher for old films."""
+def passes_quality(rating: float, votes: int, year: str, series: bool = False) -> bool:
+    """Floor for a TMDB film or series: rating plus a minimum vote count, higher for old titles."""
     try:
         old = bool(year) and int(year) < OLD_FILM_BEFORE
     except ValueError:
         old = False
     if old:
         return rating >= OLD_MIN_RATING and votes >= OLD_MIN_VOTES
+    if series:
+        return rating >= TV_MIN_RATING and votes >= TV_MIN_VOTE_COUNT
     return rating >= MIN_RATING and votes >= MIN_VOTE_COUNT
 
 
 def is_gem(item: "ContentItem") -> bool:
     """Lesser-known but highly rated film/doc (the reserved slot in the picks)."""
+    if item.content_type == "series":
+        return item.popularity <= TV_GEM_MAX_VOTES and item.rating >= GEM_MIN_RATING
     return (item.content_type in ("movie", "doc") and item.popularity <= GEM_MAX_VOTES
             and item.rating >= GEM_MIN_RATING)
 
@@ -148,7 +167,7 @@ class ContentItem:
 
 MOCK_MOVIES = [
     {"title": "Pantheon", "url": "https://www.themoviedb.org/tv/206559-pantheon",
-     "blurb": "Uploaded consciousness and simulation-theory themes.", "type": "movie"},
+     "blurb": "Uploaded consciousness and simulation-theory themes.", "type": "series"},
     {"title": "Dirty Money", "url": "https://www.themoviedb.org/tv/85400-dirty-money",
      "blurb": "Documentary series on financial schemes and speculative markets.", "type": "doc"},
 ]
@@ -164,6 +183,11 @@ MOCK_PAPERS = [
      "url": "https://arxiv.org/abs/2201.00000",
      "blurb": "Academic model of social-media-amplified speculative assets."},
 ]
+
+
+def mock_urls() -> set[str]:
+    """Every fixed mock URL, so the eval can tell offline mock rows from live ones."""
+    return {r["url"] for r in (*MOCK_MOVIES, *MOCK_VIDEOS, *MOCK_PAPERS)}
 
 
 def _mock_films(topic: str) -> list[ContentItem]:
@@ -215,6 +239,18 @@ async def _discover(client: httpx.AsyncClient, kw_id: int, doc: bool) -> list[di
     return (await _tmdb_get(client, "/discover/movie", params)).get("results", [])[:DISCOVER_PER_CALL]
 
 
+async def _discover_tv(client: httpx.AsyncClient, kw_id: int) -> list[dict]:
+    """Series tagged with the keyword. Documentary series are left to the film/doc path."""
+    params = {
+        "with_keywords": str(kw_id),
+        "sort_by": "vote_average.desc",
+        "vote_count.gte": TV_MIN_VOTE_COUNT,
+        "vote_average.gte": TV_MIN_RATING,
+        "without_genres": str(DOCUMENTARY_GENRE),
+    }
+    return (await _tmdb_get(client, "/discover/tv", params)).get("results", [])[:DISCOVER_PER_CALL]
+
+
 async def _search_tmdb(interest: Interest, client: httpx.AsyncClient) -> list[ContentItem]:
     if not _tmdb_key():
         if offline_mode():
@@ -232,22 +268,28 @@ async def _search_tmdb(interest: Interest, client: httpx.AsyncClient) -> list[Co
         if not kw:
             return []  # no thematic hook in TMDB: better to return nothing than noise
 
-        jobs = [(kid, term, doc) for kid, term in kw for doc in (True, False)]
-        batches = await asyncio.gather(*[_discover(client, kid, doc) for kid, _, doc in jobs])
+        # kind: "doc" (documentary film), "movie" (fiction film), "series" (scripted TV)
+        jobs = [(kid, term, kind) for kid, term in kw for kind in ("doc", "movie", "series")]
+        batches = await asyncio.gather(*[
+            _discover_tv(client, kid) if kind == "series" else _discover(client, kid, kind == "doc")
+            for kid, _, kind in jobs])
 
-        found: dict[int, ContentItem] = {}
-        for (kid, term, doc), results in zip(jobs, batches):
+        found: dict[tuple[str, int], ContentItem] = {}
+        for (kid, term, kind), results in zip(jobs, batches):
+            tv = kind == "series"
             for r in results:
-                year = (r.get("release_date") or "")[:4]
+                date = (r.get("first_air_date") if tv else r.get("release_date")) or ""
+                year = date[:4]
                 rating, votes = float(r.get("vote_average") or 0), int(r.get("vote_count") or 0)
-                if not passes_quality(rating, votes, year):
+                if not passes_quality(rating, votes, year, series=tv):
                     continue
-                item = found.get(r["id"])
+                key = ("tv" if tv else "movie", r["id"])     # TMDB ids are only unique per medium
+                item = found.get(key)
                 if item is None:
-                    item = found[r["id"]] = ContentItem(
-                        title=r.get("title", "Untitled"),
-                        content_type="doc" if doc else "movie",
-                        source_url=f"https://www.themoviedb.org/movie/{r['id']}",
+                    item = found[key] = ContentItem(
+                        title=(r.get("name") if tv else r.get("title")) or "Untitled",
+                        content_type=kind,
+                        source_url=f"https://www.themoviedb.org/{'tv' if tv else 'movie'}/{r['id']}",
                         topic=interest.topic,
                         topic_overlap_score=0.0,
                         blurb=(r.get("overview") or "")[:180],
@@ -384,6 +426,24 @@ async def _search_arxiv(interest: Interest, client: httpx.AsyncClient) -> list[C
 # YouTube (optional, off by default: the product is films + docs)
 # ---------------------------------------------------------------------------
 
+_ISO_DURATION = re.compile(r"^PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?$")
+
+
+def _duration_seconds(iso: str) -> int:
+    m = _ISO_DURATION.match(iso or "")
+    if not m:
+        return 0
+    h, mi, sec = (int(x or 0) for x in m.groups())
+    return h * 3600 + mi * 60 + sec
+
+
+def _title_matches(concept: str, title: str) -> bool:
+    """The video title must mention at least one meaningful word of the concept."""
+    words = [w for w in re.findall(r"[a-z0-9]+", concept.lower()) if len(w) > 2 and w not in STOPWORDS]
+    low = title.lower()
+    return not words or any(w in low for w in words)
+
+
 async def _search_youtube(interest: Interest, client: httpx.AsyncClient) -> list[ContentItem]:
     if not _youtube_key():
         if offline_mode():
@@ -392,21 +452,49 @@ async def _search_youtube(interest: Interest, client: httpx.AsyncClient) -> list
                     for r in MOCK_VIDEOS]
         log.warning("YOUTUBE_API_KEY is not set: no videos returned")
         return []
+    concept = (interest.concepts or [interest.topic])[0]
     try:
         resp = await client.get(
             YOUTUBE_SEARCH_URL,
             # a concept plus "explained" finds explainers; raw film-tag keywords find trailers
-            params={"part": "snippet",
-                    "q": f"{(interest.concepts or [interest.topic])[0]} explained",
-                    "type": "video", "maxResults": 3, "key": _youtube_key()},
+            params={"part": "snippet", "q": f"{concept} explained", "type": "video",
+                    "maxResults": YOUTUBE_CANDIDATES, "relevanceLanguage": "en",
+                    "safeSearch": "moderate", "videoEmbeddable": "true", "key": _youtube_key()},
             timeout=_timeout(),
         )
         resp.raise_for_status()
-        return [ContentItem(
-            title=r["snippet"]["title"], content_type="video",
-            source_url=f"https://www.youtube.com/watch?v={r['id']['videoId']}",
-            topic=interest.topic, topic_overlap_score=0.7,
-            blurb=r["snippet"].get("description", "")[:140]) for r in resp.json().get("items", [])]
+        hits = [r for r in resp.json().get("items", [])
+                if r.get("id", {}).get("videoId") and _title_matches(concept, r["snippet"].get("title", ""))]
+        if not hits:
+            return []
+        # one cheap batched lookup for length and views, so shorts and junk can be dropped
+        details = await client.get(
+            YOUTUBE_VIDEOS_URL,
+            params={"part": "contentDetails,statistics", "key": _youtube_key(),
+                    "id": ",".join(r["id"]["videoId"] for r in hits)},
+            timeout=_timeout(),
+        )
+        details.raise_for_status()
+        info = {d["id"]: d for d in details.json().get("items", [])}
+        out = []
+        for r in hits:                                     # keep YouTube's relevance order
+            d = info.get(r["id"]["videoId"])
+            if not d:
+                continue
+            seconds = _duration_seconds(d.get("contentDetails", {}).get("duration", ""))
+            views = int(d.get("statistics", {}).get("viewCount", 0) or 0)
+            if not (VIDEO_MIN_SECONDS <= seconds <= VIDEO_MAX_SECONDS) or views < VIDEO_MIN_VIEWS:
+                continue
+            out.append(ContentItem(
+                title=r["snippet"]["title"], content_type="video",
+                source_url=f"https://www.youtube.com/watch?v={r['id']['videoId']}",
+                topic=interest.topic, topic_overlap_score=0.7,
+                blurb=f"{r['snippet'].get('channelTitle', '')}: {r['snippet'].get('description', '')}"[:160],
+                year=(r["snippet"].get("publishedAt") or "")[:4], popularity=views,
+                matched_keywords=[concept]))
+            if len(out) >= YOUTUBE_PER_INTEREST:
+                break
+        return out
     except Exception as e:  # noqa: BLE001
         _fail("YouTube", interest.topic, e)
         return []
@@ -427,7 +515,7 @@ async def search_content(interests: list[Interest],
             tasks.append(_search_tmdb(interest, client))
             if n < ARXIV_MAX_INTERESTS:
                 tasks.append(_search_arxiv(interest, client))
-            if include_videos:
+            if include_videos and n < YOUTUBE_MAX_INTERESTS:
                 tasks.append(_search_youtube(interest, client))
         groups = await asyncio.gather(*tasks)
     finally:

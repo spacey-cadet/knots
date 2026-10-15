@@ -293,7 +293,7 @@ def test_tmdb_drops_films_below_the_gate(monkeypatch):
         path = request.url.path
         if path.endswith("/search/keyword"):
             return httpx.Response(200, json={"results": [{"id": 1, "name": "memecoins"}]})
-        if "99" in request.url.params.get("with_genres", ""):
+        if path.endswith("/discover/tv") or "99" in request.url.params.get("with_genres", ""):
             return httpx.Response(200, json={"results": []})
         return httpx.Response(200, json={"results": [
             film(1, "Good Modern", 7.4, 800, "2018-01-01"),
@@ -306,6 +306,110 @@ def test_tmdb_drops_films_below_the_gate(monkeypatch):
     items = asyncio.run(C._search_tmdb(_topic(), client))
     assert [i.title for i in items] == ["Good Modern"]
     assert items[0].rating == 7.4 and items[0].popularity == 800
+
+
+def test_series_are_discovered_gated_and_linked_to_tv(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("TMDB_API_KEY", "k")
+
+    def show(i, name, rating, votes, date):
+        return {"id": i, "name": name, "vote_average": rating, "vote_count": votes,
+                "first_air_date": date, "overview": ""}
+
+    def handler(request):
+        path = request.url.path
+        if path.endswith("/search/keyword"):
+            return httpx.Response(200, json={"results": [{"id": 1, "name": "memecoins"}]})
+        if path.endswith("/discover/tv"):
+            assert request.url.params["without_genres"] == "99"     # documentaries stay on the doc path
+            return httpx.Response(200, json={"results": [
+                show(7, "Severance", 8.2, 4000, "2022-02-18"),
+                show(8, "Meh Show", 6.4, 900, "2019-01-01"),        # below the TV floor
+                show(9, "Obscure", 8.5, 20, "2021-01-01"),          # too few votes
+                show(10, "Old Series", 7.2, 5000, "1975-01-01"),    # old: needs 7.5+
+            ]})
+        return httpx.Response(200, json={"results": []})
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    items = asyncio.run(C._search_tmdb(_topic(), client))
+    assert [(i.title, i.content_type) for i in items] == [("Severance", "series")]
+    assert items[0].source_url == "https://www.themoviedb.org/tv/7"
+
+
+def test_same_tmdb_id_for_a_film_and_a_series_are_kept_apart(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("TMDB_API_KEY", "k")
+
+    def handler(request):
+        path = request.url.path
+        if path.endswith("/search/keyword"):
+            return httpx.Response(200, json={"results": [{"id": 1, "name": "memecoins"}]})
+        if path.endswith("/discover/tv"):
+            return httpx.Response(200, json={"results": [{"id": 5, "name": "The Show", "vote_average": 8.0,
+                                                          "vote_count": 500, "first_air_date": "2020-01-01"}]})
+        if "99" in request.url.params.get("with_genres", ""):
+            return httpx.Response(200, json={"results": []})
+        return httpx.Response(200, json={"results": [{"id": 5, "title": "The Film", "vote_average": 7.5,
+                                                      "vote_count": 500, "release_date": "2020-01-01"}]})
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    items = asyncio.run(C._search_tmdb(_topic(), client))
+    assert sorted(i.title for i in items) == ["The Film", "The Show"]
+
+
+def test_series_card_and_watch_grouping():
+    show = ContentItem(title="Severance", content_type="series", source_url="https://x/tv/7", topic="memecoins",
+                       topic_overlap_score=0.9, year="2022", popularity=4000, rating=8.2)
+    film = _film("Margin Call", rating=7.1, votes=60_000, score=0.8)
+    plan = build_session_plan([_topic()], [show, film], extractor="bedrock")
+    titles = [c["title"] for c in plan["picks"]["watch"]]
+    assert titles == ["Severance", "Margin Call"]
+    assert "series" in plan["picks"]["watch"][0]["reasoning"]
+
+
+def _yt_handler(videos, details):
+    def handler(request):
+        if request.url.path.endswith("/search"):
+            return httpx.Response(200, json={"items": [
+                {"id": {"videoId": vid}, "snippet": {"title": title, "channelTitle": "Chan",
+                                                     "description": "d", "publishedAt": "2023-05-01T00:00:00Z"}}
+                for vid, title in videos]})
+        assert request.url.path.endswith("/videos")
+        return httpx.Response(200, json={"items": [
+            {"id": vid, "contentDetails": {"duration": dur}, "statistics": {"viewCount": str(views)}}
+            for vid, dur, views in details]})
+    return handler
+
+
+def test_youtube_filters_shorts_junk_and_off_topic(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("YOUTUBE_API_KEY", "k")
+    videos = [("a", "Reflexivity explained"), ("b", "Reflexivity in 30 seconds"), ("c", "Reflexivity lecture series"),
+              ("d", "Reflexivity unknown channel"), ("e", "Cat videos compilation"), ("f", "Reflexivity, Soros and markets")]
+    details = [("a", "PT12M30S", 250_000), ("b", "PT0M30S", 9_000_000),   # short: dropped
+               ("c", "PT2H10M5S", 80_000),                                # too long: dropped
+               ("d", "PT9M", 800),                                        # too few views: dropped
+               ("e", "PT10M", 5_000_000),                                 # off topic: dropped before lookup
+               ("f", "PT1H", 40_000)]
+    client = httpx.AsyncClient(transport=httpx.MockTransport(_yt_handler(videos, details)))
+    topic = I.Interest(topic="markets", depth="deep", sentiment="curious", mentions=1,
+                       concepts=["reflexivity"], keywords=["reflexivity"])
+    items = asyncio.run(C._search_youtube(topic, client))
+    assert [i.title for i in items] == ["Reflexivity explained", "Reflexivity, Soros and markets"]
+    assert items[0].source_url == "https://www.youtube.com/watch?v=a" and items[0].popularity == 250_000
+
+
+def test_youtube_failure_returns_nothing(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("YOUTUBE_API_KEY", "k")
+    client = httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(403)))
+    assert asyncio.run(C._search_youtube(_topic(), client)) == []
+    assert C.FAILURES[-1].startswith("YouTube:")
+
+
+def test_iso_duration_parsing():
+    assert C._duration_seconds("PT1H2M3S") == 3723 and C._duration_seconds("PT45S") == 45
+    assert C._duration_seconds("P1DT0S") == 0 and C._duration_seconds("") == 0   # unparseable = excluded
 
 
 def test_relevance_decides_not_popularity():

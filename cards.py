@@ -15,7 +15,7 @@ from catalogs import ContentItem, is_gem
 from interests import Interest
 
 # What the person does with each type. Used to group output for a screen/voice.
-KIND = {"movie": "watch", "doc": "watch", "video": "explore", "paper": "read"}
+KIND = {"movie": "watch", "series": "watch", "doc": "watch", "video": "explore", "paper": "read"}
 
 
 def _concept(interest: Interest) -> str:
@@ -36,17 +36,21 @@ def explain_recommendation(item: ContentItem, interest: Interest) -> str:
         lead = (f"Your questions about {topic} keep landing on {concept}; "
                 f"{item.title} puts that idea on screen as fiction." if deeper
                 else f"You've been engaging with {topic}; {item.title} explores similar themes on screen.")
+    elif item.content_type == "series":
+        lead = (f"Your questions about {topic} keep landing on {concept}; "
+                f"{item.title} is a series that takes that idea on over many episodes." if deeper
+                else f"You've been engaging with {topic}; {item.title} is a series that explores similar themes.")
     elif item.content_type == "video":
-        lead = f"For {concept}, this explainer breaks it down visually."
+        lead = f"If you want {concept} explained rather than dramatised, {item.title} is a video explainer on it."
     else:  # paper
         lead = f"If you want the research behind {concept}, {item.title} is the academic angle."
 
     parts = [lead]
-    if theme and item.content_type in ("movie", "doc"):
+    if theme and item.content_type in ("movie", "series", "doc"):
         parts.append(f"It also speaks to something you didn't say out loud: {theme}.")
     if item.matched_keywords:
         parts.append(f"Matched on: {', '.join(item.matched_keywords[:3])}.")
-    if interest.depth == "deep" and item.content_type in ("movie", "doc"):
+    if interest.depth == "deep" and item.content_type in ("movie", "series", "doc"):
         parts.append("Since you're going deep on this, there's a paper that pairs with it.")
     if is_gem(item):
         parts.append(f"Lesser-known, but well rated ({item.rating:.1f}/10 from {item.popularity:,} votes).")

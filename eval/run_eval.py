@@ -92,14 +92,7 @@ def run_extractor(mode: str, model: str | None, texts: list[str]):
 
 def is_live(card: dict) -> bool:
     """False for the fixed offline mock items, which say nothing about the pipeline."""
-    url, kind = card.get("url", ""), card.get("type", "")
-    if kind in ("movie", "doc"):
-        return "/movie/" in url            # live TMDB items; mocks are /tv/ links
-    if kind == "paper":
-        return "2201.00000" not in url     # the mock paper
-    if kind == "video":
-        return "search_query" not in url   # the mock video
-    return False
+    return card.get("url", "") not in catalogs.mock_urls()
 
 
 def read_csv(path: Path) -> list[dict]:
@@ -137,6 +130,9 @@ def cmd_run(args) -> int:
         print("WARNING: TMDB_API_KEY is not set. Films will be the fixed offline mock set, "
               "so every session gets the same films and the labels will not mean much.\n")
 
+    videos = bool(os.environ.get("YOUTUBE_API_KEY")) and not args.no_videos
+    if not videos:
+        print("NOTE: YouTube is off (no YOUTUBE_API_KEY, or --no-videos), so no explainers will appear.\n")
     results, errors, incomplete = [], 0, 0
     for sess in sessions:
         for spec in specs:
@@ -145,7 +141,7 @@ def cmd_run(args) -> int:
             try:
                 catalogs.FAILURES.clear()
                 found, used = run_extractor(mode, model, sess["texts"])
-                items = asyncio.run(search_content(found, include_videos=args.videos))
+                items = asyncio.run(search_content(found, include_videos=videos))
                 plan = build_session_plan(found, items, extractor=used)
                 failed = list(catalogs.FAILURES)
                 entry.update(ok=True, used=used, interests=[i.to_dict() for i in found], plan=plan,
@@ -439,7 +435,8 @@ def main() -> int:
     r = sub.add_parser("run", help="run sessions through extractors, build label sheets")
     r.add_argument("--extractors", default="heuristic,bedrock",
                    help="comma list: heuristic, bedrock, or bedrock=<model id> (default: heuristic,bedrock)")
-    r.add_argument("--videos", action="store_true", help="also query YouTube (needs YOUTUBE_API_KEY)")
+    r.add_argument("--no-videos", action="store_true",
+                   help="skip YouTube (it is on by default when YOUTUBE_API_KEY is set)")
     r.set_defaults(fn=cmd_run)
     lb = sub.add_parser("label", help="open the local labelling tool (saves into the CSVs)")
     lb.add_argument("--port", type=int, default=8765)

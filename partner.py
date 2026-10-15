@@ -17,7 +17,7 @@ from cards import rank_and_render
 from catalogs import ContentItem
 from interests import Interest
 
-PER_KIND = {"watch": 3, "read": 2, "explore": 2}
+PER_KIND = {"watch": 4, "read": 2, "explore": 2}
 
 
 def _join(words: list[str]) -> str:
