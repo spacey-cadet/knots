@@ -13,6 +13,7 @@ import asyncio
 import json
 
 import httpx
+import pytest
 
 import catalogs as C
 import interests as I
@@ -55,6 +56,13 @@ def _use(monkeypatch, fake, mode="auto"):
     monkeypatch.delenv("EXTRACTOR_STRICT", raising=False)
     monkeypatch.setattr(I, "_client", fake)
     I._cache.clear()
+
+
+@pytest.fixture(autouse=True)
+def _fast_arxiv(monkeypatch):
+    monkeypatch.setattr(C, "ARXIV_MIN_INTERVAL", 0)
+    monkeypatch.setattr(C, "ARXIV_RETRY_AFTER_DEFAULT", 0)
+    C._arxiv_cache.clear()
 
 
 def _offline_catalogs(monkeypatch):
@@ -171,6 +179,52 @@ def test_arxiv_follows_http_redirect(monkeypatch):
     monkeypatch.setattr(C, "ARXIV_API_URL", "http://export.arxiv.org/api/query")
     items = asyncio.run(C._search_arxiv(_topic(), client))
     assert [i.title for i in items] == ["Reflexivity in markets"] and len(hits) == 2
+
+
+ATOM = ('<feed xmlns="http://www.w3.org/2005/Atom"><entry><id>http://arxiv.org/abs/2301.00001v1</id>'
+        '<title>Reflexivity in markets</title><summary>A real paper.</summary></entry></feed>')
+
+
+def test_arxiv_retries_once_on_429_then_caches(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        return httpx.Response(429, headers={"Retry-After": "0"}) if len(calls) == 1 else httpx.Response(200, text=ATOM)
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    first = asyncio.run(C._search_arxiv(_topic(), client))
+    assert [i.title for i in first] == ["Reflexivity in markets"] and len(calls) == 2   # 429, then success
+    asyncio.run(C._search_arxiv(_topic(), client))
+    assert len(calls) == 2                                  # same query: served from cache
+    asyncio.run(C._search_arxiv(_topic("grief"), client))
+    assert len(calls) == 3                                  # different query: one new request
+
+
+def test_arxiv_gives_up_after_second_429_without_fake_paper(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    client = httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(429)))
+    assert asyncio.run(C._search_arxiv(_topic(), client)) == []
+
+
+def test_arxiv_requests_are_spaced(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setattr(C, "ARXIV_MIN_INTERVAL", 0.2)
+    C._arxiv_next_slot = 0.0
+    times = []
+
+    def handler(request):
+        times.append(__import__("time").monotonic())
+        return httpx.Response(200, text=ATOM)
+
+    async def go():
+        client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+        await asyncio.gather(*[C._search_arxiv(_topic(f"t{i}"), client) for i in range(3)])
+
+    asyncio.run(go())
+    gaps = [b - a for a, b in zip(sorted(times), sorted(times)[1:])]
+    assert len(times) == 3 and all(g >= 0.15 for g in gaps)
 
 
 def test_quality_gate_and_age_rule():

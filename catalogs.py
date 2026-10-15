@@ -34,6 +34,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
+import time
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field, asdict
 from typing import Literal
@@ -55,6 +56,11 @@ DOCUMENTARY_GENRE = 99
 MAX_SEARCH_INTERESTS = 3     # latency cap: only the top interests hit live catalogs
 MAX_KEYWORDS_PER_INTEREST = 4
 HTTP_TIMEOUT = 5
+
+# arXiv asks for at most one request every ~3 s and answers bursts with 429.
+ARXIV_MIN_INTERVAL = 3.1
+ARXIV_MAX_INTERESTS = 2       # papers are anchors; searching every interest only adds wait
+ARXIV_RETRY_AFTER_DEFAULT = 5.0
 
 # Quality floor (a gate, not a ranking signal). Fame is not quality, and
 # relevance, not rating, decides order among films that pass.
@@ -243,32 +249,66 @@ def _mock_papers(topic: str) -> list[ContentItem]:
 _ATOM = "{http://www.w3.org/2005/Atom}"
 
 
+_arxiv_next_slot = 0.0                      # monotonic time the next arXiv request may start
+_arxiv_cache: dict[str, list[ContentItem]] = {}   # query -> parsed result (successes only)
+
+
+async def _arxiv_wait_turn() -> None:
+    """Space requests ARXIV_MIN_INTERVAL apart across all concurrent searches.
+    No lock: the slot is claimed with no await in between, so it is race-free
+    inside one event loop, and it survives the eval's one-loop-per-session use."""
+    global _arxiv_next_slot
+    now = time.monotonic()
+    slot = max(now, _arxiv_next_slot)
+    _arxiv_next_slot = slot + ARXIV_MIN_INTERVAL
+    if slot > now:
+        await asyncio.sleep(slot - now)
+
+
+def _parse_arxiv(text: str, topic: str) -> list[ContentItem]:
+    items = []
+    for entry in ET.fromstring(text).findall(f"{_ATOM}entry"):
+        title = " ".join((entry.findtext(f"{_ATOM}title") or "").split())
+        url = (entry.findtext(f"{_ATOM}id") or "").strip()
+        if title and url:
+            items.append(ContentItem(
+                title=title, content_type="paper", source_url=url, topic=topic,
+                topic_overlap_score=0.8, role="anchor",
+                blurb=" ".join((entry.findtext(f"{_ATOM}summary") or "").split())[:180],
+            ))
+    return items
+
+
 async def _search_arxiv(interest: Interest, client: httpx.AsyncClient) -> list[ContentItem]:
     query = (interest.concepts[0] if interest.concepts else interest.topic)
     if offline_mode():
         return _mock_papers(interest.topic)
+    cached = _arxiv_cache.get(query)
+    if cached is not None:
+        return [ContentItem(**{**asdict(i), "topic": interest.topic}) for i in cached]
     try:
-        resp = await client.get(
-            ARXIV_API_URL,
-            params={"search_query": f'all:"{query}"', "start": 0, "max_results": 1},
-            timeout=HTTP_TIMEOUT,
-            follow_redirects=True,
-        )
-        resp.raise_for_status()
-        root = ET.fromstring(resp.text)
-        items = []
-        for entry in root.findall(f"{_ATOM}entry"):
-            title = " ".join((entry.findtext(f"{_ATOM}title") or "").split())
-            url = (entry.findtext(f"{_ATOM}id") or "").strip()
-            if title and url:
-                items.append(ContentItem(
-                    title=title, content_type="paper", source_url=url, topic=interest.topic,
-                    topic_overlap_score=0.8, role="anchor",
-                    blurb=" ".join((entry.findtext(f"{_ATOM}summary") or "").split())[:180],
-                ))
-        return items          # no match is a legitimate empty answer
+        for attempt in (1, 2):
+            await _arxiv_wait_turn()
+            resp = await client.get(
+                ARXIV_API_URL,
+                params={"search_query": f'all:"{query}"', "start": 0, "max_results": 1},
+                timeout=HTTP_TIMEOUT,
+                follow_redirects=True,
+            )
+            if resp.status_code == 429 and attempt == 1:     # rate limited: wait once, retry once
+                try:
+                    wait = min(float(resp.headers.get("Retry-After", "")), 30.0)
+                except ValueError:
+                    wait = ARXIV_RETRY_AFTER_DEFAULT
+                await asyncio.sleep(wait)
+                continue
+            resp.raise_for_status()
+            break
+        items = _parse_arxiv(resp.text, interest.topic)
+        _arxiv_cache[query] = items       # a genuine "no match" is cached too
+        return items
     except Exception as e:  # noqa: BLE001
-        log.warning("arXiv search failed for %r: %s: %s", query, type(e).__name__, e)
+        log.warning("arXiv search failed for %r: %s", query, getattr(getattr(e, "response", None), "status_code", None) or type(e).__name__)
         return []
 
 
@@ -315,9 +355,10 @@ async def search_content(interests: list[Interest],
     client = client or httpx.AsyncClient()
     try:
         tasks = []
-        for interest in interests[:MAX_SEARCH_INTERESTS]:
+        for n, interest in enumerate(interests[:MAX_SEARCH_INTERESTS]):
             tasks.append(_search_tmdb(interest, client))
-            tasks.append(_search_arxiv(interest, client))
+            if n < ARXIV_MAX_INTERESTS:
+                tasks.append(_search_arxiv(interest, client))
             if include_videos:
                 tasks.append(_search_youtube(interest, client))
         groups = await asyncio.gather(*tasks)
