@@ -4,8 +4,13 @@ Hand-labelled by the author. A pick is *good* if I would genuinely watch/read it
 
 | Extractor | Good picks (all) | Watch | Read | Unstated themes found | Themes supported |
 | --- | --- | --- | --- | --- | --- |
-| bedrock | 20/26 (77%) | 20/26 (77%) | n/a | 102 | 102/102 (100%) |
-| heuristic | 17/18 (94%) | 17/18 (94%) | n/a | 0 | n/a |
+| bedrock | 26/39 (67%) | 17/22 (77%) | 9/17 (53%) | 103 | 41/103 (40%) |
+| heuristic | 16/37 (43%) | 9/17 (53%) | 7/20 (35%) | 0 | n/a |
 
-- **bedrock:** 10 offline mock picks excluded (use --include-mock to count them)
-- **heuristic:** 10 offline mock picks excluded (use --include-mock to count them)
+Why picks were not good (counts):
+
+| Extractor | Relevance | Quality | Repeat | Other | No reason given |
+| --- | --- | --- | --- | --- | --- |
+| bedrock | 12 | 1 | 0 | 0 | 0 |
+| heuristic | 19 | 1 | 1 | 0 | 0 |
+
