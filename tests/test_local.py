@@ -1,8 +1,8 @@
 """
 Offline tests: no network, no AWS credentials, no API keys.
 
-    python test_local.py     # runs the tests, then prints a sample partner session
-    pytest -q                # same tests under pytest
+    python -m pytest -q                  # the tests
+    python tests/test_local.py           # the tests, then a sample thinking_partner session
 
 Bedrock is exercised through a fake client that returns the same response shape
 the real Converse API does, so the parsing, validation and fallback logic that
@@ -15,15 +15,22 @@ import json
 import httpx
 import pytest
 
-import catalogs as C
-import interests as I
-from cards import rank_and_render
-from catalogs import ContentItem, passes_quality, search_content
-import embeddings as E
-import history as H
-import memory as M
+import sys
 from datetime import datetime, timedelta, timezone
-from partner import build_session_plan
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))   # so `python tests/test_local.py` works too
+
+from knots import catalogs as C
+from knots import context as H
+from knots import embeddings as E
+from knots import engine
+from knots import extraction as I
+from knots import memory as M
+from knots.catalogs import ContentItem, search_content
+from knots.plan import build_session_plan
+from knots.quality import passes_quality
+from knots.ranking import rank_and_render
 
 SAMPLE_SESSION = [
     "Alexa, what's a memecoin and why do people buy them?",
@@ -491,7 +498,7 @@ def test_label_server_accepts_reason_only_on_not_good_picks(monkeypatch, tmp_pat
     import urllib.request
     from pathlib import Path
 
-    spec = importlib.util.spec_from_file_location("run_eval", Path(__file__).parent / "eval" / "run_eval.py")
+    spec = importlib.util.spec_from_file_location("run_eval", Path(__file__).resolve().parent.parent / "eval" / "run_eval.py")
     ev = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(ev)
     labels = tmp_path / "labels.csv"
@@ -907,19 +914,35 @@ def test_server_exposes_tools():
     assert {"thinking_partner", "get_recommendations", "extract_interests", "search_content"} <= names
 
 
+def test_engine_is_the_single_door(monkeypatch):
+    """The server and the eval call the engine; neither carries recommendation logic."""
+    import re
+    root = Path(__file__).resolve().parent.parent
+    for name in ("server.py", "eval/run_eval.py"):
+        src = (root / name).read_text()
+        imported = set(re.findall(r"^\s*(?:from|import) knots(?:\.(\w+))?", src, re.M))
+        assert imported <= {"", "engine"} or imported <= {"", "engine", "catalogs"}, (name, imported)
+    assert "rank_and_render" not in (root / "server.py").read_text()
+    assert "build_session_plan" not in (root / "server.py").read_text()
+
+    monkeypatch.setenv("EXTRACTOR", "heuristic")
+    _offline_catalogs(monkeypatch)
+    plan = asyncio.run(engine.plan(session_texts=SAMPLE_SESSION))
+    assert {"threads", "picks", "spoken", "ask"} <= set(plan) and plan["picks"]["watch"]
+    cards = asyncio.run(engine.recommend(session_texts=SAMPLE_SESSION, limit=3))
+    assert 0 < len(cards["cards"]) <= 3
+    assert asyncio.run(engine.plan()) ["spoken"] == engine.NOTHING_YET            # nothing said, no user: honest answer
+    assert asyncio.run(engine.search(["memecoins"]))
+
+
 if __name__ == "__main__":
     import os
-    import sys
 
-    import pytest
     code = pytest.main(["-q", __file__])
     if code == 0:
         os.environ["EXTRACTOR"] = "heuristic"
         os.environ["KNOTS_OFFLINE"] = "1"   # sample output uses the explicit offline mock catalogs
         os.environ.pop("TMDB_API_KEY", None)
-        found, used = I.extract_sync(SAMPLE_SESSION)
-        client = httpx.AsyncClient(transport=httpx.MockTransport(lambda r: httpx.Response(503)))
-        items = asyncio.run(search_content(found, client=client, include_videos=True))
         print("\n=== Sample thinking_partner output (offline, heuristic) ===")
-        print(json.dumps(build_session_plan(found, items, extractor=used), indent=2))
+        print(json.dumps(asyncio.run(engine.plan(session_texts=SAMPLE_SESSION)), indent=2))
     sys.exit(code)

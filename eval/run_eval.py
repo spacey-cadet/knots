@@ -48,10 +48,7 @@ load_dotenv(ROOT / ".env")
 os.environ.setdefault("KNOTS_HTTP_TIMEOUT", "25")
 os.environ.setdefault("KNOTS_ARXIV_CACHE", str(HERE / "results" / "arxiv_cache.json"))
 
-import interests as I  # noqa: E402
-import catalogs  # noqa: E402
-from catalogs import search_content  # noqa: E402
-from partner import build_session_plan  # noqa: E402
+from knots import catalogs, engine  # noqa: E402
 
 SESSIONS = HERE / "sessions.json"
 RESULTS = HERE / "results" / "results.json"
@@ -77,7 +74,7 @@ def parse_spec(spec: str) -> tuple[str, str | None]:
     return spec.strip(), None
 
 
-def run_extractor(mode: str, model: str | None, texts: list[str]):
+def set_extractor(mode: str, model: str | None) -> None:
     if mode not in ("heuristic", "bedrock"):
         raise ValueError(f"unknown extractor '{mode}' (use heuristic or bedrock)")
     os.environ["EXTRACTOR"] = mode
@@ -87,7 +84,6 @@ def run_extractor(mode: str, model: str | None, texts: list[str]):
         os.environ.pop("EXTRACTOR_STRICT", None)
     if model:
         os.environ["BEDROCK_MODEL_ID"] = model
-    return I.extract_sync(texts)
 
 
 def is_live(card: dict) -> bool:
@@ -140,9 +136,9 @@ def cmd_run(args) -> int:
             entry = {"session_id": sess["id"], "extractor": spec, "texts": sess["texts"]}
             try:
                 catalogs.FAILURES.clear()
-                found, used = run_extractor(mode, model, sess["texts"])
-                items = asyncio.run(search_content(found, include_videos=videos))
-                plan = build_session_plan(found, items, extractor=used)
+                set_extractor(mode, model)
+                result = asyncio.run(engine.run(session_texts=sess["texts"], include_videos=videos))
+                found, used, plan = result.interests, result.extractor, result.plan()
                 failed = list(catalogs.FAILURES)
                 entry.update(ok=True, used=used, interests=[i.to_dict() for i in found], plan=plan,
                              catalog_failures=failed)

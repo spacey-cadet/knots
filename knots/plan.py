@@ -13,9 +13,9 @@ Output is shaped for both surfaces Alexa+ has:
 
 from __future__ import annotations
 
-from cards import rank_and_render
-from catalogs import ContentItem
-from interests import Interest
+from .catalogs import ContentItem
+from .extraction import Interest
+from .ranking import rank_and_render
 
 PER_KIND = {"watch": 4, "read": 2, "explore": 2}
 

@@ -25,7 +25,7 @@ from dataclasses import dataclass, fields
 from datetime import datetime, timezone
 from pathlib import Path
 
-from interests import Interest
+from .extraction import Interest
 
 MAX_RECORDS_PER_USER = 500          # bounded: the oldest are dropped past this
 

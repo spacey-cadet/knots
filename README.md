@@ -25,30 +25,58 @@ Ranking: relevance (shared film-tag keywords) decides. Quality is a floor
 votes), not a score, and popularity is not a signal. One slot per session is
 reserved for a lesser-known (<= 3,000 votes), highly rated (>= 7.0) pick.
 
+## Repo layout
+
+The whole recommendation algorithm is one package, `knots/`, with a single entry
+point, `knots.engine`. `server.py` (the MCP transport) and `eval/run_eval.py`
+(the evaluation harness) are thin callers of it and hold no recommendation logic.
+
+```
+knots/                  the algorithm
+  engine.py             the one door: run / plan / recommend / extract / search / forget
+  context.py            input scope: one or many conversations, merging, memory recall
+  memory.py             SQLite ProfileStore (interests + embeddings, never words)
+  embeddings.py         Titan v2 with an offline hashed fallback
+  extraction.py         Bedrock extractor + heuristic fallback; best medium per interest
+  catalogs.py           retrieval: TMDB films, series, docs; YouTube explainers; arXiv papers
+  quality.py            the quality gate (rating, votes, age) and the reserved-slot rules
+  ranking.py            relevance-first ranking, reserved slots, grounded reasons
+  plan.py               watch / read / explore, spoken line, follow-up question
+server.py               MCP tools, transport only
+eval/                   run_eval.py, the labelling tool, your labels and results
+tests/test_local.py     offline tests (no network, no keys)
+```
+
+```python
+from knots import engine
+plan = await engine.plan(session_texts=["..."], user_id="alex")   # same as the thinking_partner tool
+```
+
 ## How it works
 
 ```
-session text ──► Bedrock extractor ──► interests ──► catalogs ──► reasoned cards
-(Alexa+/Reddit)   topic, concepts,     (fallback:     TMDB: films + docs (by keyword)
-                  unstated themes,      heuristic)    arXiv: papers
-                  film-tag keywords                   YouTube: explainers
+session text ──► understanding ──► retrieval ──► quality gate ──► ranking ──► plan
+(Alexa+/Reddit)   Bedrock: topic,   TMDB films,   rating, votes,   relevance,   watch / read /
+ + memory          concepts,        series, docs  age floor        reserved     explore + spoken
+                   themes, mediums  YouTube, arXiv                  slots        line + question
 ```
 
-- **Extraction (`interests.py`).** Amazon Bedrock's Converse API with a forced
+- **Understanding (`extraction.py`).** Amazon Bedrock's Converse API with a forced
   tool call returns structured JSON: the surface topic, the abstract concepts at
-  stake, unstated themes the text implies, and short film-tag-style keywords.
-  Model output is treated as untrusted (validated, clamped, session text fenced in
-  tags). On any failure (no credentials, no model access, throttling, bad JSON)
-  it falls back to the heuristic, and the response reports which extractor ran.
-- **Search (`catalogs.py`).** TMDB is queried by *keyword*, not title, so "free
-  will" finds films tagged with it rather than films named "Free Will". For each
-  keyword it runs discover twice: documentaries (the literal pick) and fiction
-  (the lateral pick). Papers from arXiv are attached as concept anchors.
-- **Reasons (`cards.py`).** Built only from facts held: the concept and theme the
-  extractor found, plus the TMDB tags that actually matched. No claims about a
-  film beyond its tags.
-- **Partner mode (`partner.py`).** Groups picks into watch / read / explore, adds
-  a short `spoken` line for voice and a follow-up `ask` question.
+  stake, unstated themes the text implies, short film-tag-style keywords and the
+  best formats. Model output is treated as untrusted (validated, clamped, session
+  text fenced in tags). On any failure (no credentials, no model access,
+  throttling, bad JSON) it falls back to the heuristic, and the response reports
+  which extractor ran.
+- **Retrieval (`catalogs.py`).** TMDB is queried by *keyword*, not title, so "free
+  will" finds films tagged with it rather than films named "Free Will". Papers
+  from arXiv are attached as concept anchors.
+- **Quality and ranking (`quality.py`, `ranking.py`).** See "Ranking" below.
+  Reasons are built only from facts held: the concept and theme the extractor
+  found, plus the tags that actually matched. No claims about a title beyond its
+  tags.
+- **Plan (`plan.py`).** Groups picks into watch / read / explore, adds a short
+  `spoken` line for voice and a follow-up `ask` question.
 
 ## Tools exposed
 
@@ -74,7 +102,8 @@ AWS chain. The role needs `bedrock:InvokeModel`. Never commit keys.
 ## Run
 
 ```bash
-python test_local.py   # offline tests + a sample thinking_partner response
+python -m pytest -q            # offline tests
+python tests/test_local.py     # the tests, then a sample thinking_partner response
 python server.py       # MCP server at http://localhost:8000/mcp
 ```
 

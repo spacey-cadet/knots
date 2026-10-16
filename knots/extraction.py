@@ -78,7 +78,7 @@ class Interest:
     confidence: float = 0.5
     # best format first. All three stay possible; the order says which fits THIS interest.
     mediums: list[str] = field(default_factory=lambda: list(MEDIUMS))
-    # --- filled when several conversations are merged (see history.py) ---
+    # --- filled when several conversations are merged (see context.py) ---
     conversations: int = 1          # how many separate conversations raised it
     last_seen: str = ""             # timestamp of the newest conversation that did, if known
     in_current: bool = True         # raised in the newest conversation

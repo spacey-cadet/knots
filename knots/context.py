@@ -37,10 +37,10 @@ import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-import embeddings as E
-import interests as I
-from interests import Interest
-from memory import ProfileStore, get_store
+from . import embeddings as E
+from . import extraction as I
+from .extraction import Interest
+from .memory import ProfileStore, get_store
 
 log = logging.getLogger("knots.history")
 

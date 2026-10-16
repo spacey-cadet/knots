@@ -11,8 +11,9 @@ assert what a film "is about" beyond its tags, so a reason can't hallucinate.
 
 from __future__ import annotations
 
-from catalogs import ContentItem, is_gem
-from interests import Interest
+from .catalogs import ContentItem
+from .extraction import Interest
+from .quality import is_gem
 
 # What the person does with each type. Used to group output for a screen/voice.
 KIND = {"movie": "watch", "series": "watch", "doc": "watch", "video": "explore", "paper": "read"}

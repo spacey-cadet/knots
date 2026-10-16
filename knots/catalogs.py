@@ -42,7 +42,9 @@ from typing import Literal
 
 import httpx
 
-from interests import STOPWORDS, Interest, allowed_mediums
+from .extraction import STOPWORDS, Interest, allowed_mediums
+from .quality import (MIN_RATING, MIN_VOTE_COUNT, TV_MIN_RATING, TV_MIN_VOTE_COUNT,
+                      passes_quality)
 
 log = logging.getLogger("knots.catalogs")
 
@@ -57,6 +59,7 @@ DOCUMENTARY_GENRE = 99
 
 MAX_SEARCH_INTERESTS = 3     # latency cap: only the top interests hit live catalogs
 MAX_KEYWORDS_PER_INTEREST = 4
+DISCOVER_PER_CALL = 20       # TMDB returns 20 per page; gate first, then rank
 HTTP_TIMEOUT = 5              # seconds; override with KNOTS_HTTP_TIMEOUT (the eval uses a longer one)
 
 
@@ -92,43 +95,6 @@ VIDEO_MIN_VIEWS = 5000       # floor against junk uploads; views are not a ranki
 ARXIV_MIN_INTERVAL = 5.0
 ARXIV_MAX_INTERESTS = 2       # papers are anchors; searching every interest only adds wait
 ARXIV_RETRY_AFTER_DEFAULT = 20.0
-
-# Quality floor (a gate, not a ranking signal). Fame is not quality, and
-# relevance, not rating, decides order among films that pass.
-MIN_VOTE_COUNT = 100         # also sent to TMDB so discover drops junk early
-MIN_RATING = 6.5
-OLD_FILM_BEFORE = 1990       # older films must clear a higher bar
-OLD_MIN_RATING = 7.5
-OLD_MIN_VOTES = 1000
-DISCOVER_PER_CALL = 20       # TMDB returns 20 per page; gate first, then rank
-GEM_MAX_VOTES = 3000         # "lesser-known": few votes ...
-GEM_MIN_RATING = 7.0         # ... but highly rated
-# TV gets fewer votes than film and skews higher-rated, so its floor differs.
-TV_MIN_VOTE_COUNT = 150
-TV_MIN_RATING = 7.0
-TV_GEM_MAX_VOTES = 1500
-
-
-def passes_quality(rating: float, votes: int, year: str, series: bool = False) -> bool:
-    """Floor for a TMDB film or series: rating plus a minimum vote count, higher for old titles."""
-    try:
-        old = bool(year) and int(year) < OLD_FILM_BEFORE
-    except ValueError:
-        old = False
-    if old:
-        return rating >= OLD_MIN_RATING and votes >= OLD_MIN_VOTES
-    if series:
-        return rating >= TV_MIN_RATING and votes >= TV_MIN_VOTE_COUNT
-    return rating >= MIN_RATING and votes >= MIN_VOTE_COUNT
-
-
-def is_gem(item: "ContentItem") -> bool:
-    """Lesser-known but highly rated film/doc (the reserved slot in the picks)."""
-    if item.content_type == "series":
-        return item.popularity <= TV_GEM_MAX_VOTES and item.rating >= GEM_MIN_RATING
-    return (item.content_type in ("movie", "doc") and item.popularity <= GEM_MAX_VOTES
-            and item.rating >= GEM_MIN_RATING)
-
 
 def offline_mode() -> bool:
     """Mock catalogs are allowed only when explicitly requested."""
