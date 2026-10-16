@@ -29,7 +29,7 @@ from knots import extraction as I
 from knots import memory as M
 from knots.catalogs import ContentItem, search_content
 from knots.plan import build_session_plan
-from knots.quality import passes_quality
+from knots.quality import is_blockbuster, passes_quality
 from knots.ranking import rank_and_render
 
 SAMPLE_SESSION = [
@@ -485,6 +485,99 @@ def test_one_slot_is_reserved_for_a_lesser_known_gem():
     assert [c["title"] for c in cards].index("Hidden") <= 2
     # no gem available -> nothing forced in
     assert not any(c["gem"] for c in rank_and_render(popular, topics, limit=4))
+
+
+def _show(title, rating, votes, topic="t0", score=0.8, year="2020"):
+    return ContentItem(title=title, content_type="series", source_url=f"https://x/tv/{title}", topic=topic,
+                       topic_overlap_score=score, year=year, popularity=votes, rating=rating)
+
+
+def test_blockbuster_means_widely_seen_and_good():
+    assert is_blockbuster(_film("Big", rating=8.0, votes=40_000))
+    assert not is_blockbuster(_film("Mid", rating=8.0, votes=3_000))               # good, not widely seen
+    assert not is_blockbuster(_film("Famous flop", rating=5.2, votes=900_000))     # fame is not quality
+    assert is_blockbuster(_show("Big show", rating=8.2, votes=3_000))              # series bar is lower
+    assert not is_blockbuster(_show("Small show", rating=8.2, votes=900))
+    assert not is_blockbuster(ContentItem(title="v", content_type="video", source_url="u", topic="t",
+                                          topic_overlap_score=1, popularity=9_000_000))
+
+
+def test_films_are_fetched_by_rating_and_by_vote_count(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("TMDB_API_KEY", "k")
+    seen = []
+
+    def handler(request):
+        path = request.url.path
+        if path.endswith("/search/keyword"):
+            return httpx.Response(200, json={"results": [{"id": 1, "name": "memecoins"}]})
+        if path.endswith("/discover/movie") and "99" not in request.url.params.get("with_genres", ""):
+            seen.append(request.url.params["sort_by"])
+            row = ({"id": 1, "title": "Niche", "vote_average": 8.4, "vote_count": 700, "release_date": "2019-01-01"}
+                   if seen[-1] == "vote_average.desc" else
+                   {"id": 2, "title": "Blockbuster", "vote_average": 7.9, "vote_count": 60000, "release_date": "2014-01-01"})
+            return httpx.Response(200, json={"results": [row]})
+        return httpx.Response(200, json={"results": []})
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    items = asyncio.run(C._search_tmdb(_topic(), client))
+    assert sorted(seen) == ["vote_average.desc", "vote_count.desc"]
+    assert sorted(i.title for i in items) == ["Blockbuster", "Niche"]
+
+
+def _slate(n=4, votes=4000):
+    """n mid-popularity films, one per topic: neither blockbusters nor gems."""
+    return ([_film(f"Film{i}", rating=7.4, votes=votes, score=0.9 - i * 0.02, topic=f"t{i}") for i in range(n)],
+            [_topic(f"t{i}") for i in range(n)])
+
+
+def test_a_relevant_blockbuster_is_always_suggested():
+    films, topics = _slate()
+    big = _film("The Big One", rating=8.1, votes=60_000, score=0.7, topic="t0")     # 0.7 >= 0.6 * 0.9
+    cards = rank_and_render(films + [big], topics, limit=4)
+    got = [c for c in cards if c["blockbuster"]]
+    assert [c["title"] for c in got] == ["The Big One"]
+    assert [c["title"] for c in cards].index("The Big One") <= 1
+    assert "Widely watched" in got[0]["reasoning"]
+
+
+def test_a_famous_but_loosely_relevant_title_is_not_forced_in():
+    films, topics = _slate()
+    loose = _film("Famous Tangent", rating=8.1, votes=60_000, score=0.3, topic="t0")  # 0.3 < 0.6 * 0.9
+    cards = rank_and_render(films + [loose], topics, limit=6)
+    assert not any(c["blockbuster"] for c in cards)
+
+
+def test_no_duplicate_when_the_top_pick_is_already_a_blockbuster():
+    films, topics = _slate()
+    films[0] = _film("Top And Famous", rating=8.3, votes=90_000, score=0.95, topic="t0")
+    cards = rank_and_render(films, topics, limit=6)
+    assert [c["title"] for c in cards].count("Top And Famous") == 1 and cards[0]["blockbuster"]
+    assert sum(c["blockbuster"] for c in cards) == 1
+
+
+def test_blockbuster_and_gem_slots_coexist_and_survive_a_tight_limit():
+    films, topics = _slate(votes=4000)
+    big = _film("The Big One", rating=8.1, votes=60_000, score=0.7, topic="t0")
+    gem = _film("Hidden", rating=7.8, votes=500, score=0.6, topic="t1")
+    cards = rank_and_render(films + [big, gem], topics, limit=3)
+    titles = [c["title"] for c in cards]
+    assert "The Big One" in titles and "Hidden" in titles
+
+
+def test_series_can_be_the_blockbuster():
+    films, topics = _slate()
+    show = _show("Dark Matter Show", rating=8.4, votes=5_000, topic="t1", score=0.6)   # 0.6 >= 0.6 * 0.88
+    cards = rank_and_render(films + [show], topics, limit=6)
+    assert any(c["blockbuster"] and c["type"] == "series" for c in cards)
+
+
+def test_plan_puts_the_blockbuster_near_the_top_of_watch():
+    films, topics = _slate()
+    big = _film("The Big One", rating=8.1, votes=60_000, score=0.7, topic="t0")
+    plan = build_session_plan(topics, films + [big], extractor="bedrock")
+    watch = [c["title"] for c in plan["picks"]["watch"]]
+    assert "The Big One" in watch and watch.index("The Big One") <= 1
 
 
 def test_empty_catalogs_yield_an_honest_note(monkeypatch):

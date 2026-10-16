@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from .catalogs import ContentItem
 from .extraction import Interest
-from .quality import is_gem
+from .quality import BLOCKBUSTER_MIN_RELEVANCE, is_blockbuster, is_gem
 
 # What the person does with each type. Used to group output for a screen/voice.
 KIND = {"movie": "watch", "series": "watch", "doc": "watch", "video": "explore", "paper": "read"}
@@ -64,7 +64,9 @@ def explain_recommendation(item: ContentItem, interest: Interest) -> str:
         parts.append(f"Matched on: {', '.join(item.matched_keywords[:3])}.")
     if interest.depth == "deep" and item.content_type in ("movie", "series", "doc"):
         parts.append("Since you're going deep on this, there's a paper that pairs with it.")
-    if is_gem(item):
+    if is_blockbuster(item):
+        parts.append(f"Widely watched and well rated ({item.rating:.1f}/10 from {item.popularity:,} votes).")
+    elif is_gem(item):
         parts.append(f"Lesser-known, but well rated ({item.rating:.1f}/10 from {item.popularity:,} votes).")
     return " ".join(parts)
 
@@ -87,27 +89,42 @@ def render_card(item: ContentItem, interest: Interest) -> dict:
         "rating": item.rating or None,          # TMDB vote_average, films/docs only
         "votes": item.popularity or None,
         "gem": is_gem(item),
+        "blockbuster": is_blockbuster(item),
     }
 
 
-GEM_POSITION = 2   # insert the reserved lesser-known pick at most this deep (index), so it survives any cap
+BLOCKBUSTER_POSITION = 1   # reserved slots go this deep (index), so a cap on the list cannot drop them
+GEM_POSITION = 2
+
+
+def _relevant_enough(item: ContentItem, best: dict[str, float]) -> bool:
+    """A famous title only counts if it is nearly as relevant as the best match for its topic."""
+    return item.topic_overlap_score >= BLOCKBUSTER_MIN_RELEVANCE * best.get(item.topic, 0.0)
 
 
 def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: int = 6) -> list[dict]:
     """Pick the top items across all topics/types and render cards.
 
-    Relevance decides the order; rating is only a tie-break (items already passed
-    the quality gate in catalogs). Popularity is deliberately not a signal, or
-    the same famous films win every session. At most one item per
-    (topic, type), so a topic yields one documentary (literal), one film
-    (lateral), one paper. One slot is reserved for a lesser-known, highly rated
-    film or doc when one exists."""
+    Relevance decides the order (weighted by how well the medium suits the interest);
+    rating is only a tie-break, and popularity is deliberately not a signal, or the same
+    famous films would win every session. At most one item per (topic, type), so a topic
+    yields one documentary (literal), one film (lateral), one series, one paper.
+
+    Two slots are reserved, each only if a candidate exists:
+      - a blockbuster: a widely seen, well-rated film or series that is ALSO strongly
+        relevant to the topic (see quality.BLOCKBUSTER_MIN_RELEVANCE);
+      - a gem: a lesser-known but highly rated film, series or doc."""
     interest_by_topic = {i.topic: i for i in interests}
+
     def fit(i: ContentItem) -> float:
         it = interest_by_topic.get(i.topic)
         return i.topic_overlap_score * (medium_weight(i, it) if it else 1.0)
 
     scored = sorted(items, key=lambda i: (fit(i), i.rating), reverse=True)
+    best: dict[str, float] = {}                    # best on-screen relevance per topic
+    for i in scored:
+        if MEDIUM_OF.get(i.content_type) == "film":
+            best[i.topic] = max(best.get(i.topic, 0.0), i.topic_overlap_score)
 
     cards, seen, used_urls = [], set(), set()
     for item in scored:
@@ -119,9 +136,15 @@ def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: 
         used_urls.add(item.source_url)
         cards.append(render_card(item, interest))
 
-    if not any(c["gem"] for c in cards):
-        gem = next((i for i in scored if is_gem(i) and i.source_url not in used_urls
-                    and i.topic in interest_by_topic), None)
-        if gem is not None:
-            cards.insert(min(GEM_POSITION, len(cards)), render_card(gem, interest_by_topic[gem.topic]))
+    def reserve(wanted, flag: str, position: int) -> None:
+        if any(c[flag] for c in cards):
+            return
+        pick = next((i for i in scored if wanted(i) and i.source_url not in used_urls
+                     and i.topic in interest_by_topic), None)
+        if pick is not None:
+            used_urls.add(pick.source_url)
+            cards.insert(min(position, len(cards)), render_card(pick, interest_by_topic[pick.topic]))
+
+    reserve(lambda i: is_blockbuster(i) and _relevant_enough(i, best), "blockbuster", BLOCKBUSTER_POSITION)
+    reserve(is_gem, "gem", GEM_POSITION)
     return cards[:limit]

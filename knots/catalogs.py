@@ -193,10 +193,12 @@ async def _resolve_keyword(client: httpx.AsyncClient, term: str) -> tuple[str, i
     return term, (exact or results[0])["id"]
 
 
-async def _discover(client: httpx.AsyncClient, kw_id: int, doc: bool) -> list[dict]:
+async def _discover(client: httpx.AsyncClient, kw_id: int, doc: bool, sort: str = "vote_average.desc") -> list[dict]:
+    """Best-rated first surfaces the strongest titles, vote count first the widely seen ones;
+    both lists are quality-gated and relevance decides the order afterwards."""
     params = {
         "with_keywords": str(kw_id),
-        "sort_by": "vote_average.desc",   # best-rated first, so famous films don't crowd out the rest
+        "sort_by": sort,
         "vote_count.gte": MIN_VOTE_COUNT,
         "vote_average.gte": MIN_RATING,
         "include_adult": "false",
@@ -237,16 +239,19 @@ async def _search_tmdb(interest: Interest, client: httpx.AsyncClient) -> list[Co
             return []  # no thematic hook in TMDB: better to return nothing than noise
 
         # kind: "doc" (documentary film), "movie" (fiction film), "series" (scripted TV)
-        jobs = [(kid, term, kind) for kid, term in kw for kind in ("doc", "movie", "series", "series-known")]
+        # "-known" jobs sort by vote count, so widely seen titles are candidates too
+        jobs = [(kid, term, kind) for kid, term in kw
+                for kind in ("doc", "movie", "movie-known", "series", "series-known")]
+        sort_for = lambda kind: "vote_count.desc" if kind.endswith("-known") else "vote_average.desc"  # noqa: E731
         batches = await asyncio.gather(*[
-            _discover_tv(client, kid, "vote_count.desc" if kind == "series-known" else "vote_average.desc")
-            if kind.startswith("series") else _discover(client, kid, kind == "doc")
+            _discover_tv(client, kid, sort_for(kind)) if kind.startswith("series")
+            else _discover(client, kid, kind == "doc", sort_for(kind))
             for kid, _, kind in jobs])
 
         found: dict[tuple[str, int], ContentItem] = {}
         for (kid, term, kind), results in zip(jobs, batches):
-            tv = kind.startswith("series")
-            kind = "series" if tv else kind
+            kind = kind.split("-")[0]
+            tv = kind == "series"
             for r in results:
                 date = (r.get("first_air_date") if tv else r.get("release_date")) or ""
                 year = date[:4]

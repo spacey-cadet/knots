@@ -20,10 +20,28 @@ keyword), papers (arXiv) and YouTube explainers (3-60 minutes, title must match 
 concept, 5,000+ views). Series have their own floor (rating >= 7.0, >= 150
 votes).
 
-Ranking: relevance (shared film-tag keywords) decides. Quality is a floor
-(TMDB rating >= 6.5 with >= 100 votes; films before 1990 need 7.5+ and 1,000+
-votes), not a score, and popularity is not a signal. One slot per session is
-reserved for a lesser-known (<= 3,000 votes), highly rated (>= 7.0) pick.
+## Ranking
+
+- **Relevance decides the order** (shared film-tag keywords, weighted by how well
+  the medium suits the interest). Rating is only a tie-break; popularity is not a
+  signal, so the same famous films do not win every session.
+- **Quality is a floor, not a score** (`quality.py`): TMDB rating >= 6.5 with >= 100
+  votes; series >= 7.0 with >= 150; anything before 1990 needs 7.5+ and 1,000+
+  votes.
+- **Both the best-rated and the most-voted titles are retrieved** for every film
+  and series keyword, so widely seen titles are candidates, not only the niche
+  best-rated ones.
+- **Two reserved slots, each only if a candidate exists:**
+  - a **blockbuster**: a widely seen film or series (>= 8,000 votes, series >= 2,000)
+    that passes the quality floor AND is nearly as relevant as the best match for
+    its topic (>= 60% of it). A famous title that only loosely fits is not suggested;
+  - a **gem**: a lesser-known (<= 3,000 votes; series <= 1,500) but highly rated
+    (>= 7.0) pick.
+
+  Both sit in the first three cards, so a cap on the list cannot drop them. Their
+  reasons say so ("Widely watched and well rated ..." / "Lesser-known, but well
+  rated ...").
+- Every number above is a constant in `quality.py`.
 
 ## Repo layout
 
