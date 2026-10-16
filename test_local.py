@@ -401,6 +401,52 @@ def test_youtube_filters_shorts_junk_and_off_topic(monkeypatch):
     assert items[0].source_url == "https://www.youtube.com/watch?v=a" and items[0].popularity == 250_000
 
 
+def test_youtube_drops_courseware_titles(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("YOUTUBE_API_KEY", "k")
+    titles = ["Lesson IV - Reflexivity", "Reflexivity: Causal Inference Bootcamp", "Reflexivity Explained (Part 2)",
+              "Reflexivity for Beginners", "Why markets chase themselves: reflexivity"]
+    videos = [(f"v{i}", t) for i, t in enumerate(titles)]
+    details = [(v, "PT10M", 100_000) for v, _ in videos]
+    client = httpx.AsyncClient(transport=httpx.MockTransport(_yt_handler(videos, details)))
+    topic = I.Interest(topic="markets", depth="deep", sentiment="curious", mentions=1,
+                       concepts=["reflexivity"], keywords=["reflexivity"])
+    assert [i.title for i in asyncio.run(C._search_youtube(topic, client))] == ["Why markets chase themselves: reflexivity"]
+
+
+def test_youtube_query_keeps_the_topics_context():
+    it = I.Interest(topic="dementia and selective memory loss", depth="deep", sentiment="curious", mentions=1,
+                    concepts=["memory consolidation"], keywords=[])
+    q = C._youtube_query(it)
+    assert q.startswith("memory consolidation") and "dementia" in q and q.endswith("explained")
+    plain = I.Interest(topic="reflexivity", depth="casual", sentiment="curious", mentions=1, concepts=["reflexivity"], keywords=[])
+    assert C._youtube_query(plain) == "reflexivity explained"
+
+
+def test_series_use_both_a_rating_sort_and_a_vote_count_sort(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("TMDB_API_KEY", "k")
+    sorts = []
+
+    def handler(request):
+        path = request.url.path
+        if path.endswith("/search/keyword"):
+            return httpx.Response(200, json={"results": [{"id": 1, "name": "memecoins"}]})
+        if path.endswith("/discover/tv"):
+            sorts.append(request.url.params["sort_by"])
+            row = ({"id": 1, "name": "Niche Gem", "vote_average": 8.9, "vote_count": 300, "first_air_date": "2021-01-01"}
+                   if sorts[-1] == "vote_average.desc" else
+                   {"id": 2, "name": "Severance", "vote_average": 8.2, "vote_count": 4000, "first_air_date": "2022-02-18"})
+            return httpx.Response(200, json={"results": [row]})
+        return httpx.Response(200, json={"results": []})
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    items = asyncio.run(C._search_tmdb(_topic(), client))
+    assert sorted(sorts) == ["vote_average.desc", "vote_count.desc"]
+    assert sorted(i.title for i in items) == ["Niche Gem", "Severance"]
+    assert all(i.content_type == "series" for i in items)
+
+
 def test_youtube_failure_returns_nothing(monkeypatch):
     monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
     monkeypatch.setenv("YOUTUBE_API_KEY", "k")

@@ -239,11 +239,13 @@ async def _discover(client: httpx.AsyncClient, kw_id: int, doc: bool) -> list[di
     return (await _tmdb_get(client, "/discover/movie", params)).get("results", [])[:DISCOVER_PER_CALL]
 
 
-async def _discover_tv(client: httpx.AsyncClient, kw_id: int) -> list[dict]:
-    """Series tagged with the keyword. Documentary series are left to the film/doc path."""
+async def _discover_tv(client: httpx.AsyncClient, kw_id: int, sort: str = "vote_average.desc") -> list[dict]:
+    """Series tagged with the keyword. Documentary series are left to the film/doc path.
+    Sorting by rating alone surfaces niche, highly rated shows (and anime); sorting by vote
+    count surfaces the established ones. Both are gated, and relevance decides the order."""
     params = {
         "with_keywords": str(kw_id),
-        "sort_by": "vote_average.desc",
+        "sort_by": sort,
         "vote_count.gte": TV_MIN_VOTE_COUNT,
         "vote_average.gte": TV_MIN_RATING,
         "without_genres": str(DOCUMENTARY_GENRE),
@@ -269,14 +271,16 @@ async def _search_tmdb(interest: Interest, client: httpx.AsyncClient) -> list[Co
             return []  # no thematic hook in TMDB: better to return nothing than noise
 
         # kind: "doc" (documentary film), "movie" (fiction film), "series" (scripted TV)
-        jobs = [(kid, term, kind) for kid, term in kw for kind in ("doc", "movie", "series")]
+        jobs = [(kid, term, kind) for kid, term in kw for kind in ("doc", "movie", "series", "series-known")]
         batches = await asyncio.gather(*[
-            _discover_tv(client, kid) if kind == "series" else _discover(client, kid, kind == "doc")
+            _discover_tv(client, kid, "vote_count.desc" if kind == "series-known" else "vote_average.desc")
+            if kind.startswith("series") else _discover(client, kid, kind == "doc")
             for kid, _, kind in jobs])
 
         found: dict[tuple[str, int], ContentItem] = {}
         for (kid, term, kind), results in zip(jobs, batches):
-            tv = kind == "series"
+            tv = kind.startswith("series")
+            kind = "series" if tv else kind
             for r in results:
                 date = (r.get("first_air_date") if tv else r.get("release_date")) or ""
                 year = date[:4]
@@ -437,6 +441,22 @@ def _duration_seconds(iso: str) -> int:
     return h * 3600 + mi * 60 + sec
 
 
+# Textbook and tutorial formats are not "explaining the idea you were curious about".
+_COURSEWARE = re.compile(
+    r"\b(lesson|lecture|bootcamp|course|tutorial|walkthrough|for beginners|template|compilation|"
+    r"behind the scenes|full episode|reaction|podcast)\b|\bepisode \d+|\bpart \d+|#\d+", re.I)
+
+
+def _youtube_query(interest: Interest) -> str:
+    """The concept, plus the topic's extra words so a bare concept cannot change meaning
+    ("memory consolidation" alone finds CPU caches; with "dementia" it does not)."""
+    concept = (interest.concepts or [interest.topic])[0]
+    have = set(re.findall(r"[a-z0-9]+", concept.lower()))
+    extra = [w for w in re.findall(r"[a-z0-9]+", interest.topic.lower())
+             if w not in have and w not in STOPWORDS and len(w) > 2 and w not in ("and", "the")]
+    return " ".join([concept, *extra[:4], "explained"])
+
+
 def _title_matches(concept: str, title: str) -> bool:
     """The video title must mention at least one meaningful word of the concept."""
     words = [w for w in re.findall(r"[a-z0-9]+", concept.lower()) if len(w) > 2 and w not in STOPWORDS]
@@ -457,14 +477,15 @@ async def _search_youtube(interest: Interest, client: httpx.AsyncClient) -> list
         resp = await client.get(
             YOUTUBE_SEARCH_URL,
             # a concept plus "explained" finds explainers; raw film-tag keywords find trailers
-            params={"part": "snippet", "q": f"{concept} explained", "type": "video",
+            params={"part": "snippet", "q": _youtube_query(interest), "type": "video",
                     "maxResults": YOUTUBE_CANDIDATES, "relevanceLanguage": "en",
                     "safeSearch": "moderate", "videoEmbeddable": "true", "key": _youtube_key()},
             timeout=_timeout(),
         )
         resp.raise_for_status()
         hits = [r for r in resp.json().get("items", [])
-                if r.get("id", {}).get("videoId") and _title_matches(concept, r["snippet"].get("title", ""))]
+                if r.get("id", {}).get("videoId") and _title_matches(concept, r["snippet"].get("title", ""))
+                and not _COURSEWARE.search(r["snippet"].get("title", ""))]
         if not hits:
             return []
         # one cheap batched lookup for length and views, so shorts and junk can be dropped
