@@ -19,7 +19,9 @@ import catalogs as C
 import interests as I
 from cards import rank_and_render
 from catalogs import ContentItem, passes_quality, search_content
+import embeddings as E
 import history as H
+import memory as M
 from datetime import datetime, timedelta, timezone
 from partner import build_session_plan
 
@@ -593,6 +595,164 @@ def test_merged_threads_keep_the_best_mediums():
     merged = H.merge_interests([(_conv("a", 3), 3.0, [_med("memory", ["video", "paper", "film"])]),
                                 (_conv("b", 0), 0.0, [_med("memory", ["video", "paper", "film"])])])
     assert merged[0].mediums == ["video", "paper", "film"]
+
+
+# ---------------------------------------------------------------------------
+# memory: embeddings + extracted interests, never raw text
+# ---------------------------------------------------------------------------
+
+def _mem(monkeypatch, tmp_path):
+    db = tmp_path / "profile.db"
+    monkeypatch.setenv("KNOTS_PROFILE_DB", str(db))
+    monkeypatch.setenv("EMBEDDER", "hashed")
+    monkeypatch.setattr(M, "_store", None)
+    return M.ProfileStore(str(db)), db
+
+
+def _remember(store, user, key, days_ago, interests, text, embedder="hashed"):
+    ts = (NOW - timedelta(days=days_ago)).isoformat()
+    store.save(user, key, ts, interests, E.hashed_embedding(text), embedder)
+
+
+MEME_TEXT = "explain memecoin tokenomics liquidity pools and the bubble"
+
+
+def test_hashed_embedding_is_unit_length_and_groups_related_text():
+    a, b, c = (E.hashed_embedding(t) for t in (MEME_TEXT, "memecoin tokenomics liquidity pools market cap bubble",
+                                               "sourdough starter hydration crumb bake bread"))
+    assert abs(sum(x * x for x in a) - 1) < 1e-6 and len(a) == E.DIM
+    assert E.cosine(a, b) > E.cosine(a, c) + 0.3
+    assert E.hashed_embedding("") == [0.0] * E.DIM                          # empty text must not crash
+
+
+def test_store_roundtrip_is_idempotent_forgets_and_is_bounded(monkeypatch, tmp_path):
+    store, _ = _mem(monkeypatch, tmp_path)
+    monkeypatch.setattr(M, "MAX_RECORDS_PER_USER", 3)
+    assert store.save("u", "k1", "2026-10-01T00:00:00+00:00", [_it("grief")], [0.5, 0.5], "hashed") is True
+    assert store.save("u", "k1", "2026-10-01T00:00:00+00:00", [_it("grief")], [0.5, 0.5], "hashed") is False
+    assert store.count("u") == 1
+    rec = store.records("u")[0]
+    assert rec.interests[0].topic == "grief" and rec.vector == [0.5, 0.5] and rec.embedder == "hashed"
+    for i in range(5):
+        store.save("u", f"n{i}", f"2026-10-0{i + 2}T00:00:00+00:00", [_it(f"t{i}")], [1.0], "hashed")
+    assert store.count("u") == 3 and {r.key for r in store.records("u")} == {"n2", "n3", "n4"}   # oldest dropped
+    store.save("other", "k", "2026-10-01T00:00:00+00:00", [_it("x")], [1.0], "hashed")
+    assert store.forget("u") == 3 and store.count("u") == 0 and store.count("other") == 1
+
+
+def test_recall_brings_back_related_history_and_leaves_unrelated(monkeypatch, tmp_path):
+    store, _ = _mem(monkeypatch, tmp_path)
+    _use(monkeypatch, FakeBedrock(MODEL_OUTPUT))
+    _remember(store, "u", "k1", 3, [_it("memecoins", ["reflexivity"])], "memecoin tokenomics liquidity pools market cap bubble")
+    _remember(store, "u", "k2", 2, [_it("sourdough")], "sourdough starter hydration crumb bake bread")
+    found, used, info = asyncio.run(H.recall_and_extract("u", [MEME_TEXT], None, store=store, now=NOW))
+    assert used == "bedrock" and info["recalled"] == 1 and "memecoins" in info["recalled_topics"]
+    assert "sourdough" not in info["recalled_topics"]
+    assert found[0].topic == "memecoins" and found[0].conversations == 2
+    assert info["stored_new"] == 1 and info["profile_size"] == 3 and info["embedder"] == "hashed"
+
+
+def test_memory_keeps_no_raw_text(monkeypatch, tmp_path):
+    store, db = _mem(monkeypatch, tmp_path)
+    _use(monkeypatch, FakeBedrock(MODEL_OUTPUT))
+    secret = "zxqv-private-sentence-about-my-landlord"
+    asyncio.run(H.recall_and_extract("u", [f"{MEME_TEXT} {secret}"], None, store=store, now=NOW))
+    assert store.count("u") == 1
+    blob = db.read_bytes()
+    assert secret.encode() not in blob and b"landlord" not in blob and b"private" not in blob
+
+
+def test_resending_a_conversation_is_not_double_counted(monkeypatch, tmp_path):
+    store, _ = _mem(monkeypatch, tmp_path)
+    _use(monkeypatch, FakeBedrock(MODEL_OUTPUT))
+    for _ in range(2):
+        found, _, info = asyncio.run(H.recall_and_extract("u", None, [_conv(MEME_TEXT, 0, cid="c1")], store=store, now=NOW))
+    assert info["recalled"] == 0 and info["stored_new"] == 0 and info["profile_size"] == 1
+    assert found[0].conversations == 1
+
+
+def test_profile_mode_answers_from_memory_alone(monkeypatch, tmp_path):
+    store, _ = _mem(monkeypatch, tmp_path)
+    assert asyncio.run(H.recall_and_extract("nobody", None, None, store=store, now=NOW)) == ([], "none", {
+        "recalled": 0, "recalled_topics": [], "stored_new": 0, "embedder": "", "profile_size": 0})
+    _remember(store, "u", "k1", 6, [_it("memecoins", ["reflexivity"])], "memecoin bubble")
+    _remember(store, "u", "k2", 1, [_it("memecoins", ["reflexivity"]), _it("grief")], "memecoin grief")
+    found, used, info = asyncio.run(H.recall_and_extract("u", None, None, store=store, now=NOW))
+    assert used == "profile" and found[0].topic == "memecoins" and found[0].conversations == 2
+    assert info["profile_size"] == 2
+
+
+def test_vectors_from_a_different_embedder_are_never_compared(monkeypatch, tmp_path):
+    store, _ = _mem(monkeypatch, tmp_path)
+    _use(monkeypatch, FakeBedrock(MODEL_OUTPUT))
+    _remember(store, "u", "k1", 3, [_it("memecoins", ["reflexivity"])], MEME_TEXT, embedder="titan")
+    _, _, info = asyncio.run(H.recall_and_extract("u", [MEME_TEXT], None, store=store, now=NOW))
+    assert info["recalled"] == 0
+
+
+def test_memory_failure_never_breaks_the_answer(monkeypatch, tmp_path):
+    class Broken:
+        def records(self, *a, **k): raise RuntimeError("disk gone")
+        def save(self, *a, **k): raise RuntimeError("disk gone")
+        def count(self, *a, **k): raise RuntimeError("disk gone")
+
+    _mem(monkeypatch, tmp_path)
+    _use(monkeypatch, FakeBedrock(MODEL_OUTPUT))
+    found, used, info = asyncio.run(H.recall_and_extract("u", [MEME_TEXT], None, store=Broken(), now=NOW))
+    assert found and used == "bedrock" and info["error"] == "memory unavailable"
+
+
+def test_titan_embedder_request_and_fallback(monkeypatch):
+    import io
+
+    class FakeTitan:
+        def __init__(self, fail=False): self.fail, self.calls = fail, []
+
+        def invoke_model(self, **kw):
+            self.calls.append(kw)
+            if self.fail:
+                raise RuntimeError("AccessDenied")
+            return {"body": io.BytesIO(json.dumps({"embedding": [3.0, 4.0]}).encode())}
+
+    fake = FakeTitan()
+    monkeypatch.setattr(E, "_client", fake)
+    monkeypatch.setenv("EMBEDDER", "auto")
+    monkeypatch.setenv("BEDROCK_MODEL_ID", "some-model")
+    vec, name = E.embed_sync("hello world")
+    assert name == "titan" and vec == [0.6, 0.8]                              # normalised
+    sent = json.loads(fake.calls[0]["body"])
+    assert sent["dimensions"] == 256 and sent["inputText"] == "hello world" and "titan-embed" in fake.calls[0]["modelId"]
+    monkeypatch.setattr(E, "_client", FakeTitan(fail=True))
+    assert E.embed_sync("hello world")[1] == "hashed"                         # auto falls back
+    monkeypatch.delenv("BEDROCK_MODEL_ID")
+    monkeypatch.setattr(E, "_client", fake)
+    assert E.embed_sync("x")[1] == "hashed"                                   # Bedrock not configured: no call
+
+
+def test_tools_remember_forget_and_stay_stateless_without_a_user_id(monkeypatch, tmp_path):
+    import server
+    store, db = _mem(monkeypatch, tmp_path)
+    db.unlink()                                                               # prove it is only created when used
+    _use(monkeypatch, FakeBedrock(MODEL_OUTPUT))
+    _offline_catalogs(monkeypatch)
+
+    def call(name, args):
+        out = asyncio.run(server.mcp.call_tool(name, args))
+        return json.loads((out[0] if isinstance(out, tuple) else out)[0].text)
+
+    call("thinking_partner", {"session_texts": SAMPLE_SESSION})              # no user_id: stateless
+    assert not db.exists()
+    first = call("thinking_partner", {"session_texts": [MEME_TEXT], "user_id": "alex"})
+    assert first["memory"]["stored_new"] == 1 and first["memory"]["recalled"] == 0
+    second = call("thinking_partner", {"session_texts": [MEME_TEXT + " again please"], "user_id": "alex"})
+    assert second["memory"]["recalled"] == 1 and "across 2 conversations" in second["spoken"]
+    quiet = call("thinking_partner", {"user_id": "alex"})                     # nothing said: profile mode
+    assert quiet["extractor"] == "profile" and quiet["threads"]
+    known = call("what_do_you_remember", {"user_id": "alex"})
+    assert known["remembered_conversations"] == 2 and known["threads"] and "never your words" in known["stores"]
+    assert call("what_do_you_remember", {"user_id": "someone else"})["remembered_conversations"] == 0
+    assert call("forget_me", {"user_id": "alex"}) == {"deleted": 2}
+    assert call("what_do_you_remember", {"user_id": "alex"})["remembered_conversations"] == 0
 
 
 # ---------------------------------------------------------------------------

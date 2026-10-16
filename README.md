@@ -122,9 +122,57 @@ strings, as before) or several as `conversations`:
   new. (A bug of that kind was fixed: over-long input used to drop the NEWEST
   text; it now keeps the latest.)
 
-Knots does not store anything: the assistant decides what history to pass. A
-server-side profile that accumulates across days is a possible next step; it
-needs a user id and a store, and raises privacy questions.
+## Memory
+
+Pass a `user_id` and Knots remembers the person between conversations. Without
+one it stays stateless: nothing is read or stored.
+
+**What is kept, per conversation:** the extracted interests (topic, concepts,
+unstated themes, keywords, best mediums), an embedding of the conversation, a
+timestamp and a content key. **The words themselves are discarded** as soon as
+they have been extracted and embedded. A test checks the database file for any
+trace of the conversation text.
+
+**How it is used**
+- A new conversation is embedded and compared with the stored ones. The most
+  related (similarity discounted by age, at most 6) are brought back, and their
+  stored interests are merged with the new ones exactly like the multi-conversation
+  input above: "you've come back to X across N conversations".
+- With nothing said at all ("what should I explore?"), it answers from the most
+  recent history alone (`extractor: "profile"`).
+- Re-sending the same conversation is not double counted.
+- A memory failure never breaks an answer; it is logged and the request goes on.
+
+**Embeddings:** Amazon Titan Text Embeddings v2 (256 dimensions) when Bedrock is
+configured, otherwise an offline hashed bag-of-words embedding (lexical only,
+no keys). The embedder's name is stored with every vector, and vectors from
+different embedders are never compared. `EMBEDDER=auto|titan|hashed`.
+
+**Control:** `what_do_you_remember(user_id)` lists the threads held and how many
+conversations they come from; `forget_me(user_id)` deletes everything stored for
+that id. Storage is SQLite at `KNOTS_PROFILE_DB` (default `data/knots_profile.db`,
+gitignored), capped at 500 conversations per person, behind a small `ProfileStore`
+interface so DynamoDB can replace it.
+
+**Privacy, plainly**
+- Embeddings are not raw text, but they are not anonymous: they keep much of the
+  meaning of what was said, and the stored "unstated themes" can be sensitive.
+  Treat the store as personal data.
+- Do not trust `user_id` as an argument in production. Derive it from the
+  authenticated caller, or one person could read another's profile.
+- A container's local disk does not survive restarts, so a deployed server needs
+  a persistent store (DynamoDB) behind `ProfileStore`.
+- Encrypt at rest and say what is kept in the app's privacy notice.
+
+## Best medium per interest
+
+Each interest carries a ranked list of `film`, `video` and `paper`. Film means
+films, series and documentaries; video means an explainer; paper means research.
+Bedrock ranks them for THAT interest (human and narrative themes lean to film,
+abstract mechanisms to video, "what do the studies say" to paper). All three stay
+possible: the best two are searched, and the third too when the person is going
+deep. Cards are ordered by relevance weighted by medium rank, and the spoken line
+leads with the best medium. Skipping a poor-fit medium also saves a catalog call.
 
 ## Known limitations
 

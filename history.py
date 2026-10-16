@@ -31,12 +31,18 @@ before: one extraction, no merging.
 from __future__ import annotations
 
 import asyncio
+import hashlib
+import logging
 import re
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
+import embeddings as E
 import interests as I
 from interests import Interest
+from memory import ProfileStore, get_store
+
+log = logging.getLogger("knots.history")
 
 MAX_CONVERSATIONS = 8
 MAX_AGE_DAYS = 60
@@ -45,6 +51,11 @@ HALF_LIFE_DAYS = 14.0
 NOW_BOOST = 1.5               # weight multiplier for the newest conversation
 RECURRENCE_CONF_BONUS = 0.05  # per extra conversation a thread appears in
 MAX_PARALLEL_EXTRACTIONS = 4  # keeps Bedrock throttling out of the picture
+
+# memory recall (see recall_and_extract)
+SIM_THRESHOLD = {"titan": 0.35, "hashed": 0.12}   # min cosine similarity to count as "related"
+MAX_RECALLED = 6              # past conversations pulled in for one request
+PROFILE_RECORDS = 30          # how much history "profile mode" looks at
 
 
 @dataclass
@@ -182,19 +193,12 @@ def merge_interests(per_conversation: list[tuple[Conversation, float, list[Inter
 
 
 # ---------------------------------------------------------------------------
-# entry point
+# entry points
 # ---------------------------------------------------------------------------
 
-async def extract_history(session_texts: list[str] | None = None,
-                          conversations: list[Conversation] | None = None,
-                          now: datetime | None = None) -> tuple[list[Interest], str]:
-    """Like interests.extract, for one conversation or many. Returns (interests, extractor_used)."""
-    convs = normalize_input(session_texts, conversations, now)
-    if not convs:
-        return [], "none"
-    if len(convs) == 1:
-        return await I.extract(convs[0][0].turns)
-
+async def _extract_each(convs: list[tuple[Conversation, float]]):
+    """One extraction per conversation (parallel, bounded). Returns
+    ([(conversation, age, interests)], extractor_label)."""
     gate = asyncio.Semaphore(MAX_PARALLEL_EXTRACTIONS)
 
     async def one(conv: Conversation):
@@ -204,5 +208,129 @@ async def extract_history(session_texts: list[str] | None = None,
     results = await asyncio.gather(*[one(c) for c, _ in convs])
     used = {u for _, u in results}
     label = next(iter(used)) if len(used) == 1 else "mixed (" + ", ".join(sorted(used)) + ")"
-    merged = merge_interests([(c, age, found) for (c, age), (found, _) in zip(convs, results)])
-    return merged, label
+    return [(c, age, found) for (c, age), (found, _) in zip(convs, results)], label
+
+
+async def extract_history(session_texts: list[str] | None = None,
+                          conversations: list[Conversation] | None = None,
+                          now: datetime | None = None) -> tuple[list[Interest], str]:
+    """Like interests.extract, for one conversation or many. Returns (interests, extractor_used).
+    Stateless: nothing is stored. See recall_and_extract for the version with memory."""
+    convs = normalize_input(session_texts, conversations, now)
+    if not convs:
+        return [], "none"
+    per, label = await _extract_each(convs)
+    return (per[0][2] if len(per) == 1 else merge_interests(per)), label
+
+
+# ---------------------------------------------------------------------------
+# memory: recall by similarity and recency, then remember
+# ---------------------------------------------------------------------------
+
+def conversation_key(conv: Conversation) -> str:
+    """Stable identity, so sending the same conversation twice is not counted twice."""
+    if conv.id:
+        return "id:" + conv.id[:100]
+    return "h:" + hashlib.sha256("\n".join(conv.turns).encode()).hexdigest()[:32]
+
+
+async def recall_and_extract(user_id: str,
+                             session_texts: list[str] | None = None,
+                             conversations: list[Conversation] | None = None,
+                             store: ProfileStore | None = None,
+                             now: datetime | None = None) -> tuple[list[Interest], str, dict]:
+    """Extract from what was passed now, bring in RELEVANT past conversations from memory,
+    merge, and remember what is new. Returns (interests, extractor_used, memory_info).
+
+    - Past conversations are chosen by embedding similarity to the newest conversation,
+      discounted by age. Only their stored interests are used (no raw text exists).
+    - With nothing passed (the person just asks "what should I explore?"), it works from
+      the most recent history alone ("profile" mode).
+    - Memory trouble never breaks the answer: any store error is logged and the request
+      continues without it."""
+    now = now or datetime.now(timezone.utc)
+    info = {"recalled": 0, "recalled_topics": [], "stored_new": 0, "embedder": "", "profile_size": 0}
+    try:
+        store = store or get_store()
+    except Exception as e:  # noqa: BLE001
+        log.warning("memory unavailable (%s: %s)", type(e).__name__, e)
+        interests, used = await extract_history(session_texts, conversations, now)
+        return interests, used, {**info, "error": "memory unavailable"}
+
+    convs = normalize_input(session_texts, conversations, now)
+
+    if not convs:                                           # profile mode
+        try:
+            recs = await asyncio.to_thread(store.records, user_id, PROFILE_RECORDS)
+        except Exception as e:  # noqa: BLE001
+            log.warning("memory read failed (%s: %s)", type(e).__name__, e)
+            return [], "none", {**info, "error": "memory unavailable"}
+        if not recs:
+            return [], "none", info
+        per = [(Conversation(turns=[], timestamp=r.timestamp), max(0.0, (now - r.time()).total_seconds() / 86400),
+                r.interests) for r in reversed(recs)]
+        merged = merge_interests(per)
+        return merged, "profile", {**info, "recalled": len(recs), "recalled_topics": [m.topic for m in merged[:5]],
+                                   "profile_size": len(recs)}
+
+    per_current, label = await _extract_each(convs)
+    newest = convs[-1][0]
+    embedded = await asyncio.gather(*[asyncio.to_thread(E.embed_sync, "\n".join(c.turns)) for c, _ in convs])
+    qvec, ename = embedded[-1]
+    info["embedder"] = ename
+
+    recalled = []
+    try:
+        keys = {conversation_key(c) for c, _ in convs}
+        thr = SIM_THRESHOLD.get(ename, 0.2)
+        scored = []
+        for r in await asyncio.to_thread(store.records, user_id):
+            if r.key in keys or r.embedder != ename:        # vectors from other embedders are not comparable
+                continue
+            sim = E.cosine(qvec, r.vector)
+            if sim < thr:
+                continue
+            age = max(0.0, (now - r.time()).total_seconds() / 86400)
+            scored.append((sim * 0.5 ** (age / HALF_LIFE_DAYS), age, r))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        recalled = sorted(scored[:MAX_RECALLED], key=lambda x: x[1], reverse=True)    # oldest first
+    except Exception as e:  # noqa: BLE001
+        log.warning("memory read failed (%s: %s)", type(e).__name__, e)
+        info["error"] = "memory unavailable"
+
+    past = [(Conversation(turns=[], timestamp=r.timestamp), age, r.interests) for _, age, r in recalled]
+    everything = past + per_current
+    interests = per_current[0][2] if len(everything) == 1 else merge_interests(everything)
+    info["recalled"] = len(recalled)
+    info["recalled_topics"] = list(dict.fromkeys(i.topic for _, _, r in recalled for i in r.interests))[:5]
+
+    try:                                                     # remember what is new
+        for (conv, _age, found), (vec, en) in zip(per_current, embedded):
+            ts = conv.timestamp or now.isoformat()
+            if await asyncio.to_thread(store.save, user_id, conversation_key(conv), ts, found, vec, en):
+                info["stored_new"] += 1
+        info["profile_size"] = await asyncio.to_thread(store.count, user_id)
+    except Exception as e:  # noqa: BLE001
+        log.warning("memory write failed (%s: %s)", type(e).__name__, e)
+        info["error"] = "memory unavailable"
+    return interests, label, info
+
+
+def profile_summary(user_id: str, store: ProfileStore | None = None, now: datetime | None = None) -> dict:
+    """What Knots remembers about a person: derived interests only, never conversation text."""
+    now = now or datetime.now(timezone.utc)
+    store = store or get_store()
+    recs = store.records(user_id, PROFILE_RECORDS)
+    if not recs:
+        return {"remembered_conversations": 0, "stores": "interests and embeddings, never your words",
+                "threads": []}
+    per = [(Conversation(turns=[], timestamp=r.timestamp), max(0.0, (now - r.time()).total_seconds() / 86400),
+            r.interests) for r in reversed(recs)]
+    return {
+        "remembered_conversations": store.count(user_id),
+        "since": min(r.timestamp for r in recs), "latest": max(r.timestamp for r in recs),
+        "stores": "interests and embeddings, never your words",
+        "threads": [{"topic": t.topic, "concepts": t.concepts, "underneath": t.implicit_themes,
+                     "conversations": t.conversations, "last_seen": t.last_seen}
+                    for t in merge_interests(per)],
+    }
