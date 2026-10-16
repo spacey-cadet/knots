@@ -146,7 +146,8 @@ def test_partner_plan_groups_picks_with_reasons(monkeypatch):
     plan = build_session_plan(found, items, extractor=used)
 
     assert plan["extractor"] == "bedrock"
-    assert plan["threads"][0]["underneath"] == ["trust without institutions", "fear of missing out"]
+    # the critic drops the unstated feeling ("fear of missing out"); the structural theme survives
+    assert plan["threads"][0]["underneath"] == ["trust without institutions"]
     assert plan["picks"]["watch"] and plan["picks"]["read"] and plan["picks"]["explore"]
     assert all(c["reasoning"] for group in plan["picks"].values() for c in group)
     assert "trust without institutions" in plan["spoken"]
@@ -1039,3 +1040,33 @@ if __name__ == "__main__":
         print("\n=== Sample thinking_partner output (offline, heuristic) ===")
         print(json.dumps(asyncio.run(engine.plan(session_texts=SAMPLE_SESSION)), indent=2))
     sys.exit(code)
+
+
+# ---- brain: critic + few-shot guidance learned from the author's labels ----
+def test_critic_prefers_stance_over_unstated_drama():
+    from knots import brain
+    text = "Does free will matter if choices are determined? I keep going back and forth on it."
+    good = brain.score(text, "whether choice is meaningful if determined")
+    bad = brain.score(text, "fear of losing selfhood and the collapse of personhood")
+    assert good is not None and good > bad
+    kept, dropped = brain.split(text, ["whether choice is meaningful if determined",
+                                       "fear of losing selfhood and the collapse of personhood"])
+    assert dropped == ["fear of losing selfhood and the collapse of personhood"] and len(kept) == 1
+
+
+def test_critic_off_switch_and_missing_model(monkeypatch):
+    from knots import brain
+    monkeypatch.setenv("KNOTS_BRAIN", "off")
+    assert brain.split("x", ["a vs b collapse of selfhood"]) == (["a vs b collapse of selfhood"], [])
+    assert brain.guidance("anything") == ""
+
+
+def test_guidance_holdout_hides_that_sessions_examples():
+    import importlib
+    G = importlib.import_module("knots.brain.guidance")
+    ex = G._examples()
+    assert ex, "examples file ships with the package"
+    sid = ex[0]["session_id"]
+    hidden = {e["theme"] for e in ex if e["session_id"] == sid} - {e["theme"] for e in ex if e["session_id"] != sid}
+    out = G.guidance(ex[0]["session_text"], holdout=sid)
+    assert all(f'"{t}"' not in out for t in hidden) and "Do NOT attribute a feeling" in out

@@ -235,3 +235,20 @@ leads with the best medium. Skipping a poor-fit medium also saves a catalog call
 - **No deployment yet.** Alexa+ needs a public HTTPS endpoint with auth.
 - **Ranking is simple** (keyword overlap, one item per topic and type). Next:
   embeddings + MMR diversity re-ranking and a hand-labelled precision@5 check.
+
+
+## The brain: themes judged the way the author judges them
+
+The "unstated themes" Bedrock produces were only 44% supported when hand-labelled (101 themes, 10 sessions).
+The labels and notes in `eval/themes.csv` fall into recurring errors (over-psychologizing, terminological
+overreach, narrative projection, invented "X vs Y"), so Knots learns from them in two ways (`knots/brain/`):
+
+1. **Few-shot guidance**: distilled rules plus the accepted and rejected labelled themes nearest to the current
+   text (with the reviewer's reason) are added to the extraction prompt (`guidance.py`).
+2. **Theme critic**: a small logistic model over interpretable features (stance/mechanism wording, unstated
+   feelings, drama words, "vs" patterns) scores each theme; low scorers move to `dropped_themes` (`critic.py`).
+
+Honest numbers, leave-one-session-out CV (`python eval/train_brain.py`): AUC 0.81; keeping themes with p>=0.4
+gives 62% precision (base 44%), p>=0.6 gives 75% but keeps only a third. The few-shot part is evaluated by
+`eval/run_eval.py`, which hides each session's own labels from its prompt. Limits: 101 labels, one labeller,
+one generator. Retrain after relabelling: `python eval/train_brain.py --save`. Disable with `KNOTS_BRAIN=off`.

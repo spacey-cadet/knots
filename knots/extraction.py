@@ -30,6 +30,10 @@ from collections import Counter
 from dataclasses import dataclass, field, asdict
 from typing import Literal
 
+from . import brain
+
+_HOLDOUT: str | None = None  # session id whose labelled themes are hidden from few-shot (eval only)
+
 log = logging.getLogger("knots.interests")
 
 STOPWORDS = {
@@ -73,6 +77,7 @@ class Interest:
     # --- the layer underneath (filled by Bedrock; heuristic leaves defaults) ---
     concepts: list[str] = field(default_factory=list)          # abstract ideas ("free will", "entropy")
     implicit_themes: list[str] = field(default_factory=list)   # unstated undercurrents ("loss of agency")
+    dropped_themes: list[str] = field(default_factory=list)    # themes the critic rejected (kept for audit)
     keywords: list[str] = field(default_factory=list)          # short film-metadata-style phrases
     rationale: str = ""             # one line: why these concepts/themes follow from the text
     confidence: float = 0.5
@@ -345,12 +350,14 @@ def bedrock_extract(session_texts: list[str]) -> list[Interest]:
 
     resp = _bedrock_client().converse(
         modelId=model_id,
-        system=[{"text": _SYSTEM_PROMPT}],
+        system=[{"text": _SYSTEM_PROMPT + "\n\n" + brain.guidance(text, holdout=_HOLDOUT)}],
         messages=[{"role": "user", "content": [{"text": f"<session>\n{text}\n</session>"}]}],
         toolConfig={"tools": [_TOOL_SPEC], "toolChoice": {"tool": {"name": "record_interests"}}},
         inferenceConfig={"maxTokens": 1500, "temperature": 0.2},
     )
     interests = _parse_interests(_extract_from_response(resp))
+    for it in interests:  # the critic: drop themes the author's labels say they would reject
+        it.implicit_themes, it.dropped_themes = brain.split(text, it.implicit_themes)
     if len(_cache) > 256:
         _cache.clear()
     _cache[key] = interests

@@ -48,7 +48,7 @@ load_dotenv(ROOT / ".env")
 os.environ.setdefault("KNOTS_HTTP_TIMEOUT", "25")
 os.environ.setdefault("KNOTS_ARXIV_CACHE", str(HERE / "results" / "arxiv_cache.json"))
 
-from knots import catalogs, engine  # noqa: E402
+from knots import catalogs, engine, extraction  # noqa: E402
 
 SESSIONS = HERE / "sessions.json"
 RESULTS = HERE / "results" / "results.json"
@@ -137,6 +137,7 @@ def cmd_run(args) -> int:
             try:
                 catalogs.FAILURES.clear()
                 set_extractor(mode, model)
+                extraction._HOLDOUT = sess["id"]  # hide this session's own labelled themes from few-shot
                 result = asyncio.run(engine.run(session_texts=sess["texts"], include_videos=videos))
                 found, used, plan = result.interests, result.extractor, result.plan()
                 failed = list(catalogs.FAILURES)
