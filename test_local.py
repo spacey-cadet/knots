@@ -524,6 +524,78 @@ def test_label_server_accepts_reason_only_on_not_good_picks(monkeypatch, tmp_pat
 
 
 # ---------------------------------------------------------------------------
+# best medium: all three possible, the best first
+# ---------------------------------------------------------------------------
+
+def _med(topic, mediums, depth="casual"):
+    return I.Interest(topic=topic, depth=depth, sentiment="curious", mentions=1,
+                      concepts=[topic], keywords=[topic], mediums=mediums)
+
+
+def test_allowed_mediums_best_two_and_all_three_when_deep():
+    assert I.allowed_mediums(_med("t", ["video", "film", "paper"])) == ["video", "film"]
+    assert I.allowed_mediums(_med("t", ["video", "film", "paper"], depth="deep")) == ["video", "film", "paper"]
+    assert I.allowed_mediums(_med("t", ["paper"])) == ["paper", "film"]       # gaps filled in default order
+
+
+def test_model_mediums_are_parsed_and_sanitised():
+    out = I._parse_interests({"interests": [
+        {"topic": "x", "concepts": ["c"], "keywords": ["k"], "mediums": ["video", "bogus", "VIDEO", "paper"]},
+        {"topic": "y", "concepts": ["c"], "keywords": ["k"]},                  # model omitted it
+        {"topic": "z", "concepts": ["c"], "keywords": ["k"], "mediums": "paper"}]})  # wrong type
+    assert out[0].mediums == ["video", "paper", "film"]
+    assert out[1].mediums == ["film", "video", "paper"] and out[2].mediums == ["film", "video", "paper"]
+
+
+def test_bedrock_is_asked_for_mediums():
+    spec = I._TOOL_SPEC["toolSpec"]["inputSchema"]["json"]["properties"]["interests"]["items"]["properties"]
+    assert spec["mediums"]["items"]["enum"] == ["film", "video", "paper"]
+    assert "mediums" in I._SYSTEM_PROMPT
+
+
+def test_catalogs_only_search_the_allowed_mediums(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("TMDB_API_KEY", "k")
+    monkeypatch.setenv("YOUTUBE_API_KEY", "k")
+    hosts = []
+
+    def handler(request):
+        hosts.append(request.url.host)
+        return httpx.Response(200, json={"results": [], "items": []}, headers={"content-type": "application/json"})
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    asyncio.run(search_content([_med("memory", ["video", "film", "paper"])], client=client, include_videos=True))
+    assert "export.arxiv.org" not in hosts and "www.googleapis.com" in hosts and "api.themoviedb.org" in hosts
+    hosts.clear()
+    asyncio.run(search_content([_med("memory", ["paper", "video", "film"], depth="deep")], client=client, include_videos=True))
+    assert {"export.arxiv.org", "www.googleapis.com", "api.themoviedb.org"} <= set(hosts)
+    hosts.clear()
+    asyncio.run(search_content([_med("grief", ["film", "paper", "video"])], client=client, include_videos=True))
+    assert "www.googleapis.com" not in hosts                                    # video ranked last, casual
+
+
+def test_best_medium_orders_the_cards_and_leads_the_spoken_line():
+    it = _med("thermodynamics", ["video", "film", "paper"], depth="deep")
+    it.topic = "memecoins"
+    film = _film("A Film", rating=8.0, votes=5000, score=0.80)
+    vid = ContentItem(title="A Video", content_type="video", source_url="https://y/v", topic="memecoins",
+                      topic_overlap_score=0.75, popularity=90_000)
+    paper = ContentItem(title="A Paper", content_type="paper", source_url="https://a/p", topic="memecoins",
+                        topic_overlap_score=0.78, role="anchor")
+    cards = rank_and_render([film, vid, paper], [it], limit=6)
+    assert [c["type"] for c in cards] == ["video", "movie", "paper"]            # medium rank beats raw overlap
+    plan = build_session_plan([it], [film, vid, paper], extractor="bedrock")
+    assert plan["threads"][0]["best_medium"] == "video"
+    assert plan["spoken"].index("A Video") < plan["spoken"].index("A Film") < plan["spoken"].index("A Paper")
+
+
+def test_merged_threads_keep_the_best_mediums():
+    merged = H.merge_interests([(_conv("a", 3), 3.0, [_med("memory", ["video", "paper", "film"])]),
+                                (_conv("b", 0), 0.0, [_med("memory", ["video", "paper", "film"])])])
+    assert merged[0].mediums == ["video", "paper", "film"]
+
+
+# ---------------------------------------------------------------------------
 # input scope: one conversation vs many
 # ---------------------------------------------------------------------------
 

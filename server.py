@@ -75,7 +75,7 @@ async def search_content(topics: list[str]) -> list[dict]:
     (papers) and optionally YouTube. A missing key or failed call returns nothing
     for that source (mock results only when KNOTS_OFFLINE=1).
     """
-    interests = [Interest(topic=t, depth="casual", sentiment="curious", mentions=1,
+    interests = [Interest(topic=t, depth="deep", sentiment="curious", mentions=1,   # deep = all three mediums
                           concepts=[t], keywords=[t]) for t in topics if t.strip()]
     return [i.to_dict() for i in await _search_content(interests)]
 

@@ -18,6 +18,17 @@ from interests import Interest
 KIND = {"movie": "watch", "series": "watch", "doc": "watch", "video": "explore", "paper": "read"}
 
 
+MEDIUM_OF = {"movie": "film", "series": "film", "doc": "film", "video": "video", "paper": "paper"}
+MEDIUM_WEIGHT = (1.0, 0.85, 0.7)    # score multiplier by an interest's medium rank
+
+
+def medium_weight(item: ContentItem, interest: Interest) -> float:
+    medium = MEDIUM_OF.get(item.content_type, "film")
+    order = [m for m in interest.mediums if m in MEDIUM_OF.values()] or ["film", "video", "paper"]
+    rank = order.index(medium) if medium in order else len(MEDIUM_WEIGHT) - 1
+    return MEDIUM_WEIGHT[min(rank, len(MEDIUM_WEIGHT) - 1)]
+
+
 def _concept(interest: Interest) -> str:
     return interest.concepts[0] if interest.concepts else interest.topic
 
@@ -70,6 +81,8 @@ def render_card(item: ContentItem, interest: Interest) -> dict:
         "concept": _concept(interest),
         "evidence": item.matched_keywords[:5],
         "relevance": round(item.topic_overlap_score, 2),
+        "medium_rank": (interest.mediums.index(MEDIUM_OF.get(item.content_type, "film")) + 1
+                        if MEDIUM_OF.get(item.content_type, "film") in interest.mediums else None),
         "rating": item.rating or None,          # TMDB vote_average, films/docs only
         "votes": item.popularity or None,
         "gem": is_gem(item),
@@ -89,7 +102,11 @@ def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: 
     (lateral), one paper. One slot is reserved for a lesser-known, highly rated
     film or doc when one exists."""
     interest_by_topic = {i.topic: i for i in interests}
-    scored = sorted(items, key=lambda i: (i.topic_overlap_score, i.rating), reverse=True)
+    def fit(i: ContentItem) -> float:
+        it = interest_by_topic.get(i.topic)
+        return i.topic_overlap_score * (medium_weight(i, it) if it else 1.0)
+
+    scored = sorted(items, key=lambda i: (fit(i), i.rating), reverse=True)
 
     cards, seen, used_urls = [], set(), set()
     for item in scored:

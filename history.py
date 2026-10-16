@@ -166,6 +166,7 @@ def merge_interests(per_conversation: list[tuple[Conversation, float, list[Inter
             keywords=_ordered_union([m[2].keywords for m in members], 8),
             rationale=best.rationale,
             confidence=min(1.0, best.confidence + RECURRENCE_CONF_BONUS * (n - 1)),
+            mediums=list(best.mediums),
             conversations=n,
             last_seen=newest_member[1].timestamp or "",
             in_current=newest in conv_ids,

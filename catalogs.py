@@ -42,7 +42,7 @@ from typing import Literal
 
 import httpx
 
-from interests import STOPWORDS, Interest
+from interests import STOPWORDS, Interest, allowed_mediums
 
 log = logging.getLogger("knots.catalogs")
 
@@ -533,10 +533,12 @@ async def search_content(interests: list[Interest],
     try:
         tasks = []
         for n, interest in enumerate(interests[:MAX_SEARCH_INTERESTS]):
-            tasks.append(_search_tmdb(interest, client))
-            if n < ARXIV_MAX_INTERESTS:
+            allowed = allowed_mediums(interest)           # skip formats that would feel forced
+            if "film" in allowed:
+                tasks.append(_search_tmdb(interest, client))
+            if "paper" in allowed and n < ARXIV_MAX_INTERESTS:
                 tasks.append(_search_arxiv(interest, client))
-            if include_videos and n < YOUTUBE_MAX_INTERESTS:
+            if "video" in allowed and include_videos and n < YOUTUBE_MAX_INTERESTS:
                 tasks.append(_search_youtube(interest, client))
         groups = await asyncio.gather(*tasks)
     finally:

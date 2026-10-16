@@ -50,6 +50,10 @@ STOPWORDS = {
     "people", "person", "things", "thing", "stuff",
 }
 
+# The three ways a thread can be served. "film" covers films, series and documentaries;
+# "video" is an explainer; "paper" is research.
+MEDIUMS = ("film", "video", "paper")
+
 Depth = Literal["casual", "deep"]
 Sentiment = Literal["curious", "engaged", "skeptical", "neutral"]
 
@@ -72,6 +76,8 @@ class Interest:
     keywords: list[str] = field(default_factory=list)          # short film-metadata-style phrases
     rationale: str = ""             # one line: why these concepts/themes follow from the text
     confidence: float = 0.5
+    # best format first. All three stay possible; the order says which fits THIS interest.
+    mediums: list[str] = field(default_factory=lambda: list(MEDIUMS))
     # --- filled when several conversations are merged (see history.py) ---
     conversations: int = 1          # how many separate conversations raised it
     last_seen: str = ""             # timestamp of the newest conversation that did, if known
@@ -90,6 +96,14 @@ class Interest:
                 seen.add(t)
                 out.append(t)
         return out[:limit]
+
+
+def allowed_mediums(it: "Interest") -> list[str]:
+    """Mediums worth searching for this interest: the best two, plus the third when the
+    person is going deep. Skipping a poor-fit medium saves a catalog call and a bad pick."""
+    order = [m for m in it.mediums if m in MEDIUMS]
+    order += [m for m in MEDIUMS if m not in order]
+    return order[:3] if it.depth == "deep" else order[:2]
 
 
 def _clean_tokens(text: str) -> list[str]:
@@ -177,6 +191,11 @@ genuinely supports; do not invent drama.
 tags ("time loop", "artificial intelligence", "financial crisis", "unreliable narrator"). \
 These are used to search film metadata, so make them concrete and film-tag-like, not essays.
 - rationale: one sentence on how you got from the text to those concepts/themes.
+- mediums: rank "film", "video" and "paper" from best to worst for THIS interest. \
+film (a film, series or documentary) suits human, emotional or narrative themes and moral \
+questions. video (an explainer) suits abstract concepts, mechanisms and technical ideas that \
+a visual walk-through makes clear. paper (research) suits a person actively asking about \
+studies, evidence or the science. Put a format last when it would feel forced.
 - depth: "deep" if they are studying it seriously (papers, mechanisms, research), else "casual".
 - sentiment: curious | engaged | skeptical | neutral.
 - confidence: 0 to 1, how well the text supports your reading.
@@ -201,6 +220,7 @@ _TOOL_SPEC = {
                             "implicit_themes": {"type": "array", "items": {"type": "string"}},
                             "keywords": {"type": "array", "items": {"type": "string"}},
                             "rationale": {"type": "string"},
+                            "mediums": {"type": "array", "items": {"type": "string", "enum": ["film", "video", "paper"]}},
                             "depth": {"type": "string", "enum": ["casual", "deep"]},
                             "sentiment": {"type": "string",
                                           "enum": ["curious", "engaged", "skeptical", "neutral"]},
@@ -249,6 +269,12 @@ def _clean_list(v, max_items: int, max_len: int = 60) -> list[str]:
     return out
 
 
+def _clean_mediums(v) -> list[str]:
+    """Valid mediums in the model's order, then any it left out in the default order."""
+    given = [m for m in _clean_list(v, 3) if m in MEDIUMS]
+    return given + [m for m in MEDIUMS if m not in given]
+
+
 def _parse_interests(raw: dict) -> list[Interest]:
     """Validate and normalise model output. The model is untrusted: clamp
     everything, drop malformed entries, never trust types."""
@@ -281,6 +307,7 @@ def _parse_interests(raw: dict) -> list[Interest]:
             keywords=keywords,
             rationale=str(it.get("rationale", ""))[:300],
             confidence=conf,
+            mediums=_clean_mediums(it.get("mediums")),
         ))
     if not out:
         raise ValueError("model returned no usable interests")

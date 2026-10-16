@@ -34,6 +34,7 @@ def _threads(interests: list[Interest]) -> list[dict]:
         "underneath": i.implicit_themes,   # what the text implies but never says
         "why_i_think_so": i.rationale,
         "confidence": round(i.confidence, 2),
+        "best_medium": i.mediums[0] if i.mediums else "film",
         "conversations": i.conversations,     # how many separate conversations raised it
         "last_seen": i.last_seen,
         "in_current": i.in_current,
@@ -47,10 +48,17 @@ def _spoken(interests: list[Interest], picks: dict[str, list[dict]]) -> str:
         sentence += f" You've come back to {lead.topic} across {lead.conversations} conversations."
     if lead.implicit_themes:
         sentence += f" Underneath it, I hear {lead.implicit_themes[0]}."
-    if picks["watch"]:
-        sentence += f" To see it on screen, try {picks['watch'][0]['title']}."
-    if picks["read"]:
-        sentence += f" And if you want the research, {picks['read'][0]['title']}."
+    # lead with the format that suits this person's lead thread, then the others
+    phrasing = {
+        "film": ("watch", "To see it on screen, try {t}."),
+        "video": ("explore", "For a clear explainer, try {t}."),
+        "paper": ("read", "And if you want the research, {t}."),
+    }
+    order = [m for m in lead.mediums if m in phrasing] or list(phrasing)
+    for n, medium in enumerate(order):
+        bucket, line = phrasing[medium]
+        if picks[bucket]:
+            sentence += " " + (line if n == 0 else line.replace("And if", "If")).format(t=picks[bucket][0]["title"])
     return sentence
 
 
