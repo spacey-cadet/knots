@@ -1113,3 +1113,27 @@ def test_titan_throttle_backoff_breaker_and_no_poisoned_cache(monkeypatch):
     E.reset_breaker()
     monkeypatch.setattr(E, "_client", Throttly(fail_first=0))
     assert F._embed("c")[1] == "titan"
+
+
+def test_titan_calls_are_paced_and_duplicates_embedded_once(monkeypatch):
+    import io
+    from knots import fitmodel as F
+
+    class Counting:
+        def __init__(self): self.n = 0
+
+        def invoke_model(self, **kw):
+            self.n += 1
+            return {"body": io.BytesIO(json.dumps({"embedding": [3.0, 4.0]}).encode())}
+
+    sleeps = []
+    monkeypatch.setattr(E.time, "sleep", lambda s: sleeps.append(s))
+    monkeypatch.setattr(E, "_TITAN_RPM", 60.0)
+    E.reset_breaker()
+    fake = Counting()
+    monkeypatch.setattr(E, "_client", fake)
+    monkeypatch.setenv("EMBEDDER", "titan")
+    monkeypatch.setenv("BEDROCK_MODEL_ID", "m")
+    vecs, name = F.embed_all(["a", "b", "a", "a", "c", "b"])
+    assert name == "titan" and len(vecs) == 6 and fake.n == 3                  # 3 unique texts, 3 calls
+    assert sum(sleeps) >= 1.0                                                  # the 2nd and 3rd calls waited ~1s each

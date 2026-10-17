@@ -89,13 +89,17 @@ def _embed(text: str) -> tuple[tuple[float, ...], str]:
 
 
 def embed_all(texts: list[str]) -> tuple[list[list[float]], str]:
-    """Vectors for texts, all from ONE embedder (if any call fell back, redo them all hashed)."""
+    """Vectors for texts, all from ONE embedder (if any call fell back, redo them all hashed).
+
+    Duplicate texts (e.g. the same interest's concept string repeated for every item) are embedded once:
+    Titan is rate-limited to ~1 call/second, so every avoided call matters."""
+    unique = list(dict.fromkeys(texts))
     with ThreadPoolExecutor(max_workers=int(os.environ.get("EMBED_WORKERS", "3"))) as pool:
-        got = list(pool.map(_embed, texts))
-    names = {n for _, n in got}
+        got = dict(zip(unique, pool.map(_embed, unique)))
+    names = {n for _, n in got.values()}
     if len(names) > 1:
         return [hashed_embedding(t) for t in texts], "hashed"
-    return [list(v) for v, _ in got], (names.pop() if names else "hashed")
+    return [list(got[t][0]) for t in texts], (names.pop() if names else "hashed")
 
 
 def zscore(xs: list[float]) -> list[float]:

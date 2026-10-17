@@ -92,6 +92,11 @@ _TITAN_SLOTS = threading.BoundedSemaphore(int(os.environ.get("TITAN_CONCURRENCY"
 _TITAN_RETRIES = int(os.environ.get("TITAN_RETRIES", "6"))
 _BREAKER_THRESHOLD = int(os.environ.get("TITAN_BREAKER_FAILS", "3"))
 _BREAKER_COOLDOWN_S = float(os.environ.get("TITAN_BREAKER_COOLDOWN_S", "30"))
+# Titan Text Embeddings V2 is capped at 60 requests/minute and AWS does not allow an increase, so pace calls
+# below that (default 50 RPM leaves headroom for other users of the account). Set TITAN_RPM=0 to disable.
+_TITAN_RPM = float(os.environ.get("TITAN_RPM", "50"))
+_pace_lock = threading.Lock()
+_next_slot = 0.0
 _breaker_lock = threading.Lock()
 _consecutive_failures = 0
 _open_until = 0.0
@@ -103,11 +108,26 @@ def _is_throttle(e: Exception) -> bool:
     return code in _THROTTLE_CODES
 
 
+def _pace() -> None:
+    """Blocks until the next request slot; every Titan call (including retries) goes through here."""
+    global _next_slot
+    if _TITAN_RPM <= 0:
+        return
+    gap = 60.0 / _TITAN_RPM
+    with _pace_lock:
+        now = time.monotonic()
+        wait = max(0.0, _next_slot - now)
+        _next_slot = max(now, _next_slot) + gap
+    if wait:
+        time.sleep(wait)
+
+
 def _titan_with_backoff(text: str) -> list[float]:
     """Retries throttling with exponential backoff + jitter; other errors raise immediately."""
     for attempt in range(_TITAN_RETRIES):
         try:
             with _TITAN_SLOTS:
+                _pace()
                 return titan_embedding(text)
         except Exception as e:  # noqa: BLE001
             if not _is_throttle(e) or attempt == _TITAN_RETRIES - 1:
@@ -118,9 +138,11 @@ def _titan_with_backoff(text: str) -> list[float]:
 
 def reset_breaker() -> None:
     """Close the circuit breaker (used by tests and long-lived servers after a quota change)."""
-    global _consecutive_failures, _open_until, _last_warned
+    global _consecutive_failures, _open_until, _last_warned, _next_slot
     with _breaker_lock:
         _consecutive_failures, _open_until, _last_warned = 0, 0.0, 0.0
+    with _pace_lock:
+        _next_slot = 0.0
 
 
 def _breaker_open() -> bool:
