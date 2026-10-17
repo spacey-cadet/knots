@@ -26,7 +26,10 @@ import json
 import logging
 import math
 import os
+import random
 import re
+import threading
+import time
 
 log = logging.getLogger("knots.embeddings")
 
@@ -45,7 +48,7 @@ def _bedrock_client():
         _client = boto3.client(
             "bedrock-runtime",
             region_name=os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or "us-east-1",
-            config=Config(retries={"max_attempts": 2, "mode": "standard"}, connect_timeout=5,
+            config=Config(retries={"max_attempts": 1, "mode": "standard"}, connect_timeout=5,
                           read_timeout=int(os.environ.get("BEDROCK_TIMEOUT_S", "20"))),
         )
     return _client
@@ -84,17 +87,77 @@ def titan_embedding(text: str) -> list[float]:
     return _normalise([float(x) for x in vec])
 
 
+_THROTTLE_CODES = {"ThrottlingException", "TooManyRequestsException", "ServiceUnavailableException"}
+_TITAN_SLOTS = threading.BoundedSemaphore(int(os.environ.get("TITAN_CONCURRENCY", "3")))
+_TITAN_RETRIES = int(os.environ.get("TITAN_RETRIES", "6"))
+_BREAKER_THRESHOLD = int(os.environ.get("TITAN_BREAKER_FAILS", "3"))
+_BREAKER_COOLDOWN_S = float(os.environ.get("TITAN_BREAKER_COOLDOWN_S", "30"))
+_breaker_lock = threading.Lock()
+_consecutive_failures = 0
+_open_until = 0.0
+_last_warned = 0.0
+
+
+def _is_throttle(e: Exception) -> bool:
+    code = getattr(e, "response", {}).get("Error", {}).get("Code") if hasattr(e, "response") else None
+    return code in _THROTTLE_CODES
+
+
+def _titan_with_backoff(text: str) -> list[float]:
+    """Retries throttling with exponential backoff + jitter; other errors raise immediately."""
+    for attempt in range(_TITAN_RETRIES):
+        try:
+            with _TITAN_SLOTS:
+                return titan_embedding(text)
+        except Exception as e:  # noqa: BLE001
+            if not _is_throttle(e) or attempt == _TITAN_RETRIES - 1:
+                raise
+            time.sleep(min(20.0, 0.5 * 2 ** attempt) * (0.5 + random.random()))
+    raise RuntimeError("unreachable")
+
+
+def reset_breaker() -> None:
+    """Close the circuit breaker (used by tests and long-lived servers after a quota change)."""
+    global _consecutive_failures, _open_until, _last_warned
+    with _breaker_lock:
+        _consecutive_failures, _open_until, _last_warned = 0, 0.0, 0.0
+
+
+def _breaker_open() -> bool:
+    return time.monotonic() < _open_until
+
+
+def _record(ok: bool) -> None:
+    global _consecutive_failures, _open_until
+    with _breaker_lock:
+        if ok:
+            _consecutive_failures = 0
+            return
+        _consecutive_failures += 1
+        if _consecutive_failures >= _BREAKER_THRESHOLD:
+            _open_until = time.monotonic() + _BREAKER_COOLDOWN_S
+            _consecutive_failures = 0
+
+
 def embed_sync(text: str) -> tuple[list[float], str]:
-    """Returns (vector, embedder_name)."""
+    """Returns (vector, embedder_name). Fallbacks to hashed are marked by the name, so callers can avoid caching them."""
+    global _last_warned
     text = (text or "").strip()
     mode = os.environ.get("EMBEDDER", "auto").lower()
     if mode in ("auto", "titan") and (mode == "titan" or os.environ.get("BEDROCK_MODEL_ID")):
-        try:
-            return titan_embedding(text), "titan"
-        except Exception as e:  # noqa: BLE001
-            if mode == "titan" and os.environ.get("EXTRACTOR_STRICT") == "1":
-                raise
-            log.warning("Titan embedding failed (%s: %s); using the hashed embedder", type(e).__name__, e)
+        if not _breaker_open():
+            try:
+                vec = _titan_with_backoff(text)
+                _record(True)
+                return vec, "titan"
+            except Exception as e:  # noqa: BLE001
+                _record(False)
+                if mode == "titan" and os.environ.get("EXTRACTOR_STRICT") == "1":
+                    raise
+                now = time.monotonic()
+                if now - _last_warned > 10:       # one warning per 10 s, not one per text
+                    _last_warned = now
+                    log.warning("Titan embedding failed (%s: %s); using the hashed embedder", type(e).__name__, e)
     return hashed_embedding(text), "hashed"
 
 

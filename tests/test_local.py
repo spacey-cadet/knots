@@ -1070,3 +1070,46 @@ def test_guidance_holdout_hides_that_sessions_examples():
     hidden = {e["theme"] for e in ex if e["session_id"] == sid} - {e["theme"] for e in ex if e["session_id"] != sid}
     out = G.guidance(ex[0]["session_text"], holdout=sid)
     assert all(f'"{t}"' not in out for t in hidden) and "Do NOT attribute a feeling" in out
+
+
+def test_titan_throttle_backoff_breaker_and_no_poisoned_cache(monkeypatch):
+    import io
+    from botocore.exceptions import ClientError
+
+    class Throttly:
+        def __init__(self, fail_first): self.n, self.fail_first = 0, fail_first
+
+        def invoke_model(self, **kw):
+            self.n += 1
+            if self.n <= self.fail_first:
+                raise ClientError({"Error": {"Code": "ThrottlingException", "Message": "slow down"}}, "InvokeModel")
+            return {"body": io.BytesIO(json.dumps({"embedding": [3.0, 4.0]}).encode())}
+
+    monkeypatch.setenv("EMBEDDER", "titan")
+    monkeypatch.setenv("BEDROCK_MODEL_ID", "m")
+    monkeypatch.setattr(E.time, "sleep", lambda s: None)
+    monkeypatch.setattr(E, "_TITAN_RETRIES", 6)
+
+    # transient throttling is retried and still yields a Titan vector
+    fake = Throttly(fail_first=3)
+    monkeypatch.setattr(E, "_client", fake)
+    assert E.embed_sync("a")[1] == "titan" and fake.n == 4
+
+    # sustained throttling trips the breaker: later calls stop hitting Bedrock at all
+    E.reset_breaker()
+    fake = Throttly(fail_first=10 ** 6)
+    monkeypatch.setattr(E, "_client", fake)
+    for _ in range(E._BREAKER_THRESHOLD):
+        assert E.embed_sync("b")[1] == "hashed"
+    calls = fake.n
+    assert E.embed_sync("b")[1] == "hashed" and fake.n == calls
+
+    # a throttled fallback is never cached, so the text gets Titan once Bedrock recovers
+    from knots import fitmodel as F
+    E.reset_breaker()
+    F._EMBED_CACHE.clear()
+    monkeypatch.setattr(E, "_client", Throttly(fail_first=10 ** 6))
+    assert F._embed("c")[1] == "hashed" and "c" not in F._EMBED_CACHE
+    E.reset_breaker()
+    monkeypatch.setattr(E, "_client", Throttly(fail_first=0))
+    assert F._embed("c")[1] == "titan"
