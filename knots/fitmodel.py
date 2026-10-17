@@ -25,6 +25,7 @@ from __future__ import annotations
 import json
 import logging
 import math
+import os
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import lru_cache
@@ -70,15 +71,26 @@ def candidate_text(item) -> str:
     return " ".join(p for p in (item.title, item.abstract or item.blurb, " ".join(item.matched_keywords)) if p)
 
 
-@lru_cache(maxsize=2048)
+_EMBED_CACHE: dict[str, tuple[tuple[float, ...], str]] = {}
+
+
 def _embed(text: str) -> tuple[tuple[float, ...], str]:
+    """Cache only real Titan vectors; a throttled fallback must not be remembered, or the text stays hashed forever."""
+    hit = _EMBED_CACHE.get(text)
+    if hit is not None:
+        return hit
     vec, name = embed_sync(text)
-    return tuple(vec), name
+    out = (tuple(vec), name)
+    if name != "hashed" or os.environ.get("EMBEDDER", "auto").lower() == "hashed":
+        if len(_EMBED_CACHE) >= 4096:
+            _EMBED_CACHE.pop(next(iter(_EMBED_CACHE)))
+        _EMBED_CACHE[text] = out
+    return out
 
 
 def embed_all(texts: list[str]) -> tuple[list[list[float]], str]:
     """Vectors for texts, all from ONE embedder (if any call fell back, redo them all hashed)."""
-    with ThreadPoolExecutor(max_workers=8) as pool:
+    with ThreadPoolExecutor(max_workers=int(os.environ.get("EMBED_WORKERS", "3"))) as pool:
         got = list(pool.map(_embed, texts))
     names = {n for _, n in got}
     if len(names) > 1:
