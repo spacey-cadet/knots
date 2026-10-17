@@ -37,7 +37,7 @@ import os
 import re
 import time
 import xml.etree.ElementTree as ET
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field, replace
 from typing import Literal
 
 import httpx
@@ -453,7 +453,108 @@ def _title_matches(concept: str, title: str) -> bool:
     return not words or any(w in low for w in words)
 
 
+# --- YouTube cache and daily budget ------------------------------------------------------------
+# The Data API caps searches per day (the quota resets at midnight Pacific time). Successful searches,
+# including ones that found nothing, are cached on disk (KNOTS_YOUTUBE_CACHE=path.json) so a re-run never
+# pays twice, and KNOTS_YOUTUBE_BUDGET=N stops live searches once N were spent today. A quota or rate-limit
+# error (403/429) stops further live searches for the rest of the process instead of hammering the API.
+_youtube_cache: dict[str, list[ContentItem]] = {}
+_youtube_usage = {"date": "", "searches": 0}
+_youtube_loaded = False
+_youtube_blocked = ""
+
+
+def _youtube_cache_path() -> str:
+    return os.environ.get("KNOTS_YOUTUBE_CACHE", "")
+
+
+def _quota_day() -> str:
+    """YouTube's quota day: it resets at midnight Pacific time."""
+    from datetime import datetime, timedelta, timezone
+    try:
+        from zoneinfo import ZoneInfo
+        return datetime.now(ZoneInfo("America/Los_Angeles")).date().isoformat()
+    except Exception:  # noqa: BLE001 - no tz database: approximate Pacific as UTC-8
+        return (datetime.now(timezone.utc) - timedelta(hours=8)).date().isoformat()
+
+
+def youtube_budget() -> int:
+    """Live searches allowed per quota day; 0 = no limit."""
+    try:
+        return max(0, int(os.environ.get("KNOTS_YOUTUBE_BUDGET", "0") or 0))
+    except ValueError:
+        return 0
+
+
+def _youtube_load() -> None:
+    global _youtube_loaded
+    if _youtube_loaded:
+        return
+    _youtube_loaded = True
+    path = _youtube_cache_path()
+    if not path:
+        return
+    try:
+        import json
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        for q, rows in data.get("queries", {}).items():
+            _youtube_cache.setdefault(q, [ContentItem(**r) for r in rows])
+        use = data.get("usage") or {}
+        if use.get("date") == _quota_day():
+            _youtube_usage.update(date=use["date"], searches=int(use.get("searches", 0)))
+    except (OSError, ValueError, TypeError):
+        pass
+
+
+def _youtube_save() -> None:
+    path = _youtube_cache_path()
+    if not path:
+        return
+    try:
+        import json
+        os.makedirs(os.path.dirname(path) or ".", exist_ok=True)
+        tmp = path + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump({"usage": dict(_youtube_usage),
+                       "queries": {q: [asdict(i) for i in v] for q, v in _youtube_cache.items()}}, f, indent=1)
+        os.replace(tmp, path)
+    except OSError:
+        log.warning("could not write the YouTube cache to %s", path)
+
+
+def youtube_searches_left() -> int | None:
+    """Live searches left today under KNOTS_YOUTUBE_BUDGET (None = unlimited). 0 once the API refused us."""
+    _youtube_load()
+    if _youtube_blocked:
+        return 0
+    budget = youtube_budget()
+    if not budget:
+        return None
+    used = _youtube_usage["searches"] if _youtube_usage["date"] == _quota_day() else 0
+    return max(0, budget - used)
+
+
+def youtube_blocked_reason() -> str:
+    return _youtube_blocked
+
+
+def _youtube_count_search() -> None:
+    today = _quota_day()
+    if _youtube_usage["date"] != today:
+        _youtube_usage.update(date=today, searches=0)
+    _youtube_usage["searches"] += 1
+
+
+def _youtube_reset_for_tests() -> None:
+    global _youtube_loaded, _youtube_blocked
+    _youtube_cache.clear()
+    _youtube_usage.update(date="", searches=0)
+    _youtube_loaded, _youtube_blocked = False, ""
+
+
 async def _search_youtube(interest: Interest, client: httpx.AsyncClient) -> list[ContentItem]:
+    global _youtube_blocked
     if not _youtube_key():
         if offline_mode():
             return [ContentItem(title=r["title"], content_type="video", source_url=r["url"],
@@ -462,6 +563,19 @@ async def _search_youtube(interest: Interest, client: httpx.AsyncClient) -> list
         log.warning("YOUTUBE_API_KEY is not set: no videos returned")
         return []
     concept = (interest.concepts or [interest.topic])[0]
+    _youtube_load()
+    query = _youtube_query(interest)
+    cached = _youtube_cache.get(query)
+    if cached is not None:                                  # a past answer: free, and the same every time
+        return [replace(i, topic=interest.topic) for i in cached]
+    if _youtube_blocked:
+        FAILURES.append(f"YouTube:{interest.topic}:{_youtube_blocked}")
+        return []
+    left = youtube_searches_left()
+    if left is not None and left <= 0:
+        FAILURES.append(f"YouTube:{interest.topic}:daily budget reached")
+        log.warning("YouTube daily search budget (%s) reached; skipping %r", youtube_budget(), interest.topic)
+        return []
     try:
         resp = await client.get(
             YOUTUBE_SEARCH_URL,
@@ -472,10 +586,13 @@ async def _search_youtube(interest: Interest, client: httpx.AsyncClient) -> list
             timeout=_timeout(),
         )
         resp.raise_for_status()
+        _youtube_count_search()                             # only an answered search spends quota
         hits = [r for r in resp.json().get("items", [])
                 if r.get("id", {}).get("videoId") and _title_matches(concept, r["snippet"].get("title", ""))
                 and not _COURSEWARE.search(r["snippet"].get("title", ""))]
         if not hits:
+            _youtube_cache[query] = []
+            _youtube_save()
             return []
         # one cheap batched lookup for length and views, so shorts and junk can be dropped
         details = await client.get(
@@ -506,8 +623,12 @@ async def _search_youtube(interest: Interest, client: httpx.AsyncClient) -> list
                 matched_keywords=[concept]))
             if len(out) >= YOUTUBE_PER_INTEREST:
                 break
+        _youtube_cache[query] = out
+        _youtube_save()
         return out
     except Exception as e:  # noqa: BLE001
+        if getattr(getattr(e, "response", None), "status_code", None) in (403, 429):
+            _youtube_blocked = f"quota or rate limit ({e.response.status_code})"
         _fail("YouTube", interest.topic, e)
         return []
 

@@ -337,6 +337,7 @@ generator, 10 labelled sessions.
 
 ```bash
 python eval/run_eval.py run                 # 30 sessions through the extractors; builds the label sheets
+python eval/run_eval.py run --resume        # YouTube allows ~100 searches/day: finish over several days (cached)
 python eval/run_eval.py label               # tabs: Picks, Themes (+ error type), Pairs
 python eval/check_labels.py                 # contradictions, missing reasons, holdout hygiene
 python eval/train_brain.py --save           # theme judge: critic + neighbours + calibration (never uses holdout)

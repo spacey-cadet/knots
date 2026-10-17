@@ -670,6 +670,7 @@ def test_catalogs_only_search_the_allowed_mediums(monkeypatch):
     asyncio.run(search_content([_med("memory", ["video", "film", "paper"])], client=client, include_videos=True))
     assert "export.arxiv.org" not in hosts and "www.googleapis.com" in hosts and "api.themoviedb.org" in hosts
     hosts.clear()
+    C._youtube_reset_for_tests()          # this test is about which media are searched, not about the YouTube cache
     asyncio.run(search_content([_med("memory", ["paper", "video", "film"], depth="deep")], client=client, include_videos=True))
     assert {"export.arxiv.org", "www.googleapis.com", "api.themoviedb.org"} <= set(hosts)
     hosts.clear()
@@ -1204,3 +1205,89 @@ def test_cohere_failure_falls_back_whole_batch_and_is_paced(monkeypatch):
     monkeypatch.setattr(E, "_client", _FakeCohere())
     E.embed_many([f"t{i}" for i in range(200)])                                # 3 requests at 20 RPM => 2 waits of ~3s
     assert sum(sleeps) >= 5.5
+
+
+# ---------------------------------------------------------------- YouTube cache, budget and quota breaker
+def _yt_client(calls, status=200, videos=(("a", "Reflexivity explained"),), details=(("a", "PT12M", 250_000),)):
+    inner = _yt_handler(list(videos), list(details))
+
+    def handler(request):
+        calls.append(request.url.path)
+        return httpx.Response(status) if status != 200 else inner(request)
+    return httpx.AsyncClient(transport=httpx.MockTransport(handler))
+
+
+def _reflex(topic="markets"):
+    return I.Interest(topic=topic, depth="deep", sentiment="curious", mentions=1,
+                      concepts=["reflexivity"], keywords=["reflexivity"])
+
+
+def test_youtube_answers_are_cached_on_disk_and_survive_a_restart(monkeypatch, tmp_path):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("YOUTUBE_API_KEY", "k")
+    monkeypatch.setenv("KNOTS_YOUTUBE_CACHE", str(tmp_path / "yt.json"))
+    calls = []
+    first = asyncio.run(C._search_youtube(_reflex(), _yt_client(calls)))
+    assert [i.title for i in first] == ["Reflexivity explained"] and calls.count("/youtube/v3/search") == 1
+    again = asyncio.run(C._search_youtube(_reflex(), _yt_client(calls)))                    # same query: free
+    assert calls.count("/youtube/v3/search") == 1 and [i.title for i in again] == ["Reflexivity explained"]
+
+    C._youtube_reset_for_tests()                                                            # "restart": memory is gone
+    calls2 = []
+    third = asyncio.run(C._search_youtube(_reflex(), _yt_client(calls2)))
+    assert calls2 == [] and [i.title for i in third] == ["Reflexivity explained"]          # served from the file
+    assert json.loads((tmp_path / "yt.json").read_text())["usage"]["searches"] == 1
+
+
+def test_youtube_empty_results_are_cached_but_failures_are_not(monkeypatch, tmp_path):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("YOUTUBE_API_KEY", "k")
+    monkeypatch.setenv("KNOTS_YOUTUBE_CACHE", str(tmp_path / "yt.json"))
+    calls = []
+    assert asyncio.run(C._search_youtube(_reflex(), _yt_client(calls, videos=(), details=()))) == []
+    assert asyncio.run(C._search_youtube(_reflex(), _yt_client(calls, videos=(), details=()))) == []
+    assert calls.count("/youtube/v3/search") == 1                         # "found nothing" is an answer worth keeping
+
+    C._youtube_reset_for_tests()
+    monkeypatch.setenv("KNOTS_YOUTUBE_CACHE", str(tmp_path / "yt2.json"))
+    bad = []
+    assert asyncio.run(C._search_youtube(_reflex(), _yt_client(bad, status=500))) == []
+    C._youtube_reset_for_tests()
+    ok = []
+    assert asyncio.run(C._search_youtube(_reflex(), _yt_client(ok))) != []   # the failure left nothing cached
+    assert ok.count("/youtube/v3/search") == 1
+
+
+def test_youtube_daily_budget_stops_live_searches_but_not_cached_ones(monkeypatch, tmp_path):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("YOUTUBE_API_KEY", "k")
+    monkeypatch.setenv("KNOTS_YOUTUBE_CACHE", str(tmp_path / "yt.json"))
+    monkeypatch.setenv("KNOTS_YOUTUBE_BUDGET", "1")
+    calls = []
+    assert C.youtube_searches_left() == 1
+    asyncio.run(C._search_youtube(_reflex(), _yt_client(calls)))
+    assert C.youtube_searches_left() == 0
+    other = I.Interest(topic="x", depth="deep", sentiment="curious", mentions=1, concepts=["entropy"], keywords=["entropy"])
+    C.FAILURES.clear()
+    assert asyncio.run(C._search_youtube(other, _yt_client(calls))) == []
+    assert calls.count("/youtube/v3/search") == 1 and C.FAILURES == ["YouTube:x:daily budget reached"]
+    assert asyncio.run(C._search_youtube(_reflex(), _yt_client(calls)))     # cached: still answered with no budget
+
+    C._youtube_reset_for_tests()                                             # a new process, same day: count persists
+    assert C.youtube_searches_left() == 0
+    data = json.loads((tmp_path / "yt.json").read_text())
+    data["usage"]["date"] = "2000-01-01"                                     # a previous quota day: allowance is fresh
+    (tmp_path / "yt.json").write_text(json.dumps(data))
+    C._youtube_reset_for_tests()
+    assert C.youtube_searches_left() == 1
+
+
+def test_youtube_quota_error_stops_further_live_searches(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("YOUTUBE_API_KEY", "k")
+    calls = []
+    assert asyncio.run(C._search_youtube(_reflex(), _yt_client(calls, status=429))) == []
+    assert "429" in C.youtube_blocked_reason() and C.youtube_searches_left() == 0
+    other = I.Interest(topic="x", depth="deep", sentiment="curious", mentions=1, concepts=["entropy"], keywords=["entropy"])
+    asyncio.run(C._search_youtube(other, _yt_client(calls)))
+    assert len(calls) == 1                                                    # no second request to a refusing API
