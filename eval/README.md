@@ -17,6 +17,20 @@ Add more models to compare, e.g. `...,bedrock=us.meta.llama3-3-70b-instruct-v1:0
 Bedrock runs in strict mode, so a failure shows as `FAIL` and is never quietly
 replaced by the heuristic. Re-running keeps labels you already entered.
 
+**YouTube quota.** The Data API allows only a small number of searches per day (about 100 by default), and
+a full pass of 30 sessions with 2 extractors needs about 110. So the eval caches every answered YouTube
+search in `eval/results/youtube_cache.json` and results are saved after each run. If you pass
+`--youtube-budget N` (or set `KNOTS_YOUTUBE_BUDGET`), it stops cleanly when N searches are spent that
+quota day (the day resets at midnight Pacific time); a 403/429 from YouTube also stops it. The next day:
+
+```bash
+python eval/run_eval.py run --resume
+```
+
+keeps every run that completed, redoes only the INCOMPLETE or missing ones, and costs nothing for searches
+already cached. Do not label or score until it reports no incomplete runs. Note that the Bedrock extractor
+can pick different interests on a re-run, which means a different search; those are new live searches.
+
 ## 2. Label (about 1 hour)
 
 ```bash

@@ -15,6 +15,8 @@ Usage (from the repo root, venv active):
 
   python eval/run_eval.py run                              # heuristic + bedrock
   python eval/run_eval.py run --extractors heuristic       # offline only
+  python eval/run_eval.py run --youtube-budget 95          # stop cleanly when the day's YouTube searches are spent
+  python eval/run_eval.py run --resume                     # next day: redo only INCOMPLETE/missing runs
   python eval/run_eval.py run --extractors "heuristic,bedrock=us.anthropic.claude-sonnet-4-6"
   python eval/run_eval.py label                            # label in the browser
   python eval/run_eval.py score
@@ -47,6 +49,8 @@ load_dotenv(ROOT / ".env")
 # An eval can afford to wait; a flaky connection must not silently drop picks.
 os.environ.setdefault("KNOTS_HTTP_TIMEOUT", "25")
 os.environ.setdefault("KNOTS_ARXIV_CACHE", str(HERE / "results" / "arxiv_cache.json"))
+# YouTube answers are cached too: the API allows only ~100 searches a day, and a re-run must never pay twice.
+os.environ.setdefault("KNOTS_YOUTUBE_CACHE", str(HERE / "results" / "youtube_cache.json"))
 
 from knots import catalogs, embeddings, engine, extraction, fitmodel  # noqa: E402
 
@@ -140,9 +144,45 @@ def cmd_run(args) -> int:
     videos = bool(os.environ.get("YOUTUBE_API_KEY")) and not args.no_videos
     if not videos:
         print("NOTE: YouTube is off (no YOUTUBE_API_KEY, or --no-videos), so no explainers will appear.\n")
-    results, errors, incomplete = [], 0, 0
+    if args.youtube_budget is not None:
+        os.environ["KNOTS_YOUTUBE_BUDGET"] = str(args.youtube_budget)
+
+    def complete(e) -> bool:
+        return bool(e and e.get("ok") and not e.get("catalog_failures"))
+
+    previous = {}
+    if args.resume:
+        try:
+            for e in json.loads(RESULTS.read_text()).get("results", []):
+                previous[(e["session_id"], e["extractor"])] = e
+        except (OSError, ValueError):
+            print("NOTE: --resume found no earlier results.json; running everything.\n")
+    order = [(s["id"], spec) for s in sessions for spec in specs]
+    entries: dict[tuple, dict] = {}
+
+    def save() -> None:
+        """Written after every run, so an interrupted run loses nothing."""
+        RESULTS.parent.mkdir(exist_ok=True)
+        RESULTS.write_text(json.dumps({"tmdb_live": tmdb_live, "embedder": embeddings.embedder_config(),
+                                       "results": [entries[k] for k in order if k in entries]}, indent=2))
+
+    errors, kept, stopped = 0, 0, None
     for sess in sessions:
         for spec in specs:
+            key = (sess["id"], spec)
+            old = previous.get(key)
+            if old and complete(old) and old.get("texts") == sess["texts"]:
+                entries[key] = old
+                kept += 1
+                print(f"  {sess['id']}  {spec:<42} kept (complete from an earlier run)")
+                continue
+            if videos and not stopped and catalogs.youtube_searches_left() == 0:
+                why = catalogs.youtube_blocked_reason() or f"the daily budget of {catalogs.youtube_budget()} searches is spent"
+                stopped = (sess["id"], spec, why)
+            if stopped:
+                if old:                      # keep whatever an earlier run produced for it, flagged as stale
+                    entries[key] = old
+                continue
             mode, model = parse_spec(spec)
             entry = {"session_id": sess["id"], "extractor": spec, "texts": sess["texts"]}
             try:
@@ -157,19 +197,21 @@ def cmd_run(args) -> int:
                              catalog_failures=failed, embedders_used=dict(fitmodel.USED_EMBEDDERS))
                 n = sum(len(v) for v in plan["picks"].values())
                 warn = f"  INCOMPLETE: {len(failed)} catalog call(s) failed" if failed else ""
-                incomplete += bool(failed)
                 print(f"  {sess['id']}  {spec:<42} ok   {len(found)} interests, {n} picks{warn}")
             except Exception as e:  # noqa: BLE001 - record and keep going
                 errors += 1
                 entry.update(ok=False, error=f"{type(e).__name__}: {e}")
                 print(f"  {sess['id']}  {spec:<42} FAIL {type(e).__name__}: {str(e)[:90]}")
-            results.append(entry)
+            entries[key] = entry
+            save()
 
-    RESULTS.parent.mkdir(exist_ok=True)
+    results = [entries[k] for k in order if k in entries]
+    incomplete = sum(1 for e in results if e.get("ok") and e.get("catalog_failures"))
+    pending = [k for k in order if k not in entries or not complete(entries[k])]
     cfg = embeddings.embedder_config()
     fell_back = sum(1 for e in results if e.get("ok") and cfg["provider"] != "hashed"
                     and e.get("embedders_used", {}).get("hashed"))
-    RESULTS.write_text(json.dumps({"tmdb_live": tmdb_live, "embedder": cfg, "results": results}, indent=2))
+    save()
     if fell_back:
         print(f"\nWARNING: {fell_back} run(s) fell back to the hashed embedder although {cfg['provider']} was "
               "requested (throttling or an error). Their rankings and pairs are not comparable with the rest; "
@@ -180,10 +222,17 @@ def cmd_run(args) -> int:
     print(f"Label picks in   {LABELS.relative_to(ROOT)}   (column: good = y/n)")
     print(f"Label themes in  {THEMES.relative_to(ROOT)}   (column: supported = y/n, error_type when n)")
     print(f"Label pairs in   {PAIRS.relative_to(ROOT)}   (column: good = y/n: would you watch and read these together?)")
+    if stopped:
+        print(f"\nSTOPPED before {stopped[0]} / {stopped[1]}: {stopped[2]}. Everything searched so far is cached "
+              f"({os.environ['KNOTS_YOUTUBE_CACHE']}). After the quota resets (midnight Pacific time), run\n"
+              "  python eval/run_eval.py run --resume\n"
+              "and only the missing runs are done; cached searches cost nothing.")
     if incomplete:
-        print(f"\n{incomplete} run(s) marked INCOMPLETE: catalog calls failed (network or rate limit), "
-              "so those sessions are missing picks. Re-run `run`: arXiv answers are cached, so only "
-              "the failures are retried. Do not label or score until this is 0.")
+        print(f"\n{incomplete} run(s) marked INCOMPLETE: catalog calls failed (network, rate limit or quota), "
+              "so those sessions are missing picks. `run --resume` redoes only those; searches already answered "
+              "are cached (arXiv and YouTube), so only the failures are retried.")
+    if pending:
+        print(f"{len(pending)} of {len(order)} run(s) are not complete yet. Do not label or score until this is 0.")
     if errors:
         print(f"\n{errors} run(s) failed; see FAIL lines above. Fix and re-run: labels you entered are kept.")
     return 0
@@ -475,6 +524,11 @@ def main() -> int:
                    help="comma list: heuristic, bedrock, or bedrock=<model id> (default: heuristic,bedrock)")
     r.add_argument("--no-videos", action="store_true",
                    help="skip YouTube (it is on by default when YOUTUBE_API_KEY is set)")
+    r.add_argument("--resume", action="store_true",
+                   help="keep runs that already completed in results.json; redo only INCOMPLETE, failed or missing ones")
+    r.add_argument("--youtube-budget", type=int, default=None, metavar="N",
+                   help="live YouTube searches allowed per quota day (tracked on disk; resets midnight Pacific). "
+                        "Stops cleanly when spent instead of failing runs one by one. Also KNOTS_YOUTUBE_BUDGET")
     r.set_defaults(fn=cmd_run)
     lb = sub.add_parser("label", help="open the local labelling tool (saves into the CSVs)")
     lb.add_argument("--port", type=int, default=8765)

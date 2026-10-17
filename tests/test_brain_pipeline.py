@@ -496,3 +496,55 @@ def test_model_card_states_the_embedder_for_each_part_and_warns_on_fallback(tmp_
     assert "global.cohere.embed-v4:0" in sect and "**cohere**" in sect      # ranker
     assert "**mixed**" in sect and "different embedders" in sect            # pairs fell back: flagged
     assert "1 eval run(s)" in sect
+
+
+def test_run_eval_resume_keeps_complete_runs_and_stops_cleanly_when_the_youtube_budget_is_spent(tmp_path, monkeypatch, capsys):
+    import argparse
+    from knots import catalogs
+    R = _load_script("run_eval")
+    sessions = [{"id": f"s{i}", "texts": [f"t{i}"]} for i in (1, 2, 3)]
+    (tmp_path / "sessions.json").write_text(json.dumps(sessions))
+    monkeypatch.setattr(R, "SESSIONS", tmp_path / "sessions.json")
+    monkeypatch.setattr(R, "RESULTS", tmp_path / "results.json")
+    monkeypatch.setattr(R, "ROOT", tmp_path)                                    # the summary prints paths relative to it
+    for n in ("LABELS", "THEMES", "PAIRS"):
+        monkeypatch.setattr(R, n, tmp_path / f"{n.lower()}.csv")
+    monkeypatch.setattr(R, "set_extractor", lambda *a: None)
+    monkeypatch.setattr(R, "build_label_sheets", lambda results: None)
+    monkeypatch.setenv("YOUTUBE_API_KEY", "k"); monkeypatch.setenv("TMDB_API_KEY", "k")
+    monkeypatch.setenv("KNOTS_YOUTUBE_CACHE", str(tmp_path / "yt.json"))
+
+    state = {"left": 2, "ran": [], "fail": {"s2"}}
+    monkeypatch.setattr(catalogs, "youtube_searches_left", lambda: state["left"])
+    monkeypatch.setattr(catalogs, "youtube_blocked_reason", lambda: "")
+
+    class FakeResult:
+        interests, extractor = [], "heuristic"
+        def plan(self): return {"threads": [], "picks": {"watch": [], "read": [], "explore": []}, "pairs": []}
+
+    async def fake_run(session_texts, include_videos):
+        sid = session_texts[0].replace("t", "s")
+        state["ran"].append(sid)
+        state["left"] -= 1
+        if sid in state["fail"]:
+            catalogs.FAILURES.append("YouTube:x:429")
+        return FakeResult()
+
+    monkeypatch.setattr(R.engine, "run", fake_run)
+    args = lambda **kw: argparse.Namespace(extractors="heuristic", no_videos=False, resume=False, youtube_budget=None, **kw)
+
+    R.cmd_run(args())
+    out = capsys.readouterr().out
+    assert state["ran"] == ["s1", "s2"]                                        # stopped before s3: budget is 0
+    assert "STOPPED before s3" in out and "run --resume" in out
+    saved = json.loads((tmp_path / "results.json").read_text())["results"]
+    assert [e["session_id"] for e in saved] == ["s1", "s2"]                     # saved as it went
+    assert saved[1]["catalog_failures"] and not saved[0]["catalog_failures"]    # s2 is INCOMPLETE
+
+    state.update(left=5, ran=[], fail=set())                                    # next day: quota is back
+    R.cmd_run(argparse.Namespace(extractors="heuristic", no_videos=False, resume=True, youtube_budget=None))
+    out = capsys.readouterr().out
+    assert state["ran"] == ["s2", "s3"]                                         # s1 was complete: not redone
+    assert "kept (complete" in out and "STOPPED" not in out
+    final = json.loads((tmp_path / "results.json").read_text())["results"]
+    assert [e["session_id"] for e in final] == ["s1", "s2", "s3"] and not any(e["catalog_failures"] for e in final)
