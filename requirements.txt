@@ -4,4 +4,4 @@ python-dotenv
 boto3
 pytest
 numpy
-scikit-learn
+sklearn
