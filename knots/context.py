@@ -53,7 +53,7 @@ RECURRENCE_CONF_BONUS = 0.05  # per extra conversation a thread appears in
 MAX_PARALLEL_EXTRACTIONS = 4  # keeps Bedrock throttling out of the picture
 
 # memory recall (see recall_and_extract)
-SIM_THRESHOLD = {"titan": 0.35, "hashed": 0.12}   # min cosine similarity to count as "related"
+SIM_THRESHOLD = {"titan": 0.35, "cohere": 0.35, "hashed": 0.12}   # min cosine similarity to count as "related"
 MAX_RECALLED = 6              # past conversations pulled in for one request
 PROFILE_RECORDS = 30          # how much history "profile mode" looks at
 

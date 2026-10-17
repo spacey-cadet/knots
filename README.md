@@ -103,7 +103,7 @@ knots/                  the algorithm
   engine.py             the one door: run / plan / recommend / extract / search / forget
   context.py            input scope: one or many conversations, merging, memory recall
   memory.py             SQLite ProfileStore (interests + embeddings, never words)
-  embeddings.py         Titan v2 with an offline hashed fallback
+  embeddings.py         Cohere Embed v4 / Titan v2 on Bedrock, with an offline hashed fallback
   extraction.py         Bedrock extractor + heuristic fallback; best medium per interest
   catalogs.py           retrieval: TMDB films, series, docs; YouTube explainers; arXiv papers
   quality.py            the quality gate (rating, votes, age) and the reserved-slot rules
@@ -247,10 +247,15 @@ trace of the conversation text.
 - Re-sending the same conversation is not double counted.
 - A memory failure never breaks an answer; it is logged and the request goes on.
 
-**Embeddings:** Amazon Titan Text Embeddings v2 (256 dimensions) when Bedrock is
-configured, otherwise an offline hashed bag-of-words embedding (lexical only,
-no keys). The embedder's name is stored with every vector, and vectors from
-different embedders are never compared. `EMBEDDER=auto|titan|hashed`.
+**Embeddings:** Cohere Embed v4 (256 dimensions, up to 96 texts per request) or
+Amazon Titan Text Embeddings v2 (256 dimensions, one text per request, capped at
+60 requests/minute with no quota increase possible) when Bedrock is configured,
+otherwise an offline hashed bag-of-words embedding (lexical only, no keys). Set
+`EMBED_MODEL_ID` to a Cohere Embed v4 cross-region inference profile to use
+Cohere; calls are paced (`COHERE_RPM`, `TITAN_RPM`), throttling is retried with
+backoff, and a circuit breaker drops a whole run to hashed rather than mixing
+embedders. The embedder's name is stored with every vector, and vectors from
+different embedders are never compared. `EMBEDDER=auto|cohere|titan|hashed`.
 
 **Control:** `what_do_you_remember(user_id)` lists the threads held and how many
 conversations they come from; `forget_me(user_id)` deletes everything stored for
