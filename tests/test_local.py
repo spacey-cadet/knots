@@ -1109,7 +1109,98 @@ def test_titan_throttle_backoff_breaker_and_no_poisoned_cache(monkeypatch):
     E.reset_breaker()
     F._EMBED_CACHE.clear()
     monkeypatch.setattr(E, "_client", Throttly(fail_first=10 ** 6))
-    assert F._embed("c")[1] == "hashed" and "c" not in F._EMBED_CACHE
+    assert F.embed_all(["c"])[1] == "hashed" and not F._EMBED_CACHE
     E.reset_breaker()
     monkeypatch.setattr(E, "_client", Throttly(fail_first=0))
-    assert F._embed("c")[1] == "titan"
+    assert F.embed_all(["c"])[1] == "titan"
+
+
+def test_titan_calls_are_paced_and_duplicates_embedded_once(monkeypatch):
+    import io
+    from knots import fitmodel as F
+
+    class Counting:
+        def __init__(self): self.n = 0
+
+        def invoke_model(self, **kw):
+            self.n += 1
+            return {"body": io.BytesIO(json.dumps({"embedding": [3.0, 4.0]}).encode())}
+
+    sleeps = []
+    monkeypatch.setattr(E.time, "sleep", lambda s: sleeps.append(s))
+    monkeypatch.setattr(E, "_TITAN_RPM", 60.0)
+    E.reset_breaker()
+    fake = Counting()
+    monkeypatch.setattr(E, "_client", fake)
+    monkeypatch.setenv("EMBEDDER", "titan")
+    monkeypatch.setenv("BEDROCK_MODEL_ID", "m")
+    vecs, name = F.embed_all(["a", "b", "a", "a", "c", "b"])
+    assert name == "titan" and len(vecs) == 6 and fake.n == 3                  # 3 unique texts, 3 calls
+    assert sum(sleeps) >= 1.0                                                  # the 2nd and 3rd calls waited ~1s each
+
+
+class _FakeCohere:
+    """Echoes one distinct 2-d vector per text and records request bodies; can fail or return the keyed shape."""
+
+    def __init__(self, fail=None, keyed=False):
+        self.bodies, self.fail, self.keyed = [], fail, keyed
+
+    def invoke_model(self, **kw):
+        import io
+        from botocore.exceptions import ClientError
+        body = json.loads(kw["body"])
+        self.bodies.append((kw["modelId"], body))
+        if self.fail:
+            raise ClientError({"Error": {"Code": self.fail, "Message": "x"}}, "InvokeModel")
+        vecs = [[3.0 + i, 4.0] for i, _ in enumerate(body["texts"])]
+        out = {"embeddings": {"float": vecs} if self.keyed else vecs}
+        return {"body": io.BytesIO(json.dumps(out).encode())}
+
+
+def test_cohere_embedder_batches_96_per_request_and_keeps_order(monkeypatch):
+    fake = _FakeCohere()
+    monkeypatch.setattr(E, "_client", fake)
+    monkeypatch.setenv("EMBEDDER", "auto")
+    monkeypatch.setenv("BEDROCK_MODEL_ID", "x")
+    monkeypatch.setenv("EMBED_MODEL_ID", "global.cohere.embed-v4:0")
+    vecs, name = E.embed_many([f"t{i}" for i in range(200)])
+    assert name == "cohere" and len(vecs) == 200
+    assert [len(b["texts"]) for _, b in fake.bodies] == [96, 96, 8]            # 3 requests, not 200
+    model, body = fake.bodies[0]
+    assert model == "global.cohere.embed-v4:0" and body["input_type"] == "search_document"
+    assert body["output_dimension"] == 256 and body["embedding_types"] == ["float"]
+    assert vecs[0] == [0.6, 0.8] and vecs[1][0] > 0.6                          # normalised, per-chunk order kept
+    E.reset_breaker()
+    monkeypatch.setattr(E, "_client", _FakeCohere(keyed=True))                  # keyed-by-type response shape
+    assert E.embed_many(["a", "b"])[1] == "cohere"
+
+
+def test_embed_all_sends_one_document_batch_and_a_query_request(monkeypatch):
+    from knots import fitmodel as F
+    fake = _FakeCohere()
+    monkeypatch.setattr(E, "_client", fake)
+    monkeypatch.setenv("EMBEDDER", "cohere")
+    vecs, name = F.embed_all(["a", "b", "a", "c"], ["what is a memecoin"])
+    assert name == "cohere" and len(vecs) == 5
+    assert [(b["input_type"], b["texts"]) for _, b in fake.bodies] == [
+        ("search_document", ["a", "b", "c"]), ("search_query", ["what is a memecoin"])]   # 2 requests for 5 vectors
+    F.embed_all(["a", "b", "a", "c"], ["what is a memecoin"])
+    assert len(fake.bodies) == 2                                                # all cached now
+
+
+def test_cohere_failure_falls_back_whole_batch_and_is_paced(monkeypatch):
+    from knots import fitmodel as F
+    monkeypatch.setenv("EMBEDDER", "cohere")
+    monkeypatch.setattr(E, "_client", _FakeCohere(fail="ThrottlingException"))
+    monkeypatch.setattr(E.time, "sleep", lambda s: None)
+    monkeypatch.setattr(E, "_TITAN_RETRIES", 2)
+    vecs, name = F.embed_all(["a", "b"], ["q"])
+    assert name == "hashed" and len(vecs) == 3 and not F._EMBED_CACHE         # nothing poisoned
+
+    sleeps = []
+    E.reset_breaker()
+    monkeypatch.setattr(E.time, "sleep", lambda s: sleeps.append(s))
+    monkeypatch.setattr(E, "_COHERE_RPM", 20.0)
+    monkeypatch.setattr(E, "_client", _FakeCohere())
+    E.embed_many([f"t{i}" for i in range(200)])                                # 3 requests at 20 RPM => 2 waits of ~3s
+    assert sum(sleeps) >= 5.5

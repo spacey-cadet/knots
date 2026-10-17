@@ -1,16 +1,19 @@
 """
 Text embeddings for Knots' memory.
 
-Two embedders behind one function, `embed(text) -> (vector, name)`:
+Three embedders behind `embed_sync(text)` and the batched `embed_many(texts)`, each returning (vectors, name):
 
   - "titan"  : Amazon Titan Text Embeddings v2 on Bedrock (256 dimensions,
                normalised). Semantic: "what is a memecoin" lands near "crypto
                speculation". Used when Bedrock is configured.
+  - "cohere" : Cohere Embed v4 on Bedrock (256 dimensions, normalised), selected by EMBEDDER=cohere or a Cohere
+               EMBED_MODEL_ID. Takes up to 96 texts per request, so a whole plan is one call.
   - "hashed" : an offline bag-of-words hash embedding (unigrams + bigrams,
                signed hashing, L2-normalised). Lexical only, but deterministic,
                free and needs no keys, so the server and tests always work.
 
-EMBEDDER env: auto (default: titan, else hashed) | titan | hashed.
+EMBEDDER env: auto (default: Cohere if EMBED_MODEL_ID names it, else Titan if Bedrock is configured, else hashed)
+| titan | cohere | hashed.
 The embedder's name is stored next to every vector. Vectors from different
 embedders are never compared (their spaces are unrelated).
 
@@ -35,6 +38,7 @@ log = logging.getLogger("knots.embeddings")
 
 DIM = 256
 DEFAULT_TITAN_MODEL = "amazon.titan-embed-text-v2:0"
+DEFAULT_COHERE_MODEL = "cohere.embed-v4:0"   # on-demand (10 RPM); use a global/geo cross-region profile id for 20+
 MAX_EMBED_CHARS = 8000
 
 _client = None
@@ -88,10 +92,18 @@ def titan_embedding(text: str) -> list[float]:
 
 
 _THROTTLE_CODES = {"ThrottlingException", "TooManyRequestsException", "ServiceUnavailableException"}
-_TITAN_SLOTS = threading.BoundedSemaphore(int(os.environ.get("TITAN_CONCURRENCY", "3")))
+_TITAN_SLOTS = threading.BoundedSemaphore(int(os.environ.get("TITAN_CONCURRENCY", "3")))   # shared by all Bedrock embedders
 _TITAN_RETRIES = int(os.environ.get("TITAN_RETRIES", "6"))
 _BREAKER_THRESHOLD = int(os.environ.get("TITAN_BREAKER_FAILS", "3"))
 _BREAKER_COOLDOWN_S = float(os.environ.get("TITAN_BREAKER_COOLDOWN_S", "30"))
+# Titan Text Embeddings V2 is capped at 60 requests/minute and AWS does not allow an increase, so pace calls below
+# that (default 50 leaves headroom). Cohere Embed v4 through a cross-region profile is 20/minute but takes up to 96
+# texts per request, so the default is 15. Set either to 0 to disable pacing.
+_TITAN_RPM = float(os.environ.get("TITAN_RPM", "50"))
+_COHERE_RPM = float(os.environ.get("COHERE_RPM", "15"))
+COHERE_BATCH = 96                                  # Cohere's maximum number of texts per request
+_pace_lock = threading.Lock()
+_next_slots: dict[str, float] = {}
 _breaker_lock = threading.Lock()
 _consecutive_failures = 0
 _open_until = 0.0
@@ -103,12 +115,26 @@ def _is_throttle(e: Exception) -> bool:
     return code in _THROTTLE_CODES
 
 
-def _titan_with_backoff(text: str) -> list[float]:
-    """Retries throttling with exponential backoff + jitter; other errors raise immediately."""
+def _pace(key: str, rpm: float) -> None:
+    """Blocks until the next request slot for this embedder; every call (including retries) goes through here."""
+    if rpm <= 0:
+        return
+    gap = 60.0 / rpm
+    with _pace_lock:
+        now = time.monotonic()
+        slot = max(now, _next_slots.get(key, 0.0))
+        _next_slots[key] = slot + gap
+    if slot > now:
+        time.sleep(slot - now)
+
+
+def _with_backoff(fn, key: str, rpm: float):
+    """Paced call; throttling is retried with exponential backoff + jitter, other errors raise immediately."""
     for attempt in range(_TITAN_RETRIES):
         try:
             with _TITAN_SLOTS:
-                return titan_embedding(text)
+                _pace(key, rpm)
+                return fn()
         except Exception as e:  # noqa: BLE001
             if not _is_throttle(e) or attempt == _TITAN_RETRIES - 1:
                 raise
@@ -116,11 +142,33 @@ def _titan_with_backoff(text: str) -> list[float]:
     raise RuntimeError("unreachable")
 
 
+def cohere_embeddings(texts: list[str], input_type: str = "search_document") -> list[list[float]]:
+    """One Cohere Embed v4 request for up to COHERE_BATCH texts. Returns one normalised vector per text."""
+    model_id = os.environ.get("EMBED_MODEL_ID", "").strip() or DEFAULT_COHERE_MODEL
+    resp = _bedrock_client().invoke_model(
+        modelId=model_id,
+        body=json.dumps({"input_type": input_type, "texts": [t[:MAX_EMBED_CHARS] or " " for t in texts],
+                         "embedding_types": ["float"], "output_dimension": DIM, "truncate": "RIGHT"}),
+        accept="application/json", contentType="application/json",
+    )
+    body = resp["body"]
+    data = json.loads(body.read() if hasattr(body, "read") else body)
+    vecs = data["embeddings"]
+    if isinstance(vecs, dict):                       # keyed by type when several types are requested
+        vecs = vecs.get("float")
+    if (not isinstance(vecs, list) or len(vecs) != len(texts)
+            or not all(isinstance(v, list) and v and all(isinstance(x, (int, float)) for x in v) for v in vecs)):
+        raise ValueError("embedding response has no usable vectors")
+    return [_normalise([float(x) for x in v]) for v in vecs]
+
+
 def reset_breaker() -> None:
-    """Close the circuit breaker (used by tests and long-lived servers after a quota change)."""
+    """Close the circuit breaker and clear pacing (used by tests and long-lived servers after a quota change)."""
     global _consecutive_failures, _open_until, _last_warned
     with _breaker_lock:
         _consecutive_failures, _open_until, _last_warned = 0, 0.0, 0.0
+    with _pace_lock:
+        _next_slots.clear()
 
 
 def _breaker_open() -> bool:
@@ -139,26 +187,53 @@ def _record(ok: bool) -> None:
             _consecutive_failures = 0
 
 
+def _provider() -> str | None:
+    """"cohere", "titan" or None (hashed). A Cohere EMBED_MODEL_ID selects Cohere in auto and titan modes too."""
+    mode = os.environ.get("EMBEDDER", "auto").lower()
+    if mode not in ("auto", "titan", "cohere"):
+        return None
+    if mode == "auto" and not os.environ.get("BEDROCK_MODEL_ID"):
+        return None
+    return "cohere" if mode == "cohere" or "cohere" in os.environ.get("EMBED_MODEL_ID", "").lower() else "titan"
+
+
+def embed_many(texts: list[str], input_type: str = "search_document") -> tuple[list[list[float]], str]:
+    """Vectors for texts from ONE embedder (all-or-nothing: if any call fails, every text is embedded hashed).
+
+    Cohere sends up to 96 texts per request, which is what makes it usable under a requests-per-minute cap.
+    `input_type` ("search_document" or "search_query") only matters to Cohere; Titan ignores it."""
+    global _last_warned
+    texts = [(t or "").strip() for t in texts]
+    if not texts:
+        return [], "hashed"
+    provider = _provider()
+    if provider and not _breaker_open():
+        try:
+            if provider == "cohere":
+                vecs: list[list[float]] = []
+                for i in range(0, len(texts), COHERE_BATCH):
+                    chunk = texts[i:i + COHERE_BATCH]
+                    vecs += _with_backoff(lambda c=chunk: cohere_embeddings(c, input_type), "cohere", _COHERE_RPM)
+            else:
+                vecs = [_with_backoff(lambda t=t: titan_embedding(t), "titan", _TITAN_RPM) for t in texts]
+            _record(True)
+            return vecs, provider
+        except Exception as e:  # noqa: BLE001
+            _record(False)
+            if os.environ.get("EMBEDDER", "auto").lower() in ("titan", "cohere") and os.environ.get("EXTRACTOR_STRICT") == "1":
+                raise
+            now = time.monotonic()
+            if now - _last_warned > 10:               # one warning per 10 s, not one per text
+                _last_warned = now
+                log.warning("%s embedding failed (%s: %s); using the hashed embedder",
+                            provider.capitalize(), type(e).__name__, e)
+    return [hashed_embedding(t) for t in texts], "hashed"
+
+
 def embed_sync(text: str) -> tuple[list[float], str]:
     """Returns (vector, embedder_name). Fallbacks to hashed are marked by the name, so callers can avoid caching them."""
-    global _last_warned
-    text = (text or "").strip()
-    mode = os.environ.get("EMBEDDER", "auto").lower()
-    if mode in ("auto", "titan") and (mode == "titan" or os.environ.get("BEDROCK_MODEL_ID")):
-        if not _breaker_open():
-            try:
-                vec = _titan_with_backoff(text)
-                _record(True)
-                return vec, "titan"
-            except Exception as e:  # noqa: BLE001
-                _record(False)
-                if mode == "titan" and os.environ.get("EXTRACTOR_STRICT") == "1":
-                    raise
-                now = time.monotonic()
-                if now - _last_warned > 10:       # one warning per 10 s, not one per text
-                    _last_warned = now
-                    log.warning("Titan embedding failed (%s: %s); using the hashed embedder", type(e).__name__, e)
-    return hashed_embedding(text), "hashed"
+    vecs, name = embed_many([text])
+    return vecs[0], name
 
 
 def cosine(a: list[float], b: list[float]) -> float:

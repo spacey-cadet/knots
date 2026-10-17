@@ -29,8 +29,8 @@ from . import receipts
 W_TYPES = ("movie", "series", "doc")
 L_TYPES = ("paper", "video")
 MAX_PAIRS = 3
-PAIR_MIN_SIM = {"titan": 0.35, "hashed": 0.10}      # cos(W, L) floor by embedder
-PAIR_MIN_SCORE = {"titan": 0.22, "hashed": 0.05}
+PAIR_MIN_SIM = {"titan": 0.35, "cohere": 0.35, "hashed": 0.10}      # cos(W, L) floor by embedder
+PAIR_MIN_SCORE = {"titan": 0.22, "cohere": 0.22, "hashed": 0.05}
 
 
 def level_match(w_level: float, l_level: float) -> float:

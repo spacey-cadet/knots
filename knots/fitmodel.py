@@ -26,13 +26,12 @@ import json
 import logging
 import math
 import os
-from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
 from . import calibration, signals
-from .embeddings import cosine, embed_sync, hashed_embedding
+from .embeddings import cosine, embed_many, hashed_embedding
 
 log = logging.getLogger("knots.fitmodel")
 
@@ -71,31 +70,47 @@ def candidate_text(item) -> str:
     return " ".join(p for p in (item.title, item.abstract or item.blurb, " ".join(item.matched_keywords)) if p)
 
 
-_EMBED_CACHE: dict[str, tuple[tuple[float, ...], str]] = {}
+_EMBED_CACHE: dict[tuple[str, str], tuple[tuple[float, ...], str]] = {}   # (input_type, text) -> (vector, embedder)
 
 
-def _embed(text: str) -> tuple[tuple[float, ...], str]:
-    """Cache only real Titan vectors; a throttled fallback must not be remembered, or the text stays hashed forever."""
-    hit = _EMBED_CACHE.get(text)
-    if hit is not None:
-        return hit
-    vec, name = embed_sync(text)
-    out = (tuple(vec), name)
-    if name != "hashed" or os.environ.get("EMBEDDER", "auto").lower() == "hashed":
-        if len(_EMBED_CACHE) >= 4096:
-            _EMBED_CACHE.pop(next(iter(_EMBED_CACHE)))
-        _EMBED_CACHE[text] = out
+def _cacheable(name: str) -> bool:
+    """A throttled fallback must not be remembered, or the text stays hashed after the real embedder recovers."""
+    return name != "hashed" or os.environ.get("EMBEDDER", "auto").lower() == "hashed"
+
+
+def _embed_batch(texts, input_type: str) -> dict[str, tuple[tuple[float, ...], str]]:
+    """Unique texts -> (vector, embedder). Cache misses go out in ONE batched call (Cohere: up to 96 per request)."""
+    out: dict[str, tuple[tuple[float, ...], str]] = {}
+    miss: list[str] = []
+    for t in dict.fromkeys(texts):
+        hit = _EMBED_CACHE.get((input_type, t))
+        if hit is not None:
+            out[t] = hit
+        else:
+            miss.append(t)
+    if miss:
+        vecs, name = embed_many(miss, input_type)
+        for t, v in zip(miss, vecs):
+            out[t] = (tuple(v), name)
+            if _cacheable(name):
+                if len(_EMBED_CACHE) >= 4096:
+                    _EMBED_CACHE.pop(next(iter(_EMBED_CACHE)))
+                _EMBED_CACHE[(input_type, t)] = out[t]
     return out
 
 
-def embed_all(texts: list[str]) -> tuple[list[list[float]], str]:
-    """Vectors for texts, all from ONE embedder (if any call fell back, redo them all hashed)."""
-    with ThreadPoolExecutor(max_workers=int(os.environ.get("EMBED_WORKERS", "3"))) as pool:
-        got = list(pool.map(_embed, texts))
-    names = {n for _, n in got}
+def embed_all(texts: list[str], queries: list[str] = ()) -> tuple[list[list[float]], str]:
+    """Vectors for texts + queries (in that order), all from ONE embedder.
+
+    Texts are embedded as documents and queries as queries (this matters to Cohere). Duplicates are embedded once,
+    and if anything fell back, everything is redone hashed so vectors from different embedders are never mixed."""
+    docs = _embed_batch(texts, "search_document")
+    qs = _embed_batch(queries, "search_query") if queries else {}
+    names = {n for _, n in (*docs.values(), *qs.values())}
     if len(names) > 1:
-        return [hashed_embedding(t) for t in texts], "hashed"
-    return [list(v) for v, _ in got], (names.pop() if names else "hashed")
+        return [hashed_embedding(t) for t in (*texts, *queries)], "hashed"
+    ordered = [docs[t][0] for t in texts] + [qs[q][0] for q in queries]
+    return [list(v) for v in ordered], (names.pop() if names else "hashed")
 
 
 def zscore(xs: list[float]) -> list[float]:
@@ -137,7 +152,7 @@ def score_items(query: str, items: list, interests: list, medium_weight) -> Scor
     texts = [candidate_text(i) for i in items]
     concept_texts = [" ".join([by_topic[i.topic].topic, *by_topic[i.topic].concepts]) if i.topic in by_topic else i.topic
                      for i in items]
-    vecs, name = embed_all(texts + concept_texts + ([q] if q else [])) if items else ([], "hashed")
+    vecs, name = embed_all(texts + concept_texts, [q] if q else []) if items else ([], "hashed")
     n = len(items)
     iv, cv = vecs[:n], vecs[n:2 * n]
     qv = vecs[2 * n] if q else None
