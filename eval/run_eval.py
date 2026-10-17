@@ -56,10 +56,21 @@ LABELS = HERE / "labels.csv"
 THEMES = HERE / "themes.csv"
 REPORT = HERE / "RESULTS.md"
 
+PAIRS = HERE / "pairs.csv"
+# `split` is "train" or "holdout" (from sessions.json). Holdout rows are never used to train or
+# tune anything; they exist only to measure the system honestly.
 LABEL_COLS = ["session_id", "session_text", "thread", "kind", "type", "title", "year",
-              "url", "evidence", "reasoning", "live", "good", "reason", "note", "extractor"]
+              "url", "evidence", "reasoning", "live", "good", "reason", "note", "extractor", "split"]
+ERROR_TYPES = ("", "over_psychologizing", "terminological_overreach", "narrative_projection",
+               "binary_imposition", "normative_expansion", "causal_projection", "other")
 THEME_COLS = ["session_id", "session_text", "topic", "theme", "rationale",
-              "supported", "note", "extractor"]
+              "supported", "error_type", "note", "extractor", "split"]
+PAIR_COLS = ["session_id", "session_text", "pair_id", "concept", "watch_title", "watch_url",
+             "learn_title", "learn_url", "pair_score", "bridge", "good", "note", "extractor", "split"]
+
+
+def session_splits() -> dict[str, str]:
+    return {s["id"]: s.get("split", "train") for s in json.loads(SESSIONS.read_text())}
 
 
 # ---------------------------------------------------------------------------
@@ -159,7 +170,8 @@ def cmd_run(args) -> int:
     build_label_sheets(results)
     print(f"\nSaved raw outputs to {RESULTS.relative_to(ROOT)}")
     print(f"Label picks in   {LABELS.relative_to(ROOT)}   (column: good = y/n)")
-    print(f"Label themes in  {THEMES.relative_to(ROOT)}   (column: supported = y/n)")
+    print(f"Label themes in  {THEMES.relative_to(ROOT)}   (column: supported = y/n, error_type when n)")
+    print(f"Label pairs in   {PAIRS.relative_to(ROOT)}   (column: good = y/n: would you watch and read these together?)")
     if incomplete:
         print(f"\n{incomplete} run(s) marked INCOMPLETE: catalog calls failed (network or rate limit), "
               "so those sessions are missing picks. Re-run `run`: arXiv answers are cached, so only "
@@ -172,8 +184,10 @@ def cmd_run(args) -> int:
 def build_label_sheets(results: list[dict]) -> None:
     old_labels = {(r["session_id"], r["extractor"], r["url"]): r for r in read_csv(LABELS)}
     old_themes = {(r["session_id"], r["extractor"], r["topic"], r["theme"]): r for r in read_csv(THEMES)}
+    old_pairs = {(r["session_id"], r["extractor"], r["pair_id"]): r for r in read_csv(PAIRS)}
+    splits = session_splits()
 
-    pick_rows, theme_rows = [], []
+    pick_rows, theme_rows, pair_rows = [], [], []
     for e in results:
         if not e.get("ok"):
             continue
@@ -190,21 +204,33 @@ def build_label_sheets(results: list[dict]) -> None:
                     "reasoning": c["reasoning"], "live": "yes" if is_live(c) else "no",
                     "good": prev.get("good", ""), "reason": prev.get("reason", ""),
                     "note": prev.get("note", ""),
-                    "extractor": e["extractor"],
+                    "extractor": e["extractor"], "split": splits.get(e["session_id"], "train"),
                 })
+        for n, pr in enumerate(plan.get("pairs", []), start=1):
+            pid = hashlib.sha1((pr["watch"]["url"] + "|" + pr["learn"]["url"]).encode()).hexdigest()[:10]
+            prev = old_pairs.get((e["session_id"], e["extractor"], pid), {})
+            pair_rows.append({
+                "session_id": e["session_id"], "session_text": text, "pair_id": pid,
+                "concept": pr["concept"], "watch_title": pr["watch"]["title"], "watch_url": pr["watch"]["url"],
+                "learn_title": pr["learn"]["title"], "learn_url": pr["learn"]["url"],
+                "pair_score": pr["score"], "bridge": pr["bridge"],
+                "good": prev.get("good", ""), "note": prev.get("note", ""),
+                "extractor": e["extractor"], "split": splits.get(e["session_id"], "train"),
+            })
         for it in e["interests"]:
             for theme in it.get("implicit_themes", []):
                 prev = old_themes.get((e["session_id"], e["extractor"], it["topic"], theme), {})
                 theme_rows.append({
                     "session_id": e["session_id"], "session_text": text, "topic": it["topic"],
                     "theme": theme, "rationale": it.get("rationale", ""),
-                    "supported": prev.get("supported", ""), "note": prev.get("note", ""),
-                    "extractor": e["extractor"],
+                    "supported": prev.get("supported", ""), "error_type": prev.get("error_type", ""),
+                    "note": prev.get("note", ""),
+                    "extractor": e["extractor"], "split": splits.get(e["session_id"], "train"),
                 })
 
     # Shuffle within each session (fixed seed) so you can label without knowing which
     # extractor produced a row. Hide the last column (`extractor`) while labelling.
-    for rows in (pick_rows, theme_rows):
+    for rows in (pick_rows, theme_rows, pair_rows):
         by_session = defaultdict(list)
         for r in rows:
             by_session[r["session_id"]].append(r)
@@ -216,6 +242,7 @@ def build_label_sheets(results: list[dict]) -> None:
 
     write_csv(LABELS, LABEL_COLS, pick_rows)
     write_csv(THEMES, THEME_COLS, theme_rows)
+    write_csv(PAIRS, PAIR_COLS, pair_rows)
 
 
 # ---------------------------------------------------------------------------
@@ -307,6 +334,7 @@ REASONS = ("", "relevance", "quality", "repeat", "other")   # why a pick was "no
 SHEETS = {
     "pick": (LABELS, LABEL_COLS, ("session_id", "extractor", "url"), "good"),
     "theme": (THEMES, THEME_COLS, ("session_id", "extractor", "topic", "theme"), "supported"),
+    "pair": (PAIRS, PAIR_COLS, ("session_id", "extractor", "pair_id"), "good"),
 }
 
 
@@ -320,7 +348,7 @@ def cmd_label(args) -> int:
     import threading
     import webbrowser
 
-    if not LABELS.exists() and not THEMES.exists():
+    if not LABELS.exists() and not THEMES.exists() and not PAIRS.exists():
         print("No labels.csv / themes.csv yet. Run `python eval/run_eval.py run` first.")
         return 1
 
@@ -359,7 +387,7 @@ def cmd_label(args) -> int:
             elif self.path == "/api/data":
                 out = {}
                 with lock:
-                    for kind, name in (("pick", "picks"), ("theme", "themes")):
+                    for kind, name in (("pick", "picks"), ("theme", "themes"), ("pair", "pairs")):
                         path, _, _, _ = SHEETS[kind]
                         rows = []
                         for r in read_csv(path):
@@ -385,10 +413,13 @@ def cmd_label(args) -> int:
                 kind, rid = body["kind"], body["id"]
                 value, note = str(body.get("value", "")), str(body.get("note", ""))[:500]
                 reason = str(body.get("reason", ""))
+                error_type = str(body.get("error_type", ""))
                 if kind not in SHEETS or value not in ("", "y", "n"):
                     raise ValueError("bad kind or value")
                 if reason not in REASONS or (reason and (kind != "pick" or value != "n")):
                     raise ValueError("bad reason")
+                if error_type not in ERROR_TYPES or (error_type and (kind != "theme" or value != "n")):
+                    raise ValueError("bad error_type")
             except Exception as e:  # noqa: BLE001
                 self._send(400, f"bad request: {e}".encode(), "text/plain")
                 return
@@ -400,6 +431,8 @@ def cmd_label(args) -> int:
                         r[label_col], r["note"] = value, note
                         if kind == "pick":
                             r["reason"] = reason
+                        if kind == "theme":
+                            r["error_type"] = error_type
                         break
                 else:
                     self._send(404, b"row not found (did you re-run the eval? reload the page)", "text/plain")

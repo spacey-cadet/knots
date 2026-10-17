@@ -8,7 +8,9 @@ videos to explore, each with the reason it was picked.
 
 The goal is to help people who think hard about abstract ideas find the films
 that make those ideas concrete: entertainment that sits close to the research,
-not a random feed.
+not a random feed. Entertainment and learning belong together, so Knots also builds
+**watch-and-learn pairs** (a drama plus the explainer or paper on the same idea) and
+shows, for every pick, the evidence behind it.
 
 The extractor runs with zero keys (heuristic fallback). Catalog results are always
 real: with no TMDB key, or when a live call fails, the catalogs return nothing
@@ -22,9 +24,18 @@ votes).
 
 ## Ranking
 
-- **Relevance decides the order** (shared film-tag keywords, weighted by how well
-  the medium suits the interest). Rating is only a tie-break; popularity is not a
+- **Fit decides the order.** With the person's words available (the normal path),
+  `fitmodel.py` scores each candidate by similarity to what was said and to the
+  interest it was found for, tag overlap, quality, how well the format suits the
+  interest, and, for papers, authority (log citations, survey status). Similarities
+  are z-scored within the candidate set, so weights do not depend on which embedder
+  ran. Without the person's words the original rule applies unchanged: shared
+  film-tag keywords, weighted by medium, rating as tie-break. Popularity is not a
   signal, so the same famous films do not win every session.
+- **Weights are stated, not hidden.** Until `eval/train_rank.py --write` has fitted
+  them on 20+ labelled sessions, `fitmodel.DEFAULT_WEIGHTS` are hand-set priors, and
+  cards show **no** confidence number (an uncalibrated probability would be invented).
+  Once fitted, weights ship with a calibration measured on held-out sessions.
 - **Quality is a floor, not a score** (`quality.py`): TMDB rating >= 6.5 with >= 100
   votes; series >= 7.0 with >= 150; anything before 1990 needs 7.5+ and 1,000+
   votes.
@@ -43,6 +54,44 @@ votes).
   rated ...").
 - Every number above is a constant in `quality.py`.
 
+## Trust: receipts, confidence, and saying nothing
+
+- **Receipts** (`receipts.py`): every card lists its evidence: a sentence you said
+  that shares terms with the interest (quoted, never paraphrased), the catalog tags
+  that matched, the first sentences of the item's own overview or abstract, and for
+  papers whether it is a **preprint, not peer reviewed** or has a journal reference
+  (arXiv lists one only if the authors added it), plus an OpenAlex citation count when
+  the title matches exactly. A card with no matched tags and no summary is not shown.
+- **Papers are ranked on more than a keyword**: citations (omitted, never guessed,
+  when unknown) and survey/review status lift accessible, well-cited overviews.
+- **Confidence only when measured**: themes carry a calibrated probability
+  (`underneath_confidence`) and picks carry `confidence` only where a calibration was
+  fitted on held-out data. Otherwise the field is empty.
+- **Saying nothing**: themes below the judge's threshold are withheld
+  (`withheld_themes`), and a pair is dropped if either half is unsourced.
+
+## Watch-and-learn pairs
+
+`plan()` returns `pairs`: one thing to watch (film, series, documentary) and one to
+learn from (paper or explainer) about the SAME interest, as a double feature.
+
+```
+pair_score = min(fit(W), fit(L)) * cos(W, L) * level_match(W, L)
+```
+
+`min` stops a strong half rescuing a weak one; `cos` requires the two to cover the
+same idea; `level_match` is a ladder (drama, then explainer, then survey paper). One
+pair per interest, each item used once, and the bridge sentence is built only from
+facts held (shared tags that literally appear in both). The floors and the ladder are
+**untuned design choices**: label pairs in the `Pairs` tab and run
+`python eval/eval_pairs.py` to find out whether they are right.
+
+## Challenge me (opt-in)
+
+`thinking_partner(..., challenge_me=True)` (or `KNOTS_CHALLENGE=1`) reserves one slot
+for a well-rated title found with the extractor's `counter_keywords`: a serious view that
+complicates yours. The card says what it pushes back on. Off by default.
+
 ## Repo layout
 
 The whole recommendation algorithm is one package, `knots/`, with a single entry
@@ -58,11 +107,19 @@ knots/                  the algorithm
   extraction.py         Bedrock extractor + heuristic fallback; best medium per interest
   catalogs.py           retrieval: TMDB films, series, docs; YouTube explainers; arXiv papers
   quality.py            the quality gate (rating, votes, age) and the reserved-slot rules
-  ranking.py            relevance-first ranking, reserved slots, grounded reasons
-  plan.py               watch / read / explore, spoken line, follow-up question
+  ranking.py            ranking, reserved slots (blockbuster, gem, challenge), grounded reasons
+  fitmodel.py           the fit model: similarity + quality + format + authority, calibrated if fitted
+  signals.py            survey flag, reading level, level ladder, paper authority
+  receipts.py           the evidence shown with every card
+  pairing.py            watch-and-learn pairs
+  calibration.py        "when it says 80%, is it right 80% of the time?"
+  plan.py               watch / read / explore, pairs, spoken line, follow-up question
+  brain/                the learned theme judge: critic, nearest labelled themes, few-shot guidance
+    data/               shipped artifacts (critic, examples, calibration); retrain with eval/train_brain.py
 server.py               MCP tools, transport only
-eval/                   run_eval.py, the labelling tool, your labels and results
-tests/test_local.py     offline tests (no network, no keys)
+eval/                   run_eval.py, the labelling tool, labels, results, training and evaluation scripts
+MODEL_CARD.md           generated from eval/results/metrics_*.json (eval/make_model_card.py)
+tests/                  offline tests (no network, no keys)
 ```
 
 ```python
@@ -100,8 +157,8 @@ session text ──► understanding ──► retrieval ──► quality gate 
 
 | Tool | Use |
 | --- | --- |
-| `thinking_partner(session_texts, include_videos=True)` | "What are we doing today?" Threads, what's underneath, grouped picks with reasons, spoken line, follow-up question |
-| `get_recommendations(session_texts, limit=6)` | Full pipeline as ranked cards |
+| `thinking_partner(session_texts, include_videos=True, challenge_me=False)` | "What are we doing today?" Threads, what's underneath (with confidence), grouped picks with reasons and receipts, watch-and-learn pairs, spoken line, follow-up question |
+| `get_recommendations(session_texts, limit=6, challenge_me=False)` | Full pipeline as ranked cards |
 | `extract_interests(session_texts)` | Topics, concepts, unstated themes, keywords, and which extractor ran |
 | `search_content(topics)` | Catalog lookup for plain topic strings |
 
@@ -233,22 +290,58 @@ leads with the best medium. Skipping a poor-fit medium also saves a catalog call
   "buy" as topics). It exists to keep the server answering, not to demo.
 - **No Reddit source yet.** `session_texts` expects Alexa+ conversation strings.
 - **No deployment yet.** Alexa+ needs a public HTTPS endpoint with auth.
-- **Ranking is simple** (keyword overlap, one item per topic and type). Next:
-  embeddings + MMR diversity re-ranking and a hand-labelled precision@5 check.
+- **The ranker and the pair scorer are not yet trained.** They run on documented
+  hand-set priors until enough sessions are labelled with the new card features
+  (re-run `run_eval.py run`, label, then `train_rank.py`). Pair floors and the level
+  ladder are untuned. Similarity is a hashed lexical proxy unless Bedrock embeddings
+  (Titan) are available; the pair and ranking quality should be re-measured with Titan.
+- **OpenAlex and the challenge search are untested against the live services.** They are
+  covered by mock transports only. A failure leaves citations unknown, never guessed.
+- **One labeller, few sessions.** See `MODEL_CARD.md` for what is and is not measured.
 
 
 ## The brain: themes judged the way the author judges them
 
 The "unstated themes" Bedrock produces were only 44% supported when hand-labelled (101 themes, 10 sessions).
 The labels and notes in `eval/themes.csv` fall into recurring errors (over-psychologizing, terminological
-overreach, narrative projection, invented "X vs Y"), so Knots learns from them in two ways (`knots/brain/`):
+overreach, narrative projection, invented "X vs Y"), recorded in the `error_type` column. Knots learns from them
+in three ways (`knots/brain/`):
 
-1. **Few-shot guidance**: distilled rules plus the accepted and rejected labelled themes nearest to the current
-   text (with the reviewer's reason) are added to the extraction prompt (`guidance.py`).
-2. **Theme critic**: a small logistic model over interpretable features (stance/mechanism wording, unstated
-   feelings, drama words, "vs" patterns) scores each theme; low scorers move to `dropped_themes` (`critic.py`).
+1. **Few-shot guidance** (`guidance.py`): distilled rules plus the accepted and rejected labelled themes nearest
+   to the current text (with your reason) are added to the extraction prompt.
+2. **Theme critic** (`critic.py`): a logistic model over interpretable features (stance/mechanism wording,
+   unstated feelings, drama words, "vs" patterns).
+3. **Nearest labelled themes** (`neighbors.py`): a theme is scored by the labelled themes it most resembles.
+   No hand-written word lists, and every new label changes it immediately.
 
-Honest numbers, leave-one-session-out CV (`python eval/train_brain.py`): AUC 0.81; keeping themes with p>=0.4
-gives 62% precision (base 44%), p>=0.6 gives 75% but keeps only a third. The few-shot part is evaluated by
-`eval/run_eval.py`, which hides each session's own labels from its prompt. Limits: 101 labels, one labeller,
-one generator. Retrain after relabelling: `python eval/train_brain.py --save`. Disable with `KNOTS_BRAIN=off`.
+`judge.py` averages 2 and 3, calibrates the result (Platt scaling fitted on held-out scores) and withholds themes
+below the threshold. Honest numbers at the time of writing, leave-one-session-out on the 10 train sessions
+(`python eval/train_brain.py`; always see `MODEL_CARD.md` for the current ones): critic AUC 0.81, nearest-theme
+AUC 0.78, **average 0.84 [0.77, 0.91]**; keeping calibrated p >= 0.5 keeps 36 of 101 themes at 75% supported
+(base rate 44%).
+
+**Caveats you should keep.** The critic's word lists were written after reading these same labels, so its
+cross-validated number is optimistic. The only clean test is the **holdout**: sessions marked `"split": "holdout"`
+in `eval/sessions.json` (s25-s30) are never trained or tuned on. They are unlabelled; label them in your own
+words (no LLM drafting), then re-run `train_brain.py` to get the number to trust. Limits: one labeller, one
+generator, 10 labelled sessions.
+
+## Learning from your labels (the workflow)
+
+```bash
+python eval/run_eval.py run                 # 30 sessions through the extractors; builds the label sheets
+python eval/run_eval.py label               # tabs: Picks, Themes (+ error type), Pairs
+python eval/check_labels.py                 # contradictions, missing reasons, holdout hygiene
+python eval/train_brain.py --save           # theme judge: critic + neighbours + calibration (never uses holdout)
+python eval/train_rank.py --write           # ranker weights + calibration (needs 20+ train sessions)
+python eval/eval_pairs.py                   # how often a pair is one you would watch and read together
+python eval/make_model_card.py              # MODEL_CARD.md from the metrics files
+```
+
+Rules the scripts enforce: models are scored on sessions they never saw; holdout rows are never trained on;
+weights are written only with enough sessions; intervals come from resampling whole sessions. Retraining after
+relabelling is one command. Put an honest account of how labels and notes were made (including any LLM help) in
+`eval/LABEL_PROVENANCE.txt`; the model card quotes it. Set `KNOTS_BRAIN=off` to disable the judge and guidance.
+
+Environment: `KNOTS_THEME_THRESHOLD` (override the shipped threshold), `KNOTS_CHALLENGE=1`, `KNOTS_OPENALEX=0`
+(skip citation lookups), `OPENALEX_MAILTO` (identify yourself to OpenAlex's polite pool).

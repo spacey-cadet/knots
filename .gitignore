@@ -4,4 +4,5 @@ __pycache__/
 .pytest_cache/
 .venv
 eval/results/arxiv_cache.json
-data/
+/data/
+knots/data/

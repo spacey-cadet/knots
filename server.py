@@ -81,20 +81,23 @@ async def search_content(topics: list[str]) -> list[dict]:
 @mcp.tool()
 async def get_recommendations(session_texts: list[str] | None = None, limit: int = 6,
                               conversations: list[ConversationIn] | None = None,
-                              user_id: str | None = None) -> dict:
+                              user_id: str | None = None,
+                              challenge_me: bool = False) -> dict:
     """
     Full pipeline: extract interests from session text, match them against
     the content catalogs, rank, and return ready-to-render cards, each with the
     reason it was chosen. Accepts one conversation (`session_texts`) or several
     (`conversations`), as in extract_interests.
     """
-    return await engine.recommend(session_texts, _convs(conversations), user_id, limit)
+    return await engine.recommend(session_texts, _convs(conversations), user_id, limit,
+                                  challenge=challenge_me or None)
 
 
 @mcp.tool()
 async def thinking_partner(session_texts: list[str] | None = None, include_videos: bool = True,
                            conversations: list[ConversationIn] | None = None,
-                           user_id: str | None = None) -> dict:
+                           user_id: str | None = None,
+                           challenge_me: bool = False) -> dict:
     """
     Call this when the person asks things like "what are we doing today?",
     "what should I explore?", "what should I watch or read?", or opens a
@@ -112,8 +115,13 @@ async def thinking_partner(session_texts: list[str] | None = None, include_video
     the interests and an embedding of each conversation (never the words), brings
     back related past conversations, and can answer with no conversation text at
     all ("what should I explore?") from what it remembers.
+
+    Also returns `pairs`: watch-and-learn double features (a film or series plus the explainer or
+    paper on the same idea), each card with its receipts. Set `challenge_me` to reserve one pick
+    that complicates the person's own view.
     """
-    return await engine.plan(session_texts, _convs(conversations), user_id, include_videos)
+    return await engine.plan(session_texts, _convs(conversations), user_id, include_videos,
+                             challenge=challenge_me or None)
 
 
 @mcp.tool()

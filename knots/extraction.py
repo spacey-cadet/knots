@@ -78,6 +78,9 @@ class Interest:
     concepts: list[str] = field(default_factory=list)          # abstract ideas ("free will", "entropy")
     implicit_themes: list[str] = field(default_factory=list)   # unstated undercurrents ("loss of agency")
     dropped_themes: list[str] = field(default_factory=list)    # themes the critic rejected (kept for audit)
+    counterpoint: str = ""                                     # one sentence: a view that would complicate theirs (opt-in challenge slot)
+    counter_keywords: list[str] = field(default_factory=list)  # film-tag-style phrases for that view
+    theme_confidence: dict = field(default_factory=dict)       # kept theme -> calibrated P(supported); empty if uncalibrated
     keywords: list[str] = field(default_factory=list)          # short film-metadata-style phrases
     rationale: str = ""             # one line: why these concepts/themes follow from the text
     confidence: float = 0.5
@@ -196,6 +199,9 @@ genuinely supports; do not invent drama.
 tags ("time loop", "artificial intelligence", "financial crisis", "unreliable narrator"). \
 These are used to search film metadata, so make them concrete and film-tag-like, not essays.
 - rationale: one sentence on how you got from the text to those concepts/themes.
+- counterpoint: ONE neutral sentence naming a serious view that would complicate the person's \
+apparent view (not an attack on them), and counter_keywords: 2-4 film-database-style tags for it. \
+Leave both empty if the person holds no clear view.
 - mediums: rank "film", "video" and "paper" from best to worst for THIS interest. \
 film (a film, series or documentary) suits human, emotional or narrative themes and moral \
 questions. video (an explainer) suits abstract concepts, mechanisms and technical ideas that \
@@ -225,6 +231,8 @@ _TOOL_SPEC = {
                             "implicit_themes": {"type": "array", "items": {"type": "string"}},
                             "keywords": {"type": "array", "items": {"type": "string"}},
                             "rationale": {"type": "string"},
+                            "counterpoint": {"type": "string"},
+                            "counter_keywords": {"type": "array", "items": {"type": "string"}},
                             "mediums": {"type": "array", "items": {"type": "string", "enum": ["film", "video", "paper"]}},
                             "depth": {"type": "string", "enum": ["casual", "deep"]},
                             "sentiment": {"type": "string",
@@ -311,6 +319,8 @@ def _parse_interests(raw: dict) -> list[Interest]:
             implicit_themes=_clean_list(it.get("implicit_themes"), 4),
             keywords=keywords,
             rationale=str(it.get("rationale", ""))[:300],
+            counterpoint=str(it.get("counterpoint", ""))[:240],
+            counter_keywords=_clean_list(it.get("counter_keywords"), 4),
             confidence=conf,
             mediums=_clean_mediums(it.get("mediums")),
         ))
@@ -356,8 +366,8 @@ def bedrock_extract(session_texts: list[str]) -> list[Interest]:
         inferenceConfig={"maxTokens": 1500, "temperature": 0.2},
     )
     interests = _parse_interests(_extract_from_response(resp))
-    for it in interests:  # the critic: drop themes the author's labels say they would reject
-        it.implicit_themes, it.dropped_themes = brain.split(text, it.implicit_themes)
+    for it in interests:  # the judge: drop themes the author's labels say they would reject
+        it.implicit_themes, it.dropped_themes, it.theme_confidence = brain.assess(text, it.implicit_themes)
     if len(_cache) > 256:
         _cache.clear()
     _cache[key] = interests

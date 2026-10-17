@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from .catalogs import ContentItem
 from .extraction import Interest
+from .pairing import build_pairs
 from .ranking import rank_and_render
 
 PER_KIND = {"watch": 4, "read": 2, "explore": 2}
@@ -32,6 +33,8 @@ def _threads(interests: list[Interest]) -> list[dict]:
         "topic": i.topic,
         "concepts": i.concepts,
         "underneath": i.implicit_themes,   # what the text implies but never says
+        "underneath_confidence": i.theme_confidence,   # calibrated P(supported) per theme; {} if uncalibrated
+        "withheld_themes": len(i.dropped_themes),     # themes the judge held back rather than overreach
         "why_i_think_so": i.rationale,
         "confidence": round(i.confidence, 2),
         "best_medium": i.mediums[0] if i.mediums else "film",
@@ -41,7 +44,7 @@ def _threads(interests: list[Interest]) -> list[dict]:
     } for i in interests]
 
 
-def _spoken(interests: list[Interest], picks: dict[str, list[dict]]) -> str:
+def _spoken(interests: list[Interest], picks: dict[str, list[dict]], pairs: list[dict] | None = None) -> str:
     lead = interests[0]
     sentence = f"It sounds like you're circling {_join([i.topic for i in interests[:2]])}."
     if lead.conversations > 1:
@@ -59,6 +62,9 @@ def _spoken(interests: list[Interest], picks: dict[str, list[dict]]) -> str:
         bucket, line = phrasing[medium]
         if picks[bucket]:
             sentence += " " + (line if n == 0 else line.replace("And if", "If")).format(t=picks[bucket][0]["title"])
+    if pairs:
+        p = pairs[0]
+        sentence += f" For a double feature, watch {p['watch']['title']} and then {p['learn']['title']}."
     return sentence
 
 
@@ -71,10 +77,10 @@ def _ask(interests: list[Interest]) -> str:
 
 
 def build_session_plan(interests: list[Interest], items: list[ContentItem],
-                       extractor: str = "") -> dict:
+                       extractor: str = "", query: str = "") -> dict:
     """Group ranked, reasoned cards into watch / read / explore around the
     person's current threads."""
-    cards = rank_and_render(items, interests, limit=len(items) or 1)
+    cards = rank_and_render(items, interests, limit=len(items) or 1, query=query)
     picks: dict[str, list[dict]] = {"watch": [], "read": [], "explore": []}
     seen_urls: set[str] = set()      # the same title can match several topics; show it once
     for c in cards:
@@ -85,11 +91,13 @@ def build_session_plan(interests: list[Interest], items: list[ContentItem],
         bucket.append(c)
     note = "" if any(picks.values()) else (
         "No catalog results right now (catalogs unavailable or no keys set), so I'm not guessing.")
+    pairs = build_pairs(items, interests, query)
     return {
         "extractor": extractor,
         "threads": _threads(interests),
         "picks": picks,
+        "pairs": pairs,          # watch-and-learn double features, only when both halves are sourced
         "note": note,
-        "spoken": _spoken(interests, picks),
+        "spoken": _spoken(interests, picks, pairs),
         "ask": _ask(interests),
     }

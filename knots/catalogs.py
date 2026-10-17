@@ -42,6 +42,7 @@ from typing import Literal
 
 import httpx
 
+from . import signals
 from .extraction import STOPWORDS, Interest, allowed_mediums
 from .quality import (MIN_RATING, MIN_VOTE_COUNT, TV_MIN_RATING, TV_MIN_VOTE_COUNT,
                       passes_quality)
@@ -122,6 +123,14 @@ class ContentItem:
     matched_keywords: list[str] = field(default_factory=list)  # evidence: which terms hit
     popularity: int = 0             # TMDB vote_count; evidence of obscurity, not a ranking signal
     rating: float = 0.0             # TMDB vote_average (0-10)
+    # --- richer candidate facts: embeddings and ranking need more than a 180-char blurb ---
+    abstract: str = ""              # film/series overview, paper abstract, or video description (longer than blurb)
+    citations: int | None = None    # papers: OpenAlex cited_by_count; None = unknown (never guessed)
+    is_survey: bool = False         # papers: a review/overview, the accessible way into a field
+    status: str = ""                # papers: "preprint" or "published" (only when a journal reference is listed)
+    venue: str = ""                 # papers: the journal reference arXiv lists, if any
+    duration_s: int = 0             # videos
+    challenge: str = ""             # set when found by the opt-in "challenge me" search: the counterpoint it raises
 
     def to_dict(self) -> dict:
         return asdict(self)
@@ -268,6 +277,7 @@ async def _search_tmdb(interest: Interest, client: httpx.AsyncClient) -> list[Co
                         topic=interest.topic,
                         topic_overlap_score=0.0,
                         blurb=(r.get("overview") or "")[:180],
+                        abstract=(r.get("overview") or "")[:900],
                         year=year, popularity=votes, rating=rating,
                     )
                 if term not in item.matched_keywords:
@@ -348,16 +358,24 @@ async def _arxiv_wait_turn() -> None:
         await asyncio.sleep(slot - now)
 
 
+_ARXIV_NS = "{http://arxiv.org/schemas/atom}"
+
+
 def _parse_arxiv(text: str, topic: str) -> list[ContentItem]:
     items = []
     for entry in ET.fromstring(text).findall(f"{_ATOM}entry"):
         title = " ".join((entry.findtext(f"{_ATOM}title") or "").split())
         url = (entry.findtext(f"{_ATOM}id") or "").strip()
         if title and url:
+            summary = " ".join((entry.findtext(f"{_ATOM}summary") or "").split())
+            venue = " ".join((entry.findtext(f"{_ARXIV_NS}journal_ref") or "").split())[:200]
             items.append(ContentItem(
                 title=title, content_type="paper", source_url=url, topic=topic,
                 topic_overlap_score=0.8, role="anchor",
-                blurb=" ".join((entry.findtext(f"{_ATOM}summary") or "").split())[:180],
+                blurb=summary[:180], abstract=summary[:900],
+                is_survey=signals.is_survey(title, summary),
+                # arXiv is a preprint server; only a listed journal reference says it was published
+                status="published" if venue else "preprint", venue=venue,
             ))
     return items
 
@@ -482,6 +500,8 @@ async def _search_youtube(interest: Interest, client: httpx.AsyncClient) -> list
                 source_url=f"https://www.youtube.com/watch?v={r['id']['videoId']}",
                 topic=interest.topic, topic_overlap_score=0.7,
                 blurb=f"{r['snippet'].get('channelTitle', '')}: {r['snippet'].get('description', '')}"[:160],
+                abstract=f"{r['snippet'].get('title', '')}. {r['snippet'].get('description', '')}"[:600],
+                duration_s=seconds,
                 year=(r["snippet"].get("publishedAt") or "")[:4], popularity=views,
                 matched_keywords=[concept]))
             if len(out) >= YOUTUBE_PER_INTEREST:
@@ -492,11 +512,58 @@ async def _search_youtube(interest: Interest, client: httpx.AsyncClient) -> list
         return []
 
 
+OPENALEX_URL = "https://api.openalex.org/works"
+
+
+def _title_key(t: str) -> set[str]:
+    return set(re.findall(r"[a-z0-9]+", t.lower()))
+
+
+async def _openalex_enrich(items: list[ContentItem], client: httpx.AsyncClient) -> None:
+    """Add citation counts to papers. A match must have a near-identical title, so a wrong
+    paper's count is never attached. Any failure leaves `citations` as None (unknown)."""
+    async def one(item: ContentItem) -> None:
+        params = {"search": item.title, "per-page": 1, "select": "title,cited_by_count"}
+        if os.environ.get("OPENALEX_MAILTO"):
+            params["mailto"] = os.environ["OPENALEX_MAILTO"]
+        try:
+            resp = await client.get(OPENALEX_URL, params=params, timeout=_timeout())
+            resp.raise_for_status()
+            hit = (resp.json().get("results") or [None])[0]
+            if not hit:
+                return
+            a, b = _title_key(item.title), _title_key(hit.get("title") or "")
+            if a and b and len(a & b) / len(a | b) >= 0.85 and isinstance(hit.get("cited_by_count"), int):
+                item.citations = hit["cited_by_count"]
+        except Exception as e:  # noqa: BLE001
+            _fail("OpenAlex", item.title[:40], e)
+
+    todo = [i for i in items if i.content_type == "paper" and i.citations is None]
+    if todo:
+        await asyncio.gather(*[one(i) for i in todo[:8]])
+
+
+async def _challenge_search(interest: Interest, client: httpx.AsyncClient) -> list[ContentItem]:
+    """The opt-in 'challenge me' slot: films/series/docs found with the extractor's counter-keywords,
+    i.e. a view that complicates the person's own. Tagged so ranking can reserve one slot."""
+    probe = Interest(topic=interest.topic, depth=interest.depth, sentiment=interest.sentiment, mentions=1,
+                     keywords=list(interest.counter_keywords), confidence=interest.confidence)
+    out = await _search_tmdb(probe, client)
+    for item in out:
+        item.challenge = interest.counterpoint
+    return out
+
+
+def challenge_enabled(flag: bool | None) -> bool:
+    return flag if flag is not None else os.environ.get("KNOTS_CHALLENGE") == "1"
+
+
 async def search_content(interests: list[Interest],
                          client: httpx.AsyncClient | None = None,
-                         include_videos: bool | None = None) -> list[ContentItem]:
+                         include_videos: bool | None = None,
+                         challenge: bool | None = None) -> list[ContentItem]:
     """Fan out interests to the catalogs in parallel. `client` is injectable for tests.
-    `include_videos=None` defers to the INCLUDE_VIDEOS env flag."""
+    `include_videos=None` defers to the INCLUDE_VIDEOS env flag; `challenge=None` to KNOTS_CHALLENGE."""
     if include_videos is None:
         include_videos = os.environ.get("INCLUDE_VIDEOS") == "1"
     owns = client is None
@@ -511,8 +578,15 @@ async def search_content(interests: list[Interest],
                 tasks.append(_search_arxiv(interest, client))
             if "video" in allowed and include_videos and n < YOUTUBE_MAX_INTERESTS:
                 tasks.append(_search_youtube(interest, client))
+        if challenge_enabled(challenge) and not offline_mode():
+            lead = next((i for i in interests[:MAX_SEARCH_INTERESTS] if i.counter_keywords and i.counterpoint), None)
+            if lead is not None:
+                tasks.append(_challenge_search(lead, client))
         groups = await asyncio.gather(*tasks)
+        items = [item for g in groups for item in g]
+        if not offline_mode() and os.environ.get("KNOTS_OPENALEX", "1") != "0":
+            await _openalex_enrich(items, client)
     finally:
         if owns:
             await client.aclose()
-    return [item for g in groups for item in g]
+    return items

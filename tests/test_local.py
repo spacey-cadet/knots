@@ -42,7 +42,7 @@ SAMPLE_SESSION = [
 MODEL_OUTPUT = {"interests": [{
     "topic": "memecoins",
     "concepts": ["collective belief", "reflexivity"],
-    "implicit_themes": ["trust without institutions", "fear of missing out"],
+    "implicit_themes": ["algorithmic amplification of risk", "fear of missing out"],
     "keywords": ["financial crisis", "stock market", "greed"],
     "rationale": "Asking why people buy them and whether it's a bubble points at belief creating value.",
     "depth": "deep", "sentiment": "skeptical", "confidence": 0.8,
@@ -111,7 +111,7 @@ def test_bedrock_extracts_underlying_concepts(monkeypatch):
     assert used == "bedrock"
     top = found[0]
     assert "reflexivity" in top.concepts
-    assert "trust without institutions" in top.implicit_themes
+    assert "algorithmic amplification of risk" in top.implicit_themes
     assert top.search_terms()[0] == "financial crisis"      # keywords lead, shaped for TMDB
     sent = fake.calls[0]["messages"][0]["content"][0]["text"]
     assert sent.startswith("<session>") and "memecoin" in sent  # untrusted text is fenced
@@ -147,10 +147,10 @@ def test_partner_plan_groups_picks_with_reasons(monkeypatch):
 
     assert plan["extractor"] == "bedrock"
     # the critic drops the unstated feeling ("fear of missing out"); the structural theme survives
-    assert plan["threads"][0]["underneath"] == ["trust without institutions"]
+    assert plan["threads"][0]["underneath"] == ["algorithmic amplification of risk"]
     assert plan["picks"]["watch"] and plan["picks"]["read"] and plan["picks"]["explore"]
     assert all(c["reasoning"] for group in plan["picks"].values() for c in group)
-    assert "trust without institutions" in plan["spoken"]
+    assert "algorithmic amplification of risk" in plan["spoken"]
     assert plan["ask"].endswith("?")
     urls = [c["url"] for group in plan["picks"].values() for c in group]
     assert len(urls) == len(set(urls))                      # no title offered twice

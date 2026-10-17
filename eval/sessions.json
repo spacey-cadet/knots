@@ -1,102 +1,315 @@
 [
-  {
-    "id": "s01",
-    "note": "Your demo case. Finance + belief + bubbles.",
-    "texts": [
-      "Alexa, what's a memecoin and why do people buy them?",
-      "Can you explain memecoin tokenomics, like liquidity pools and market cap?",
-      "I keep seeing memecoin threads on my Reddit feed, is this all just a bubble?",
-      "Tell me more about the research behind speculative crypto assets."
-    ]
-  },
-  {
-    "id": "s02",
-    "note": "Abstract philosophy. Should find concepts the person never named (determinism, moral responsibility).",
-    "texts": [
-      "Alexa, is free will an illusion?",
-      "What did that neuroscience experiment say about decisions being made before we're aware of them?",
-      "If everything is determined, how can anyone be held responsible for what they do?",
-      "I've been reading about compatibilism, explain it simply."
-    ]
-  },
-  {
-    "id": "s03",
-    "note": "AI minds. Technical vocabulary; tests whether keywords stay film-tag-like.",
-    "texts": [
-      "Could a large language model ever be conscious?",
-      "What's the difference between an AI that seems to understand and one that actually does?",
-      "Explain the alignment problem. Why is it hard to specify what we want?",
-      "I keep reading threads about AI systems behaving differently when they know they are being tested."
-    ]
-  },
-  {
-    "id": "s04",
-    "note": "Climate. Emotional undercurrent (helplessness) is implied, not stated.",
-    "texts": [
-      "How close are we to climate tipping points?",
-      "Explain the Atlantic current collapse thing I saw on the news.",
-      "Why does it feel like nothing gets done even though we know what the problem is?",
-      "What does research say about how societies react to slow-moving disasters?"
-    ]
-  },
-  {
-    "id": "s05",
-    "note": "Loneliness and online life. Strongly implicit themes.",
-    "texts": [
-      "Why do I feel more lonely the more time I spend online?",
-      "Is there research on social media and mental health?",
-      "My feed is mostly strangers arguing. Why does outrage spread faster than anything else?",
-      "What happened to the idea that the internet would bring people together?"
-    ]
-  },
-  {
-    "id": "s06",
-    "note": "Reality and simulation. Lots of well-tagged films exist; checks for obvious picks.",
-    "texts": [
-      "Alexa, explain the simulation hypothesis.",
-      "How would anyone even test whether we live in a simulation?",
-      "What's the Boltzmann brain problem? I keep seeing it mentioned.",
-      "If I can't tell the difference, does it matter?"
-    ]
-  },
-  {
-    "id": "s07",
-    "note": "Surveillance and privacy.",
-    "texts": [
-      "What data do companies actually collect about me?",
-      "I read about predictive policing and facial recognition being used in cities.",
-      "Is privacy dead or just changing?",
-      "Explain the chilling effect of knowing you're being watched."
-    ]
-  },
-  {
-    "id": "s08",
-    "note": "Memory and grief. Personal detail; tests tact and whether themes stay supported by the text.",
-    "texts": [
-      "How does the brain store memories of people who have died?",
-      "My grandmother had dementia. Why do some memories survive and others vanish?",
-      "Can memories be edited or implanted?",
-      "I've been reading about how remembering changes the memory itself."
-    ]
-  },
-  {
-    "id": "s09",
-    "note": "Meritocracy and inequality. Easy to over-read political themes; check support strictly.",
-    "texts": [
-      "Is meritocracy a myth?",
-      "How much of success is luck versus effort?",
-      "I keep seeing threads about wealth inequality and inherited advantage.",
-      "What does research say about social mobility in different countries?"
-    ]
-  },
-  {
-    "id": "s10",
-    "note": "STRESS TEST. Vague and noisy on purpose. A good system finds little or low confidence. Label picks strictly: if the session gave no real signal, picks are not good.",
-    "texts": [
-      "Alexa, what's the weather like later?",
-      "Play something relaxing. Also what time is it in Tokyo?",
-      "I've been kind of curious lately, not sure about what though.",
-      "Maybe something with time travel? Or not."
-    ]
-  }
+ {
+  "id": "s01",
+  "note": "Your demo case. Finance + belief + bubbles.",
+  "texts": [
+   "Alexa, what's a memecoin and why do people buy them?",
+   "Can you explain memecoin tokenomics, like liquidity pools and market cap?",
+   "I keep seeing memecoin threads on my Reddit feed, is this all just a bubble?",
+   "Tell me more about the research behind speculative crypto assets."
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s02",
+  "note": "Abstract philosophy. Should find concepts the person never named (determinism, moral responsibility).",
+  "texts": [
+   "Alexa, is free will an illusion?",
+   "What did that neuroscience experiment say about decisions being made before we're aware of them?",
+   "If everything is determined, how can anyone be held responsible for what they do?",
+   "I've been reading about compatibilism, explain it simply."
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s03",
+  "note": "AI minds. Technical vocabulary; tests whether keywords stay film-tag-like.",
+  "texts": [
+   "Could a large language model ever be conscious?",
+   "What's the difference between an AI that seems to understand and one that actually does?",
+   "Explain the alignment problem. Why is it hard to specify what we want?",
+   "I keep reading threads about AI systems behaving differently when they know they are being tested."
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s04",
+  "note": "Climate. Emotional undercurrent (helplessness) is implied, not stated.",
+  "texts": [
+   "How close are we to climate tipping points?",
+   "Explain the Atlantic current collapse thing I saw on the news.",
+   "Why does it feel like nothing gets done even though we know what the problem is?",
+   "What does research say about how societies react to slow-moving disasters?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s05",
+  "note": "Loneliness and online life. Strongly implicit themes.",
+  "texts": [
+   "Why do I feel more lonely the more time I spend online?",
+   "Is there research on social media and mental health?",
+   "My feed is mostly strangers arguing. Why does outrage spread faster than anything else?",
+   "What happened to the idea that the internet would bring people together?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s06",
+  "note": "Reality and simulation. Lots of well-tagged films exist; checks for obvious picks.",
+  "texts": [
+   "Alexa, explain the simulation hypothesis.",
+   "How would anyone even test whether we live in a simulation?",
+   "What's the Boltzmann brain problem? I keep seeing it mentioned.",
+   "If I can't tell the difference, does it matter?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s07",
+  "note": "Surveillance and privacy.",
+  "texts": [
+   "What data do companies actually collect about me?",
+   "I read about predictive policing and facial recognition being used in cities.",
+   "Is privacy dead or just changing?",
+   "Explain the chilling effect of knowing you're being watched."
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s08",
+  "note": "Memory and grief. Personal detail; tests tact and whether themes stay supported by the text.",
+  "texts": [
+   "How does the brain store memories of people who have died?",
+   "My grandmother had dementia. Why do some memories survive and others vanish?",
+   "Can memories be edited or implanted?",
+   "I've been reading about how remembering changes the memory itself."
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s09",
+  "note": "Meritocracy and inequality. Easy to over-read political themes; check support strictly.",
+  "texts": [
+   "Is meritocracy a myth?",
+   "How much of success is luck versus effort?",
+   "I keep seeing threads about wealth inequality and inherited advantage.",
+   "What does research say about social mobility in different countries?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s10",
+  "note": "STRESS TEST. Vague and noisy on purpose. A good system finds little or low confidence. Label picks strictly: if the session gave no real signal, picks are not good.",
+  "texts": [
+   "Alexa, what's the weather like later?",
+   "Play something relaxing. Also what time is it in Tokyo?",
+   "I've been kind of curious lately, not sure about what though.",
+   "Maybe something with time travel? Or not."
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s11",
+  "note": "added for breadth",
+  "texts": [
+   "How do vaccines train the immune system?",
+   "Why do I need a booster for some and not others?",
+   "Is it true immunity from infection is better than from the shot?",
+   "Who decides how long a trial has to run before approval?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s12",
+  "note": "added for breadth",
+  "texts": [
+   "Why did the Roman Empire fall?",
+   "Was it really barbarians or was it the economy and plague?",
+   "I read that lead pipes poisoned them, is that a myth?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s13",
+  "note": "added for breadth",
+  "texts": [
+   "What actually happens inside a black hole?",
+   "Does information get destroyed, I heard about a paradox",
+   "Explain Hawking radiation like I'm not a physicist"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s14",
+  "note": "added for breadth",
+  "texts": [
+   "I've been thinking about moving abroad for work.",
+   "What's it like to rebuild your whole social life in your thirties?",
+   "How do immigrants keep a sense of home?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s15",
+  "note": "added for breadth",
+  "texts": [
+   "How do neural networks learn, in plain language?",
+   "What's a loss function and why does gradient descent work?",
+   "Do these models understand anything or just pattern match?",
+   "Is that distinction even meaningful?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s16",
+  "note": "added for breadth",
+  "texts": [
+   "Why are housing prices so high in big cities?",
+   "Is it zoning or is it investors?",
+   "What did Tokyo do differently?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s17",
+  "note": "added for breadth",
+  "texts": [
+   "Explain how the electoral college works",
+   "Has it ever picked someone who lost the popular vote?",
+   "What would a ranked choice system change?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s18",
+  "note": "added for breadth",
+  "texts": [
+   "Is meditation scientifically legit?",
+   "What does the research say about long-term effects on the brain?",
+   "I tried it and got more anxious, is that normal?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s19",
+  "note": "added for breadth",
+  "texts": [
+   "What was the Manhattan Project actually like day to day?",
+   "Did the scientists know what they were building?",
+   "Was the decision to use it a moral choice or a military one?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s20",
+  "note": "added for breadth",
+  "texts": [
+   "How do languages die?",
+   "Why does the number of speakers matter so much?",
+   "Can a dead language really be revived like Hebrew was?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s21",
+  "note": "added for breadth",
+  "texts": [
+   "I can't tell if I'm bored or burned out",
+   "Everything feels flat lately even things I used to love",
+   "How do people recover from this?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s22",
+  "note": "added for breadth",
+  "texts": [
+   "How does the stock market actually set prices?",
+   "Are index funds really better than picking stocks?",
+   "What was the 2008 crash really about?",
+   "Could it happen again?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s23",
+  "note": "added for breadth",
+  "texts": [
+   "What is dark matter and how do we know it exists?",
+   "Could we be wrong about gravity instead?",
+   "Why is this so hard to detect?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s24",
+  "note": "added for breadth",
+  "texts": [
+   "Why do some cities have great public transit and others don't?",
+   "Is car culture a choice or was it engineered?",
+   "What happened to streetcars in America?"
+  ],
+  "split": "train"
+ },
+ {
+  "id": "s25",
+  "note": "holdout: label with your own words, no LLM drafting",
+  "texts": [
+   "How does CRISPR work?",
+   "Should we edit embryos to remove disease?",
+   "Where is the line between therapy and enhancement?"
+  ],
+  "split": "holdout"
+ },
+ {
+  "id": "s26",
+  "note": "holdout: label with your own words, no LLM drafting",
+  "texts": [
+   "What makes a good argument versus a persuasive one?",
+   "Why do smart people believe false things?",
+   "Can you reason someone out of a belief they weren't reasoned into?"
+  ],
+  "split": "holdout"
+ },
+ {
+  "id": "s27",
+  "note": "holdout: label with your own words, no LLM drafting",
+  "texts": [
+   "How did the printing press change Europe?",
+   "Is social media a similar shift?",
+   "What did people fear about books back then?"
+  ],
+  "split": "holdout"
+ },
+ {
+  "id": "s28",
+  "note": "holdout: label with your own words, no LLM drafting",
+  "texts": [
+   "Why is sleep so important and what happens if you skip it?",
+   "Is the 8 hour rule real?",
+   "Does catching up on weekends work?"
+  ],
+  "split": "holdout"
+ },
+ {
+  "id": "s29",
+  "note": "holdout: label with your own words, no LLM drafting",
+  "texts": [
+   "What is a sovereign wealth fund?",
+   "Why do some countries have them and others don't?",
+   "Norway's seems like a different thing entirely"
+  ],
+  "split": "holdout"
+ },
+ {
+  "id": "s30",
+  "note": "holdout: label with your own words, no LLM drafting",
+  "texts": [
+   "Something about memory keeps bugging me",
+   "How reliable are my own memories really?",
+   "Eyewitness accounts seem to fail so often, why?"
+  ],
+  "split": "holdout"
+ }
 ]

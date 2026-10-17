@@ -110,6 +110,7 @@
   <div class="tabs" role="tablist">
     <button class="tab" id="tab-picks" role="tab" data-mode="picks">Picks</button>
     <button class="tab" id="tab-themes" role="tab" data-mode="themes">Themes</button>
+    <button class="tab" id="tab-pairs" role="tab" data-mode="pairs">Pairs</button>
   </div>
   <div class="grow"></div>
   <label class="toggle" id="mock-toggle" title="Offline mock rows come from the fixed fallback data, not the live catalogs">
@@ -123,18 +124,19 @@
 
 <footer>
   <kbd>Y</kbd> yes &nbsp; <kbd>N</kbd> no &nbsp; <kbd>S</kbd> skip &nbsp; <kbd>B</kbd> or <kbd>←</kbd> back
-  &nbsp; after <kbd>N</kbd>: <kbd>1</kbd> relevance <kbd>2</kbd> quality <kbd>3</kbd> repeat &nbsp; <kbd>C</kbd> clear &nbsp; <kbd>/</kbd> note &nbsp; <kbd>Esc</kbd> leave note
+  &nbsp; after <kbd>N</kbd>: <kbd>1</kbd>-<kbd>4</kbd> reason (themes: <kbd>1</kbd>-<kbd>7</kbd> error type) &nbsp; <kbd>C</kbd> clear &nbsp; <kbd>/</kbd> note &nbsp; <kbd>Esc</kbd> leave note
 </footer>
 
 <script>
 const $ = (s) => document.querySelector(s);
-let data = { picks: [], themes: [] };
+let data = { picks: [], themes: [], pairs: [] };
 let mode = 'picks';
 let idx = 0;
 let includeMock = false;
 let saveTimer = null;
 
-const field = () => (mode === 'picks' ? 'good' : 'supported');
+const field = () => (mode === 'themes' ? 'supported' : 'good');
+const KIND = { picks: 'pick', themes: 'theme', pairs: 'pair' };
 const rows = () => {
   const all = data[mode];
   return mode === 'picks' && !includeMock ? all.filter((r) => r.live === 'yes') : all;
@@ -176,9 +178,10 @@ async function save(row) {
   setStatus('Saving…');
   try {
     await api('/api/label', {
-      kind: mode === 'picks' ? 'pick' : 'theme', id: row.id,
+      kind: KIND[mode], id: row.id,
       value: row[field()] || '', note: row.note || '',
       reason: mode === 'picks' && row[field()] === 'n' ? (row.reason || '') : '',
+      error_type: mode === 'themes' && row[field()] === 'n' ? (row.error_type || '') : '',
     });
     setStatus('Saved ✓');
   } catch (e) {
@@ -194,6 +197,7 @@ function updateProgress() {
   $('#bar').style.width = r.length ? (100 * done / r.length) + '%' : '0';
   $('#tab-picks').setAttribute('aria-selected', mode === 'picks');
   $('#tab-themes').setAttribute('aria-selected', mode === 'themes');
+  $('#tab-pairs').setAttribute('aria-selected', mode === 'pairs');
   $('#mock-toggle').style.display = mode === 'picks' ? '' : 'none';
 }
 
@@ -201,10 +205,10 @@ function label(value) {
   const r = rows()[idx];
   if (!r) return;
   r[field()] = value;
-  if (value !== 'n') r.reason = '';
+  if (value !== 'n') { r.reason = ''; r.error_type = ''; }
   save(r);
-  // a "not good" pick waits for its reason (1/2/3), so the score can say why it failed
-  const waitForReason = mode === 'picks' && value === 'n';
+  // a "not good" pick (or "not supported" theme) waits for its reason, so the score can say why it failed
+  const waitForReason = (mode === 'picks' || mode === 'themes') && value === 'n';
   if (value && !waitForReason) idx += 1;
   render();
 }
@@ -212,10 +216,17 @@ function label(value) {
 const REASONS = [['relevance', 'Wrong / loose topic'], ['quality', 'Low rated / obscure'],
                  ['repeat', 'Repeat'], ['other', 'Other']];
 
+const ERROR_TYPES = [['over_psychologizing', 'Feeling they never stated'], ['terminological_overreach', 'Term not in their words'],
+                     ['narrative_projection', 'Invented story'], ['binary_imposition', 'Invented X vs Y'],
+                     ['normative_expansion', 'Moral / legal framing'], ['causal_projection', 'Causal leap'], ['other', 'Other']];
+const choices = () => (mode === 'themes' ? ERROR_TYPES : REASONS);
+
 function setReason(reason) {
   const r = rows()[idx];
-  if (!r || mode !== 'picks' || r.good !== 'n') return;
-  r.reason = reason;
+  if (!r) return;
+  if (mode === 'picks' && r.good === 'n') r.reason = reason;
+  else if (mode === 'themes' && r.supported === 'n') r.error_type = reason;
+  else return;
   save(r);
   idx += 1;
   render();
@@ -233,8 +244,13 @@ function rubric() {
        'Judge against what the person said, not against how famous the title is.',
        'Session s10 is deliberately vague: if the text gave no real signal, picks are not good.',
        'When you mark Not good, pick a reason: wrong/loose topic, low rated or obscure, or a repeat.']
+    : mode === 'pairs'
+    ? ['Good = I would genuinely watch the first and then read or watch the second to learn more about the SAME idea.',
+       'Not good = the two do not really cover the same idea, the second is too hard or too easy a follow-up, or I would not want either.',
+       'Judge the pair as a double feature, not each title alone.']
     : ['Supported = the session text genuinely implies this theme, even though it was never said.',
-       'Not supported = invented, or a stretch beyond what two or three questions can show.'];
+       'Not supported = invented, or a stretch beyond what two or three questions can show.',
+       'When you mark Not supported, pick the kind of error. Judge it in your own words, from the text alone.'];
   return el('details', { class: 'rubric' }, el('summary', {}, 'Labelling rubric'),
             el('ul', {}, items.map((t) => el('li', {}, t))));
 }
@@ -247,17 +263,19 @@ function sessionBlock(r) {
 }
 
 function reasonRow(r) {
-  if (mode !== 'picks' || r.good !== 'n') return null;
-  return el('div', { class: 'reasons' }, 'Why not good?',
-    REASONS.map(([key, text], i) => el('button', {
-      class: 'act reason' + (r.reason === key ? ' on' : ''), onclick: () => setReason(key),
+  const picks = mode === 'picks' && r.good === 'n', themes = mode === 'themes' && r.supported === 'n';
+  if (!picks && !themes) return null;
+  const cur = picks ? r.reason : r.error_type;
+  return el('div', { class: 'reasons' }, picks ? 'Why not good?' : 'What kind of error?',
+    choices().map(([key, text], i) => el('button', {
+      class: 'act reason' + (cur === key ? ' on' : ''), onclick: () => setReason(key),
     }, text, el('kbd', {}, String(i + 1)))));
 }
 
 function actions(r) {
   const cur = r[field()];
-  const yes = mode === 'picks' ? 'Good' : 'Supported';
-  const no = mode === 'picks' ? 'Not good' : 'Not supported';
+  const yes = mode === 'themes' ? 'Supported' : 'Good';
+  const no = mode === 'themes' ? 'Not supported' : 'Not good';
   return el('div', { class: 'actions' },
     el('button', { class: 'act good' + (cur === 'y' ? ' on' : ''), onclick: () => label('y') }, yes, el('kbd', {}, 'Y')),
     el('button', { class: 'act bad' + (cur === 'n' ? ' on' : ''), onclick: () => label('n') }, no, el('kbd', {}, 'N')),
@@ -303,6 +321,18 @@ function themeCard(r) {
     el('p', { class: 'claim' }, r.theme),
     r.rationale ? [el('p', { class: 'eyebrow' }, "The model's reasoning"), el('p', { class: 'quiet' }, r.rationale)] : null,
     el('p', { class: 'question' }, 'Does the session text genuinely imply this theme?'),
+    noteBox(r), actions(r), reasonRow(r));
+}
+
+function pairCard(r) {
+  const link = (u, t) => el('a', { href: u, target: '_blank', rel: 'noopener noreferrer' }, t + ' ↗');
+  return el('div', { class: 'card' },
+    rubric(), sessionBlock(r), el('hr'),
+    el('p', { class: 'eyebrow' }, `Double feature about: ${r.concept}`),
+    el('p', { class: 'eyebrow' }, 'Watch'), el('h2', { class: 'title' }, r.watch_title), link(r.watch_url, 'open'),
+    el('p', { class: 'eyebrow' }, 'Then learn'), el('h2', { class: 'title' }, r.learn_title), link(r.learn_url, 'open'),
+    el('p', { class: 'eyebrow' }, 'Why Knots pairs them'), el('p', { class: 'why' }, r.bridge),
+    el('p', { class: 'question' }, 'Would you watch the first and then read/watch the second, together?'),
     noteBox(r), actions(r));
 }
 
@@ -331,7 +361,7 @@ function render() {
     return;
   }
   const r = list[idx];
-  main.append(mode === 'picks' ? pickCard(r) : themeCard(r));
+  main.append(mode === 'picks' ? pickCard(r) : mode === 'pairs' ? pairCard(r) : themeCard(r));
   main.prepend(el('p', { class: 'progress', style: 'margin:0 0 10px' }, `Row ${idx + 1} of ${list.length}`));
 }
 
@@ -357,7 +387,7 @@ document.addEventListener('keydown', (e) => {
   else if (k === 's' || k === 'arrowright') go(1);
   else if (k === 'b' || k === 'arrowleft') go(-1);
   else if (k === 'c') label('');
-  else if (k >= '1' && k <= String(REASONS.length)) setReason(REASONS[Number(k) - 1][0]);
+  else if (k >= '1' && k <= String(choices().length)) setReason(choices()[Number(k) - 1][0]);
   else if (k === '/') { e.preventDefault(); const n = $('#note'); if (n) n.focus(); }
 });
 

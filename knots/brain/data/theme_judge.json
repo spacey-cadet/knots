@@ -1,0 +1,12 @@
+{
+ "calibration": {
+  "a": 1.2317102887797886,
+  "b": -0.033483846240057416
+ },
+ "threshold": 0.5,
+ "meta": {
+  "train_labels": 101,
+  "train_sessions": 10,
+  "loso_ensemble_auc": 0.836
+ }
+}

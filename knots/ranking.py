@@ -11,6 +11,7 @@ assert what a film "is about" beyond its tags, so a reason can't hallucinate.
 
 from __future__ import annotations
 
+from . import fitmodel, receipts, signals
 from .catalogs import ContentItem
 from .extraction import Interest
 from .quality import BLOCKBUSTER_MIN_RELEVANCE, is_blockbuster, is_gem
@@ -62,8 +63,8 @@ def explain_recommendation(item: ContentItem, interest: Interest) -> str:
         parts.append(f"It also speaks to something you didn't say out loud: {theme}.")
     if item.matched_keywords:
         parts.append(f"Matched on: {', '.join(item.matched_keywords[:3])}.")
-    if interest.depth == "deep" and item.content_type in ("movie", "series", "doc"):
-        parts.append("Since you're going deep on this, there's a paper that pairs with it.")
+    if item.challenge:
+        parts.append(f"This one pushes back on your view: {item.challenge}")
     if is_blockbuster(item):
         parts.append(f"Widely watched and well rated ({item.rating:.1f}/10 from {item.popularity:,} votes).")
     elif is_gem(item):
@@ -71,9 +72,23 @@ def explain_recommendation(item: ContentItem, interest: Interest) -> str:
     return " ".join(parts)
 
 
-def render_card(item: ContentItem, interest: Interest) -> dict:
-    """Structured payload for one recommendation card."""
+def card_extras(sc: "fitmodel.Scored", k: int, item: ContentItem, interest: Interest, query: str) -> dict:
+    """Evidence and model facts for card k: receipts, fit features, calibrated confidence (or None)."""
     return {
+        "sim": round(sc.sims[k], 4) if sc.query_used else None,
+        "fit_features": {f: round(v, 3) for f, v in sc.features[k].items()},
+        "fit_score": round(sc.scores[k], 3),
+        "confidence": sc.confidence(k),          # None = no calibration fitted, so no number is shown
+        "receipts": receipts.build(item, interest, query),
+        "level": signals.level_of(item),
+        "status": item.status or None, "citations": item.citations,
+        "survey": item.is_survey or None, "challenge": item.challenge or None,
+    }
+
+
+def render_card(item: ContentItem, interest: Interest, extras: dict | None = None) -> dict:
+    """Structured payload for one recommendation card."""
+    card = {
         "title": item.title,
         "type": item.content_type,
         "kind": KIND.get(item.content_type, "explore"),
@@ -91,6 +106,9 @@ def render_card(item: ContentItem, interest: Interest) -> dict:
         "gem": is_gem(item),
         "blockbuster": is_blockbuster(item),
     }
+    if extras:
+        card.update(extras)
+    return card
 
 
 BLOCKBUSTER_POSITION = 1   # reserved slots go this deep (index), so a cap on the list cannot drop them
@@ -102,7 +120,11 @@ def _relevant_enough(item: ContentItem, best: dict[str, float]) -> bool:
     return item.topic_overlap_score >= BLOCKBUSTER_MIN_RELEVANCE * best.get(item.topic, 0.0)
 
 
-def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: int = 6) -> list[dict]:
+CHALLENGE_POSITION = 3
+
+
+def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: int = 6,
+                    query: str = "") -> list[dict]:
     """Pick the top items across all topics/types and render cards.
 
     Relevance decides the order (weighted by how well the medium suits the interest);
@@ -113,12 +135,30 @@ def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: 
     Two slots are reserved, each only if a candidate exists:
       - a blockbuster: a widely seen, well-rated film or series that is ALSO strongly
         relevant to the topic (see quality.BLOCKBUSTER_MIN_RELEVANCE);
-      - a gem: a lesser-known but highly rated film, series or doc."""
+      - a gem: a lesser-known but highly rated film, series or doc.
+    A third appears only if the opt-in challenge search found one: a well-rated title that
+    complicates the person's own view.
+
+    With `query` (the session text) order comes from fitmodel.py: similarity to what was said,
+    quality, format fit and, for papers, authority. Every such card carries receipts, and a card
+    with nothing to stand on (no matched tags and no summary) is dropped. Without a query the
+    order is the original relevance-times-medium rule, unchanged."""
     interest_by_topic = {i.topic: i for i in interests}
+    sc = fitmodel.score_items(query, items, interests, medium_weight) if query.strip() and items else None
+    pos = {id(it): k for k, it in enumerate(items)}
 
     def fit(i: ContentItem) -> float:
+        if sc is not None:
+            return sc.scores[pos[id(i)]]
         it = interest_by_topic.get(i.topic)
         return i.topic_overlap_score * (medium_weight(i, it) if it else 1.0)
+
+    def make(item: ContentItem) -> dict | None:
+        interest = interest_by_topic[item.topic]
+        if sc is None:
+            return render_card(item, interest)
+        card = render_card(item, interest, card_extras(sc, pos[id(item)], item, interest, query))
+        return card if receipts.sourced(card["receipts"]) else None
 
     scored = sorted(items, key=lambda i: (fit(i), i.rating), reverse=True)
     best: dict[str, float] = {}                    # best on-screen relevance per topic
@@ -132,19 +172,28 @@ def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: 
         key = (item.topic, item.content_type)
         if interest is None or key in seen:
             continue
+        card = make(item)
+        if card is None:
+            continue
         seen.add(key)
         used_urls.add(item.source_url)
-        cards.append(render_card(item, interest))
+        cards.append(card)
 
     def reserve(wanted, flag: str, position: int) -> None:
         if any(c[flag] for c in cards):
             return
         pick = next((i for i in scored if wanted(i) and i.source_url not in used_urls
                      and i.topic in interest_by_topic), None)
-        if pick is not None:
+        card = make(pick) if pick is not None else None
+        if card is not None:
             used_urls.add(pick.source_url)
-            cards.insert(min(position, len(cards)), render_card(pick, interest_by_topic[pick.topic]))
+            cards.insert(min(position, len(cards)), card)
 
     reserve(lambda i: is_blockbuster(i) and _relevant_enough(i, best), "blockbuster", BLOCKBUSTER_POSITION)
     reserve(is_gem, "gem", GEM_POSITION)
+    if any(i.challenge for i in items) and not any(c.get("challenge") for c in cards):
+        pick = next((i for i in scored if i.challenge and i.topic in interest_by_topic), None)
+        card = make(pick) if pick is not None else None
+        if card is not None:
+            cards.insert(min(CHALLENGE_POSITION, len(cards)), card)
     return cards[:limit]

@@ -1,0 +1,75 @@
+{
+ "train_labels": 101,
+ "train_sessions": 10,
+ "loso": {
+  "critic": {
+   "auc": 0.807,
+   "auc_ci90": [
+    0.719,
+    0.887
+   ],
+   "within_session_auc": 0.818
+  },
+  "neighbors": {
+   "auc": 0.781,
+   "auc_ci90": [
+    0.705,
+    0.873
+   ],
+   "within_session_auc": 0.863
+  },
+  "ensemble": {
+   "auc": 0.836,
+   "auc_ci90": [
+    0.767,
+    0.913
+   ],
+   "within_session_auc": 0.893
+  },
+  "at_threshold": {
+   "threshold": 0.5,
+   "kept": 36,
+   "of": 101,
+   "precision": 0.75,
+   "base_rate": 0.436
+  }
+ },
+ "calibration": {
+  "a": 1.2317,
+  "b": -0.0335,
+  "ece": 0.0519,
+  "reliability": [
+   {
+    "bin": "0.0-0.2",
+    "n": 26,
+    "predicted": 0.095,
+    "observed": 0.115
+   },
+   {
+    "bin": "0.2-0.4",
+    "n": 26,
+    "predicted": 0.309,
+    "observed": 0.308
+   },
+   {
+    "bin": "0.4-0.6",
+    "n": 20,
+    "predicted": 0.486,
+    "observed": 0.4
+   },
+   {
+    "bin": "0.6-0.8",
+    "n": 13,
+    "predicted": 0.685,
+    "observed": 0.846
+   },
+   {
+    "bin": "0.8-1.0",
+    "n": 16,
+    "predicted": 0.93,
+    "observed": 0.875
+   }
+  ]
+ },
+ "holdout": null
+}

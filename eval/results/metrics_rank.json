@@ -1,0 +1,4 @@
+{
+ "status": "not_trained",
+ "reason": "107 labelled live picks, but only 0 carry stored fit features (107 do not). Re-run `python eval/run_eval.py run`, then label the new picks."
+}
