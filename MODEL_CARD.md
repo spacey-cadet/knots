@@ -1,10 +1,18 @@
 # Knots model card
 
-Generated 2026-10-16 from `eval/results/metrics_*.json` by `eval/make_model_card.py`. Numbers below are copied from those files, not written by hand.
+Generated 2026-10-17 from `eval/results/metrics_*.json` by `eval/make_model_card.py`. Numbers below are copied from those files, not written by hand.
 
 ## What it is
 
 Knots reads what someone has been researching and recommends things to watch (films, series, documentaries), explainers (YouTube) and research (arXiv), including watch-and-learn pairs. Three small learned parts sit on top of retrieval from TMDB, YouTube and arXiv: a **theme judge** (which unstated themes to trust), a **fit ranker** (what fits this session), and a **pair scorer**.
+
+## Embedder
+
+The fit ranker and the pair scorer compare texts as vectors, so their numbers depend on which embedding model produced them, and so do the pair floors and similarity thresholds (set per embedder, still untuned). Each part below says what it was measured with.
+
+- Theme judge: none. It scores theme phrases with character n-gram TF-IDF and a feature critic; no embedding model is involved, so its numbers do not depend on the embedder.
+- Fit ranker: not recorded (measured before the embedder was tracked): do not assume it was the semantic embedder; re-run `python eval/run_eval.py run` to record it
+- Pair scorer: not recorded (measured before the embedder was tracked): do not assume it was the semantic embedder; re-run `python eval/run_eval.py run` to record it
 
 ## How the labels were made
 

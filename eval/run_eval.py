@@ -48,7 +48,7 @@ load_dotenv(ROOT / ".env")
 os.environ.setdefault("KNOTS_HTTP_TIMEOUT", "25")
 os.environ.setdefault("KNOTS_ARXIV_CACHE", str(HERE / "results" / "arxiv_cache.json"))
 
-from knots import catalogs, engine, extraction  # noqa: E402
+from knots import catalogs, embeddings, engine, extraction, fitmodel  # noqa: E402
 
 SESSIONS = HERE / "sessions.json"
 RESULTS = HERE / "results" / "results.json"
@@ -147,13 +147,14 @@ def cmd_run(args) -> int:
             entry = {"session_id": sess["id"], "extractor": spec, "texts": sess["texts"]}
             try:
                 catalogs.FAILURES.clear()
+                fitmodel.USED_EMBEDDERS.clear()
                 set_extractor(mode, model)
                 extraction._HOLDOUT = sess["id"]  # hide this session's own labelled themes from few-shot
                 result = asyncio.run(engine.run(session_texts=sess["texts"], include_videos=videos))
                 found, used, plan = result.interests, result.extractor, result.plan()
                 failed = list(catalogs.FAILURES)
                 entry.update(ok=True, used=used, interests=[i.to_dict() for i in found], plan=plan,
-                             catalog_failures=failed)
+                             catalog_failures=failed, embedders_used=dict(fitmodel.USED_EMBEDDERS))
                 n = sum(len(v) for v in plan["picks"].values())
                 warn = f"  INCOMPLETE: {len(failed)} catalog call(s) failed" if failed else ""
                 incomplete += bool(failed)
@@ -165,7 +166,14 @@ def cmd_run(args) -> int:
             results.append(entry)
 
     RESULTS.parent.mkdir(exist_ok=True)
-    RESULTS.write_text(json.dumps({"tmdb_live": tmdb_live, "results": results}, indent=2))
+    cfg = embeddings.embedder_config()
+    fell_back = sum(1 for e in results if e.get("ok") and cfg["provider"] != "hashed"
+                    and e.get("embedders_used", {}).get("hashed"))
+    RESULTS.write_text(json.dumps({"tmdb_live": tmdb_live, "embedder": cfg, "results": results}, indent=2))
+    if fell_back:
+        print(f"\nWARNING: {fell_back} run(s) fell back to the hashed embedder although {cfg['provider']} was "
+              "requested (throttling or an error). Their rankings and pairs are not comparable with the rest; "
+              "re-run `run` before labelling or training.")
 
     build_label_sheets(results)
     print(f"\nSaved raw outputs to {RESULTS.relative_to(ROOT)}")

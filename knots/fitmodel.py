@@ -26,6 +26,7 @@ import json
 import logging
 import math
 import os
+from collections import Counter
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -70,6 +71,8 @@ def candidate_text(item) -> str:
     return " ".join(p for p in (item.title, item.abstract or item.blurb, " ".join(item.matched_keywords)) if p)
 
 
+# Which embedder actually scored each candidate set since the last clear(); the eval records it with its results.
+USED_EMBEDDERS: Counter = Counter()
 _EMBED_CACHE: dict[tuple[str, str], tuple[tuple[float, ...], str]] = {}   # (input_type, text) -> (vector, embedder)
 
 
@@ -171,4 +174,5 @@ def score_items(query: str, items: list, interests: list, medium_weight) -> Scor
         })
     w = weights()
     scores = [sum(w[f] * x[f] for f in FEATURES) for x in feats]
+    USED_EMBEDDERS[name] += 1
     return Scored(items, feats, scores, sims, iv, name, bool(q))

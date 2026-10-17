@@ -91,7 +91,7 @@ def main() -> int:
         msg = (f"{labelled} labelled live picks, but only {len(rows)} carry stored fit features "
                f"({missing} do not). Re-run `python eval/run_eval.py run`, then label the new picks.")
         print(msg)
-        METRICS.write_text(json.dumps({"status": "not_trained", "reason": msg}, indent=1))
+        METRICS.write_text(json.dumps({"status": "not_trained", "reason": msg, "embedder": M.embedder_info()}, indent=1))
         return 1
     X, y, g, loso, res, (a, b), rel, ece = evaluate(train, args.C)
     sessions = len(set(g))
@@ -118,7 +118,7 @@ def main() -> int:
         "status": "trained", "train_picks": len(y), "train_sessions": sessions, "good_rate": round(float(y.mean()), 3),
         "good_rate_by_type": by_type, "loso": res, "weights": w,
         "calibration": {"a": round(a, 4), "b": round(b, 4), "ece": round(ece, 4), "reliability": rel},
-        "holdout": holdout}, indent=1))
+        "holdout": holdout, "embedder": M.embedder_info()}, indent=1))
     if args.write:
         if sessions < MIN_SESSIONS and not args.force:
             print(f"\nNot written: only {sessions} train sessions (< {MIN_SESSIONS}). Label more, or pass --force.")

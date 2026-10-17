@@ -230,6 +230,18 @@ def embed_many(texts: list[str], input_type: str = "search_document") -> tuple[l
     return [hashed_embedding(t) for t in texts], "hashed"
 
 
+def embedder_config() -> dict:
+    """What the environment asks for right now (an eval records this; the embedder that actually ran is separate)."""
+    provider = _provider() or "hashed"
+    model = None
+    if provider == "cohere":
+        model = os.environ.get("EMBED_MODEL_ID", "").strip() or DEFAULT_COHERE_MODEL
+    elif provider == "titan":
+        model = os.environ.get("EMBED_MODEL_ID", "").strip() or DEFAULT_TITAN_MODEL
+    return {"requested": os.environ.get("EMBEDDER", "auto").lower(), "provider": provider,
+            "model_id": model, "dimensions": DIM}
+
+
 def embed_sync(text: str) -> tuple[list[float], str]:
     """Returns (vector, embedder_name). Fallbacks to hashed are marked by the name, so callers can avoid caching them."""
     vecs, name = embed_many([text])
