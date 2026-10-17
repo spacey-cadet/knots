@@ -62,3 +62,34 @@ def fit_platt(scores, y) -> tuple[float, float]:
     from sklearn.linear_model import LogisticRegression
     m = LogisticRegression(C=1e6, max_iter=1000).fit(np.asarray(scores, float).reshape(-1, 1), y)
     return float(m.coef_[0][0]), float(m.intercept_[0])
+
+
+def embedder_info(results_path=None) -> dict:
+    """Which embedder produced eval/results/results.json (and so every ranker and pair number built from it).
+
+    {"recorded": False} for a results file written before this was tracked, so nothing is guessed."""
+    import json
+    from pathlib import Path
+    path = Path(results_path) if results_path else Path(__file__).resolve().parent / "results" / "results.json"
+    try:
+        data = json.loads(path.read_text())
+    except (OSError, ValueError):
+        return {"recorded": False}
+    cfg = data.get("embedder")
+    if not cfg:
+        return {"recorded": False}
+    runs: dict[str, int] = {}
+    fell_back = 0
+    for e in data.get("results", []):
+        used = e.get("embedders_used") or {}
+        if not e.get("ok") or not used:
+            continue
+        for name in used:
+            runs[name] = runs.get(name, 0) + 1
+        if cfg.get("provider") != "hashed" and used.get("hashed"):
+            fell_back += 1
+    names = sorted(runs)
+    provider = names[0] if len(names) == 1 else ("mixed" if names else cfg.get("provider"))
+    return {"recorded": True, "provider": provider, "requested": cfg.get("requested"),
+            "model_id": cfg.get("model_id"), "dimensions": cfg.get("dimensions"),
+            "runs_by_embedder": runs, "fell_back_runs": fell_back}

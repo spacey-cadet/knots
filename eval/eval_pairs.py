@@ -43,7 +43,8 @@ def main() -> int:
     out = {"all": summarize(rows),
            "train": summarize([r for r in rows if r.get("split", "train") != "holdout"]),
            "holdout": summarize([r for r in rows if r.get("split") == "holdout"]),
-           "generated": len(rows), "unlabelled": sum(r["good"] not in ("y", "n") for r in rows)}
+           "generated": len(rows), "unlabelled": sum(r["good"] not in ("y", "n") for r in rows),
+           "embedder": M.embedder_info()}
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text(json.dumps(out, indent=1))
     if not out["all"]:

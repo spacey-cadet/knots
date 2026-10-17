@@ -42,6 +42,42 @@ def provenance() -> str:
             "drafted any of the notes, in `eval/LABEL_PROVENANCE.txt`.")
 
 
+def embedder_line(info: dict | None) -> str:
+    if not info or not info.get("recorded"):
+        return ("not recorded (measured before the embedder was tracked): do not assume it was the semantic "
+                "embedder; re-run `python eval/run_eval.py run` to record it")
+    if info.get("provider") == "none":
+        return info.get("note", "no embedder")
+    p = info.get("provider")
+    model = f" (`{info['model_id']}`, {info.get('dimensions')} dimensions)" if info.get("model_id") else ""
+    if p == "hashed":
+        return ("**hashed** (offline, lexical only). These numbers do not describe a semantic embedder such as "
+                "Cohere or Titan; re-measure with one")
+    if p == "mixed":
+        return "**mixed**: " + ", ".join(f"{k} in {v} run(s)" for k, v in info["runs_by_embedder"].items()) + ", so not comparable"
+    return f"**{p}**{model}, requested `{info.get('requested')}`"
+
+
+def embedder_section(brain, rank, pairs) -> list[str]:
+    L = ["## Embedder", "",
+         "The fit ranker and the pair scorer compare texts as vectors, so their numbers depend on which embedding model "
+         "produced them, and so do the pair floors and similarity thresholds (set per embedder, still untuned). "
+         "Each part below says what it was measured with.", "",
+         "- Theme judge: none. It scores theme phrases with character n-gram TF-IDF and a feature critic; "
+         "no embedding model is involved, so its numbers do not depend on the embedder.",
+         f"- Fit ranker: {embedder_line((rank or {}).get('embedder'))}",
+         f"- Pair scorer: {embedder_line((pairs or {}).get('embedder'))}", ""]
+    infos = [(n, (m or {}).get("embedder")) for n, m in (("fit ranker", rank), ("pair scorer", pairs))]
+    infos = [(n, i) for n, i in infos if i and i.get("recorded")]
+    if len({i["provider"] for _, i in infos}) > 1:
+        L += ["**Warning:** the ranker and the pair scorer were measured with different embedders.", ""]
+    for n, i in infos:
+        if i.get("fell_back_runs"):
+            L += [f"**Warning:** {i['fell_back_runs']} eval run(s) behind the {n} fell back to the hashed embedder "
+                  "(throttling or an error), so those results mix embedders. Re-run before trusting them.", ""]
+    return L
+
+
 def main() -> int:
     brain, rank, pairs = load("metrics_brain.json"), load("metrics_rank.json"), load("metrics_pairs.json")
     L = ["# Knots model card", "",
@@ -52,6 +88,7 @@ def main() -> int:
          "documentaries), explainers (YouTube) and research (arXiv), including watch-and-learn pairs. "
          "Three small learned parts sit on top of retrieval from TMDB, YouTube and arXiv: a **theme judge** "
          "(which unstated themes to trust), a **fit ranker** (what fits this session), and a **pair scorer**.", "",
+         ] + embedder_section(brain, rank, pairs) + [
          "## How the labels were made", "",
          "One person labelled every row (see `eval/`). Sessions marked `holdout` in `eval/sessions.json` are "
          "never trained or tuned on; they exist to test. Labels reflect one person's taste. "

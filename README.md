@@ -298,8 +298,10 @@ leads with the best medium. Skipping a poor-fit medium also saves a catalog call
 - **The ranker and the pair scorer are not yet trained.** They run on documented
   hand-set priors until enough sessions are labelled with the new card features
   (re-run `run_eval.py run`, label, then `train_rank.py`). Pair floors and the level
-  ladder are untuned. Similarity is a hashed lexical proxy unless Bedrock embeddings
-  (Titan) are available; the pair and ranking quality should be re-measured with Titan.
+  ladder are untuned, and so are the per-embedder similarity thresholds. Similarity is a
+  hashed lexical proxy unless Bedrock embeddings (Cohere Embed v4 or Titan) are configured;
+  the pair and ranking quality should be re-measured with the embedder you will run in
+  production. `MODEL_CARD.md` states which embedder each number was measured with.
 - **OpenAlex and the challenge search are untested against the live services.** They are
   covered by mock transports only. A failure leaves citations unknown, never guessed.
 - **One labeller, few sessions.** See `MODEL_CARD.md` for what is and is not measured.

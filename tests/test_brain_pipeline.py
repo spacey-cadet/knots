@@ -438,3 +438,61 @@ def test_model_card_numbers_come_from_metrics_files(tmp_path, monkeypatch):
     assert "0.77 [0.60, 0.90]" in card and "Holdout: not yet measured" in card
     assert "Not yet measured" in card.split("## Fit ranker")[1]            # ranker had no metrics file
     assert "TODO (author)" in card                                          # provenance is the author's to state
+
+
+# ---------------------------------------------------------------- embedder is recorded with every measurement
+def test_embedder_info_reads_what_the_eval_recorded_and_never_guesses(tmp_path):
+    import metrics as M
+    old = tmp_path / "old.json"
+    old.write_text(json.dumps({"tmdb_live": True, "results": [{"ok": True}]}))        # written before tracking
+    assert M.embedder_info(old) == {"recorded": False} and M.embedder_info(tmp_path / "missing.json") == {"recorded": False}
+
+    cfg = {"requested": "auto", "provider": "cohere", "model_id": "global.cohere.embed-v4:0", "dimensions": 256}
+    ok = tmp_path / "ok.json"
+    ok.write_text(json.dumps({"embedder": cfg, "results": [
+        {"ok": True, "embedders_used": {"cohere": 2}}, {"ok": True, "embedders_used": {"cohere": 1}}]}))
+    info = M.embedder_info(ok)
+    assert info["provider"] == "cohere" and info["model_id"] == "global.cohere.embed-v4:0"
+    assert info["runs_by_embedder"] == {"cohere": 2} and info["fell_back_runs"] == 0
+
+    mixed = tmp_path / "mixed.json"
+    mixed.write_text(json.dumps({"embedder": cfg, "results": [
+        {"ok": True, "embedders_used": {"cohere": 1}}, {"ok": True, "embedders_used": {"hashed": 1}}]}))
+    info = M.embedder_info(mixed)
+    assert info["provider"] == "mixed" and info["fell_back_runs"] == 1
+
+
+def test_scoring_counts_the_embedder_that_actually_ran(monkeypatch):
+    monkeypatch.setenv("EMBEDDER", "hashed")
+    fitmodel.USED_EMBEDDERS.clear()
+    on = item("The Illusion of Free Will", "paper", abstract="Neuroscience of decisions", tags=["free will"])
+    fitmodel.score_items(QUERY, [on], [interest()], medium_weight)
+    assert dict(fitmodel.USED_EMBEDDERS) == {"hashed": 1}
+    fitmodel.USED_EMBEDDERS.clear()
+
+
+def test_model_card_states_the_embedder_for_each_part_and_warns_on_fallback(tmp_path, monkeypatch):
+    MC = _load_script("make_model_card")
+    monkeypatch.setattr(MC, "ROOT", tmp_path); monkeypatch.setattr(MC, "RES", tmp_path)
+    MC.main()                                                               # nothing recorded anywhere
+    card = (tmp_path / "MODEL_CARD.md").read_text()
+    assert "## Embedder" in card and card.count("not recorded") == 2        # ranker and pairs; the judge has none
+
+    cohere = {"recorded": True, "provider": "cohere", "requested": "auto", "model_id": "global.cohere.embed-v4:0",
+              "dimensions": 256, "runs_by_embedder": {"cohere": 3}, "fell_back_runs": 0}
+    fell = {**cohere, "provider": "mixed", "runs_by_embedder": {"cohere": 2, "hashed": 1}, "fell_back_runs": 1}
+    (tmp_path / "metrics_rank.json").write_text(json.dumps({"status": "not_trained", "reason": "x", "embedder": cohere}))
+    (tmp_path / "metrics_pairs.json").write_text(json.dumps({"all": None, "embedder": fell}))
+    (tmp_path / "metrics_brain.json").write_text(json.dumps({
+        "embedder": {"recorded": True, "provider": "none", "note": "character n-gram TF-IDF; no embedding model"},
+        "train_labels": 1, "train_sessions": 1,
+        "loso": {k: {"auc": 0.7, "auc_ci90": [0.6, 0.8], "within_session_auc": 0.7} for k in ("critic", "neighbors", "ensemble")}
+                | {"at_threshold": {"threshold": 0.5, "kept": 1, "of": 2, "precision": 0.5, "base_rate": 0.5}},
+        "calibration": {"ece": 0.1, "reliability": []}, "holdout": None}))
+    MC.main()
+    card = (tmp_path / "MODEL_CARD.md").read_text()
+    sect = card.split("## Embedder")[1].split("## How the labels")[0]
+    assert "no embedding model is involved" in sect                         # theme judge: always, regardless of files
+    assert "global.cohere.embed-v4:0" in sect and "**cohere**" in sect      # ranker
+    assert "**mixed**" in sect and "different embedders" in sect            # pairs fell back: flagged
+    assert "1 eval run(s)" in sect

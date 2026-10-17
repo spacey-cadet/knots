@@ -125,7 +125,9 @@ def main() -> int:
 
     out = {"train_labels": int(len(y)), "train_sessions": int(len(set(g))), "loso": res,
            "calibration": {"a": round(a, 4), "b": round(b, 4), "ece": round(M.ece(cal, y), 4), "reliability": rel},
-           "holdout": holdout}
+           "holdout": holdout,
+           "embedder": {"recorded": True, "provider": "none",
+                        "note": "character n-gram TF-IDF over theme phrases; no embedding model is involved"}}
     METRICS.parent.mkdir(exist_ok=True)
     METRICS.write_text(json.dumps(out, indent=1))
 
