@@ -814,3 +814,103 @@ def test_alexa_adapter_escapes_ssml_limits_length_and_keeps_the_session_open():
     assert out["response"]["shouldEndSession"] is False and out["response"]["reprompt"]
     assert out["response"]["card"]["content"] == "A&B - n"
     assert alexa.to_alexa(resp, end_session=True)["response"].get("reprompt") is None
+
+
+# ---------------------------------------------------------------- profile + retrain
+from knots import profile as PF  # noqa: E402
+from knots import retrain as RT  # noqa: E402
+
+
+def unit(i, dim=8, j=None, mix=0.0):
+    v = [0.0] * dim
+    v[i] = 1.0
+    if j is not None:
+        v[j] = mix
+    return v
+
+
+def test_profile_stays_bounded_merges_similar_and_decays(monkeypatch):
+    p = PF.Profile()
+    day = 86400.0
+    PF.update(p, [("memecoins", unit(0), 1.0)], "titan", now=0)
+    PF.update(p, [("crypto speculation", unit(0, j=1, mix=0.1), 0.6)], "titan", now=day)
+    assert len(p.slots) == 1 and p.slots[0].n == 2                                  # merged, not duplicated
+    for k in range(60):                                                              # far more topics than slots
+        PF.update(p, [(f"t{k}", [1.0 if i == k else 0.0 for i in range(64)], 1.0)], "titan", now=day * (2 + k))
+    before = p.slots[0].weight
+    PF.update(p, [], "titan", now=day * 400)                                         # a long silence
+    assert not p.slots or p.slots[0].weight < before
+
+
+def test_profile_never_mixes_embedders_and_serialises():
+    p = PF.update(PF.Profile(), [("a", unit(0), 1.0)], "titan", now=1)
+    assert PF.prior(p, unit(0), "hashed") == 0.0                                    # other space: no influence
+    PF.update(p, [("b", unit(1), 1.0)], "hashed", now=2)
+    assert p.embedder == "hashed" and [s.topic for s in p.slots] == ["b"]            # reset, not blended
+    q = PF.Profile.from_dict(json.loads(json.dumps(p.to_dict())))
+    assert q.slots[0].topic == "b" and q.embedder == "hashed"
+
+
+def test_profile_prior_is_capped_so_the_session_always_wins():
+    p = PF.update(PF.Profile(), [("a", unit(0), 5.0)], "titan", now=1)
+    assert 0 < PF.prior(p, unit(0), "titan") <= PF.PRIOR_CAP
+    assert PF.prior(p, unit(3), "titan") == 0.0
+
+
+def test_session_mode_reads_wording_and_blends_with_a_slow_average():
+    assert PF.session_mode(["Alexa, can you explain how does tokenomics work? I want to understand the research"]) > 0.7
+    assert PF.session_mode(["something fun, I'm bored, movie night, just want to chill"]) < 0.3
+    assert PF.session_mode(["hello there"]) is None
+    long_run = PF.Profile(learn_play=0.9)
+    m = PF.blend_mode(0.1, long_run)                                                 # a playful night for a serious learner
+    assert m["label"] in ("play", "mixed") and m["learn_vs_play"] < 0.5 and m["from_session"]
+    assert PF.blend_mode(None, long_run)["label"] == "learn" and PF.blend_mode(None, None)["label"] == "mixed"
+    p = PF.update(PF.Profile(learn_play=0.9), [], "x", now=1, session_mode=0.1)
+    assert 0.8 < p.learn_play < 0.9                                                  # moves slowly
+
+
+def lab(user, url, good="y", source="user", ts=0, sid="s1"):
+    return {"user": user, "url": url, "good": good, "source": source, "ts": ts, "session_id": sid}
+
+
+def test_retrain_uses_only_human_labels_dedupes_and_caps_each_person():
+    pol = RT.Policy(min_labels=5, min_users=2, per_user_cap=3, min_new=1)
+    rows = [lab("a", f"u{i}", ts=i) for i in range(10)] + [lab("b", "x"), lab("b", "y", source="model"),
+                                                          lab("c", "z", good="")]
+    rows.append(lab("b", "x", good="n", ts=5))                                       # later label replaces the earlier one
+    el = RT.eligible(rows, pol)
+    assert sum(r["user"] == "a" for r in el) == 3 and not any(r["source"] == "model" for r in el)
+    assert [r["good"] for r in el if r["user"] == "b"] == ["n"] and not any(r["user"] == "c" for r in el)
+
+
+def test_retrain_waits_for_enough_labels_from_enough_people():
+    pol = RT.Policy(min_labels=6, min_users=3, per_user_cap=10, min_new=2)
+    few = [lab("a", f"u{i}") for i in range(8)]
+    ok, why = RT.should_retrain(few, {}, pol)
+    assert not ok and "1 people, need 3" in why
+    many = few + [lab("b", "p"), lab("c", "q")]
+    assert RT.should_retrain(many, {}, pol)[0]
+    assert not RT.should_retrain(many, {"trained_on": 9}, pol)[0]                    # not enough NEW labels
+
+
+def test_gate_demands_a_real_gain_without_regression_and_registry_can_roll_back(tmp_path):
+    champ = {"p@3": 0.70, "ndcg@5": 0.80}
+    assert RT.gate(champ, {"p@3": 0.73, "ndcg@5": 0.80})["promote"]
+    assert not RT.gate(champ, {"p@3": 0.71, "ndcg@5": 0.85})["promote"]              # too small a gain
+    bad = RT.gate(champ, {"p@3": 0.80, "ndcg@5": 0.70})
+    assert not bad["promote"] and "ndcg@5" in bad["reason"]                          # regressed elsewhere
+    reg = RT.Registry(tmp_path)
+    v1 = reg.register({"w": 1}, champ, 200); reg.promote(v1, 200)
+    v2 = reg.register({"w": 2}, {"p@3": 0.74, "ndcg@5": 0.8}, 400); reg.promote(v2, 400)
+    assert reg.champion()["artifact"] == {"w": 2}
+    assert reg.rollback() == v1 and reg.champion()["artifact"] == {"w": 1}
+    assert reg.rollback() is None
+
+
+def test_golden_contract_and_alexa_responses_have_not_drifted():
+    sys.path.insert(0, str(ROOT / "tests"))
+    import make_golden
+    r, a = make_golden.build()
+    assert r == json.loads((ROOT / "tests" / "golden" / "response_ok.json").read_text())
+    assert a == json.loads((ROOT / "tests" / "golden" / "alexa_ok.json").read_text())
+    assert "“" not in r["say"] and len(r["say"]) < 400                           # short and quote-free for the ear

@@ -4,8 +4,8 @@ The response contract: one shape every surface (Alexa skill, MCP tool, screen) r
     {
       "version": 1,
       "status": "ok" | "relaxed" | "empty",   # relaxed: fewer checks passed than usual, say so
-      "say": "...",                           # what a voice reads: <= 2 picks, no URLs
-      "picks": [{title, type, year, note, why, facts[{label,value,source}], confidence, url, matched_topic}],
+      "say": "...",                           # what a voice reads: <= 2 picks, no URLs, no quotes
+      "picks": [{title, type, year, note, spoken_note, why, facts[{label,value,source}], confidence, url, matched_topic}],
       "themes": [{theme, evidence, rank}],    # <= 5, each with the person's words
       "ask": "...",                           # one follow-up question
       "mode": {"learn_vs_play": 0..1, "label": "learn" | "play" | "mixed"}   # when a profile supplied it
@@ -73,6 +73,7 @@ def build_response(plan: dict, items: list[ContentItem], interests: list, mode: 
             "title": c["title"], "type": c["type"], "year": c.get("year", ""), "url": c["url"],
             "matched_topic": c.get("matched_topic", ""),
             "note": build_note(it, theme, rephrase) if it else c.get("reasoning", ""),
+            "spoken_note": build_note(it, None, rephrase) if it else "",   # no quote: the theme is said once, up front
             "why": c.get("reasoning", ""),
             "facts": facts(it) if it else [],
             "confidence": _confidence(c, level),
@@ -97,6 +98,6 @@ def _say(resp: dict, plan: dict) -> str:
     for n, p in enumerate(resp["picks"][:SPOKEN_PICKS]):
         kind = {"movie": "film", "series": "series", "doc": "documentary", "video": "video", "paper": "paper"}.get(p["type"], p["type"])
         yr = f" from {p['year']}" if p["year"] else ""
-        bits.append(f"{'Try' if n == 0 else 'Or'} {p['title']}, a {kind}{yr}. {p['note']}")
+        bits.append(f"{'Try' if n == 0 else 'Or'} {p['title']}, a {kind}{yr}. {p['spoken_note'] or p['note']}")
     hedge = "" if resp["status"] == "ok" else "These are looser matches than usual. "
     return (lead + hedge + " ".join(bits) + (" " + resp["ask"] if resp["ask"] else "")).strip()
