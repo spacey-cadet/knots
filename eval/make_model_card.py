@@ -78,8 +78,41 @@ def embedder_section(brain, rank, pairs) -> list[str]:
     return L
 
 
+def ranking_section(ranking: dict | None) -> list[str]:
+    L = ["## Ranking quality (what is read out first)", ""]
+    if not ranking:
+        return L + ["Not yet measured: run `python eval/eval_rank.py`.", ""]
+    head = ranking.get("headline") or ["p@1", "p@3", "map", "ndcg@5"]
+    names = {"p@1": "P@1", "p@3": "P@3", "map": "MAP", "ndcg@5": "NDCG@5"}
+    L += ["Each list is the picks shown for one session. Only shown picks are labelled, so this measures the order "
+          "and the precision of the shown set, not whether a better item was never retrieved. P@k is precision in the "
+          "first k picks; MAP and NDCG ignore lists with nothing good in them (the count is given). Intervals "
+          "resample sessions. Embedder: " + embedder_line(ranking.get("embedder")) + ".", ""]
+    for scope in [k for k in ranking if isinstance(ranking[k], dict) and "train" in ranking[k]]:
+        sc = ranking[scope]
+        res = sc.get("train")
+        if not res:
+            continue
+        base = res["as read aloud"]
+        L += [f"**{scope}**: {sc['lists']} complete lists from {sc['sessions']} train sessions; "
+              f"{base['set_precision']['mean']:.0%} of everything shown was good; "
+              f"{base['lists_without_a_good_pick']} list(s) had no good pick.", "",
+              "| Order | " + " | ".join(names.get(h, h) for h in head) + " |", "| --- " * (len(head) + 1) + "|"]
+        for order, v in res.items():
+            L.append(f"| {order} | " + " | ".join(
+                f"{v[h]['mean']:.2f} [{v[h]['ci90'][0]:.2f}, {v[h]['ci90'][1]:.2f}]" for h in head) + " |")
+        ex = sc.get("excluded", {})
+        if ex.get("partly_unlabelled"):
+            L += ["", f"{len(ex['partly_unlabelled'])} list(s) were left out because some of their picks are still unlabelled."]
+        hold = sc.get("holdout")
+        L += ["", "Holdout: " + ("see `metrics_ranking.json`." if hold else "not yet measured (holdout sessions are unlabelled)."), ""]
+    return L + ["Rows other than \"as read aloud\" re-order the same picks, so they show what a different ordering rule "
+                "would have scored, not what the live system returned.", ""]
+
+
 def main() -> int:
     brain, rank, pairs = load("metrics_brain.json"), load("metrics_rank.json"), load("metrics_pairs.json")
+    ranking = load("metrics_ranking.json")
     L = ["# Knots model card", "",
          f"Generated {date.today().isoformat()} from `eval/results/metrics_*.json` by `eval/make_model_card.py`. "
          "Numbers below are copied from those files, not written by hand.", "",
@@ -126,6 +159,7 @@ def main() -> int:
     else:
         L.append("Not yet measured: " + (rank or {}).get("reason", "run `python eval/train_rank.py`.") +
                  " Until trained, ranking uses documented hand-set prior weights and cards show **no** confidence number.")
+    L += [""] + ranking_section(ranking)
     L += ["", "## Watch-and-learn pairs", ""]
     if pairs and pairs.get("all"):
         for k in ("train", "holdout"):

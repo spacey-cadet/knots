@@ -42,10 +42,30 @@ the CSVs instantly, and the page never shows which extractor made a row. The
 rubric is on each card. Use the **Picks** and **Themes** tabs. Rows marked
 "offline mock" are hidden by default and ignored by `score`.
 
+**What counts as a label.** Exactly one column per sheet is ground truth: `good` on picks and
+`supported` on themes (y/n). Everything else you write is a *comment about* the verdict, not part of it:
+`reason`, `note` and `error_type` (and the extractor's `rationale`). They help you and the model card
+explain failures and let `check_labels.py` catch mis-clicks, but nothing is trained or scored on them, and
+they are not shown to the extraction model (set `KNOTS_GUIDANCE_NOTES=1` to try that as an experiment; its
+effect cannot be measured on the labels the notes were written from). Shipped theme examples
+(`knots/brain/data/theme_examples.jsonl`) carry only the text and the verdict.
+
 Prefer a spreadsheet? Edit `labels.csv` (`good`) and `themes.csv` (`supported`)
 with `y`/`n`, and hide the last column (`extractor`) while you do.
 
 ## 3. Score
+
+```bash
+python eval/eval_rank.py     # precision@k, hit rate, MRR, MAP, NDCG@k of the order picks are read in
+```
+
+`eval_rank.py` takes each list of shown picks whose picks are all labelled, orders it several ways (as read
+aloud, the ranker's score, tag overlap, session fit, rating, popularity, random) and reports each metric with a
+90% interval from resampling sessions. Only shown picks are labelled, so it measures the order and the precision
+of the shown set, not whether a better item was never retrieved. Lists with an unlabelled pick are named and
+left out; holdout sessions are reported separately.
+
+Then:
 
 ```bash
 python eval/run_eval.py score     # writes eval/RESULTS.md
