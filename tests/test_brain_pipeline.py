@@ -548,3 +548,88 @@ def test_run_eval_resume_keeps_complete_runs_and_stops_cleanly_when_the_youtube_
     assert "kept (complete" in out and "STOPPED" not in out
     final = json.loads((tmp_path / "results.json").read_text())["results"]
     assert [e["session_id"] for e in final] == ["s1", "s2", "s3"] and not any(e["catalog_failures"] for e in final)
+
+
+# ---------------------------------------------------------------- ranking metrics and the order-quality baseline
+def test_ranking_metrics_match_hand_calculations():
+    import math
+    import metrics as M
+    r = [1, 0, 1, 0]
+    assert M.p_at_k(r, 1) == 1.0 and M.p_at_k(r, 3) == pytest.approx(2 / 3) and M.mrr(r) == 1.0
+    assert M.average_precision(r) == pytest.approx((1 + 2 / 3) / 2)
+    assert M.ndcg_at_k(r, 5) == pytest.approx((1 + 0.5) / (1 + 1 / math.log2(3)))      # dcg 1.5 over the ideal [1,1,0,0]
+    late = [0, 0, 1]
+    assert M.hit_at_k(late, 1) == 0 and M.hit_at_k(late, 3) == 1 and M.mrr(late) == pytest.approx(1 / 3)
+    assert M.ndcg_at_k(late, 5) == pytest.approx(0.5) and M.p_at_k([1], 3) == 1.0       # a short list is judged on what it has
+    none = [0, 0]
+    assert math.isnan(M.average_precision(none)) and math.isnan(M.ndcg_at_k(none, 3)) and M.mrr(none) == 0.0
+
+
+def test_summarize_rankings_resamples_sessions_and_reports_lists_with_nothing_good():
+    import metrics as M
+    groups = [{"session": "a", "rels": [1, 0]}, {"session": "a", "rels": [1, 1]},
+              {"session": "b", "rels": [0, 1]}, {"session": "c", "rels": [0, 0]}]
+    s = M.summarize_rankings(groups, n_boot=300)
+    assert s["lists"] == 4 and s["sessions"] == 3 and s["lists_without_a_good_pick"] == 1
+    assert s["p@1"]["mean"] == 0.5                                          # 1, 1, 0, 0
+    assert s["map"]["mean"] == pytest.approx((1.0 + 1.0 + 0.5) / 3, abs=1e-3)   # the all-bad list is not scored
+    assert s["p@1"]["ci90"][0] <= 0.5 <= s["p@1"]["ci90"][1]
+    perfect = M.summarize_rankings([{"session": "a", "rels": [1, 1]}, {"session": "b", "rels": [1]}], n_boot=100)
+    assert perfect["p@1"] == {"mean": 1.0, "ci90": [1.0, 1.0]}
+    chance = M.summarize_rankings(M.expected_random([{"session": "a", "rels": [1, 0, 0, 0]}], draws=400))
+    assert chance["p@1"]["mean"] == pytest.approx(0.25, abs=0.07)           # one good item in four: 25% by chance
+
+
+def test_eval_rank_orders_as_read_aloud_and_leaves_out_unlabelled_and_holdout_lists():
+    ER = _load_script("eval_rank")
+
+    def card(url, fit, kind="watch", overlap=0.0):
+        return {"url": url, "fit_score": fit, "kind": kind, "fit_features": {"overlap": overlap, "sim_session": fit}}
+
+    def entry(sid, picks, mediums):
+        return {"ok": True, "session_id": sid, "extractor": "bedrock", "interests": [{"mediums": mediums}],
+                "plan": {"picks": picks}}
+
+    e1 = entry("s1", {"watch": [card("w1", 0.1), card("w2", 0.9)], "read": [card("r1", 0.5, "read")], "explore": []},
+               ["paper", "film", "video"])
+    assert [c["url"] for c in ER.displayed_order(e1)] == ["r1", "w1", "w2"]          # lead medium first, then the rest
+    e2 = entry("s2", {"watch": [card("x1", 0.3), card("x2", 0.2)], "read": [], "explore": []}, ["film"])
+    e3 = entry("s3", {"watch": [card("y1", 0.3), card("y2", 0.2)], "read": [], "explore": []}, ["film"])
+    e4 = entry("s4", {"watch": [card("z1", 0.3)], "read": [], "explore": []}, ["film"])
+    labels = [{"session_id": "s1", "extractor": "bedrock", "url": u, "good": g}
+              for u, g in (("r1", "n"), ("w1", "n"), ("w2", "y"))]
+    labels += [{"session_id": "s2", "extractor": "bedrock", "url": "x1", "good": "y"},
+               {"session_id": "s2", "extractor": "bedrock", "url": "x2", "good": "n"},
+               {"session_id": "s3", "extractor": "bedrock", "url": "y1", "good": "y"},     # y2 unlabelled: left out
+               {"session_id": "s4", "extractor": "bedrock", "url": "z1", "good": "y"}]     # holdout session
+    splits = {"s1": "train", "s2": "train", "s3": "train", "s4": "holdout"}
+    built = ER.build_lists([e1, e2, e3, e4], labels, splits)
+    assert [e["session_id"] for e, _ in built["train"]] == ["s1", "s2"]
+    assert built["excluded"]["partly_unlabelled"] == [["s3", "bedrock", 1, 2]]
+    assert built["excluded"]["holdout_lists"] == 1 and len(built["holdout"]) == 1
+    read = ER.groups_for(built["train"], built["lab"], "as read aloud")
+    fit = ER.groups_for(built["train"], built["lab"], "fit score")
+    assert read[0]["rels"] == [0, 0, 1] and fit[0]["rels"] == [1, 0, 0]               # the ranker's order puts w2 first
+    res = ER.evaluate(built["train"], built["lab"])
+    assert res["as read aloud"]["p@1"]["mean"] == 0.5 and res["fit score"]["p@1"]["mean"] == 1.0
+    assert "random (chance)" in res and ER.evaluate([], {}) is None
+
+
+def test_model_card_has_a_ranking_section_with_numbers_only_from_the_file(tmp_path, monkeypatch):
+    MC = _load_script("make_model_card")
+    monkeypatch.setattr(MC, "ROOT", tmp_path); monkeypatch.setattr(MC, "RES", tmp_path)
+    MC.main()
+    assert "Not yet measured: run `python eval/eval_rank.py`" in (tmp_path / "MODEL_CARD.md").read_text()
+    cell = lambda m: {"mean": m, "ci90": [round(m - 0.1, 3), round(m + 0.1, 3)]}  # noqa: E731
+    row = {"set_precision": cell(0.6), "lists_without_a_good_pick": 2, "lists": 9} | {h: cell(0.42) for h in ("p@1", "p@3", "map", "ndcg@5")}
+    (tmp_path / "metrics_ranking.json").write_text(json.dumps({
+        "embedder": {"recorded": True, "provider": "cohere", "requested": "auto", "model_id": "m", "dimensions": 256},
+        "headline": ["p@1", "p@3", "map", "ndcg@5"],
+        "bedrock": {"lists": 9, "sessions": 7, "excluded": {"partly_unlabelled": [["s1", "bedrock", 1, 2]]}, "holdout": None,
+                    "train": {"as read aloud": row, "random (chance)": row}}}))
+    MC.main()
+    card = (tmp_path / "MODEL_CARD.md").read_text()
+    sect = card.split("## Ranking quality")[1].split("## Watch-and-learn")[0]
+    assert "9 complete lists from 7 train sessions" in sect and "0.42 [0.32, 0.52]" in sect
+    assert "60% of everything shown was good" in sect and "1 list(s) were left out" in sect
+    assert "not yet measured (holdout sessions are unlabelled)" in sect and "**cohere**" in sect

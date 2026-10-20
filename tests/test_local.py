@@ -1291,3 +1291,19 @@ def test_youtube_quota_error_stops_further_live_searches(monkeypatch):
     other = I.Interest(topic="x", depth="deep", sentiment="curious", mentions=1, concepts=["entropy"], keywords=["entropy"])
     asyncio.run(C._search_youtube(other, _yt_client(calls)))
     assert len(calls) == 1                                                    # no second request to a refusing API
+
+
+def test_reviewer_notes_are_diagnostics_not_prompt_content_or_shipped_labels(monkeypatch):
+    import importlib
+    G = importlib.import_module("knots.brain.guidance")
+    ex = [{"session_id": "x", "session_text": "free will and neuroscience", "theme": "an accepted theme", "supported": "y"},
+          {"session_id": "x", "session_text": "free will and neuroscience", "theme": "a rejected theme", "supported": "n",
+           "note": "THIS-IS-A-REVIEWER-COMMENT", "error_type": "over_psychologizing"}]
+    monkeypatch.setattr(G, "_examples", lambda: ex)
+    out = G.guidance("free will and neuroscience")
+    assert '"a rejected theme"' in out and "THIS-IS-A-REVIEWER-COMMENT" not in out and "with why" not in out
+    monkeypatch.setenv("KNOTS_GUIDANCE_NOTES", "1")                                  # an explicit, opt-in experiment
+    assert "THIS-IS-A-REVIEWER-COMMENT" in G.guidance("free will and neuroscience")
+    monkeypatch.undo()
+    shipped = importlib.import_module("knots.brain.guidance")._examples()
+    assert shipped and all(set(e) == {"session_id", "session_text", "theme", "supported"} for e in shipped)

@@ -37,6 +37,9 @@ DATA = ROOT / "knots" / "brain" / "data"
 METRICS = ROOT / "eval" / "results" / "metrics_brain.json"
 THRESHOLD = 0.5
 MIN_HOLDOUT = 10
+# What a shipped example may carry: the text and the verdict. `note` and `error_type` explain a verdict; they
+# are diagnostics for the author and never a training target or prompt content.
+EXAMPLE_FIELDS = ("session_id", "session_text", "theme", "supported")
 
 
 def load(split: str | None = "train"):
@@ -139,7 +142,7 @@ def main() -> int:
             {"features": FEATURE_NAMES, "mean": mu.tolist(), "std": sd.tolist(),
              "w": m_all.coef_[0].tolist(), "b": float(m_all.intercept_[0])}, indent=1))
         (DATA / "theme_examples.jsonl").write_text("".join(
-            json.dumps({k: r.get(k, "") for k in ("session_id", "session_text", "theme", "supported", "error_type", "note")},
+            json.dumps({k: r.get(k, "") for k in EXAMPLE_FIELDS},
                        ensure_ascii=False) + "\n" for r in rows))
         (DATA / "theme_judge.json").write_text(json.dumps(
             {"calibration": {"a": a, "b": b}, "threshold": THRESHOLD,

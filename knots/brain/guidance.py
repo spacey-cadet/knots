@@ -1,5 +1,9 @@
 """Few-shot guidance: the author's own accepted/rejected themes, retrieved by similarity to the
-current text and injected into the extraction prompt, plus the rules distilled from their notes."""
+current text and injected into the extraction prompt, plus a short list of written rules.
+
+The label is the verdict (supported y/n). A reviewer's free-text note about WHY a theme failed is a
+diagnostic, not a label, so it is not shown to the model unless KNOTS_GUIDANCE_NOTES=1 (an experiment
+whose effect cannot be measured on the same labels it was written from)."""
 from __future__ import annotations
 
 import json
@@ -40,6 +44,7 @@ def guidance(session_text: str, k: int = 3, holdout: str | None = None) -> str:
     bad = [e for e in ex if e["supported"] == "n"][:k]
     lines = [RULES, "", "Accepted themes (from other conversations):"]
     lines += [f'- "{e["theme"]}"' for e in good]
-    lines.append("Rejected themes, with why:")
-    lines += [f'- "{e["theme"]}"' + (f' — {e["note"]}' if e["note"] else "") for e in bad]
+    with_notes = os.environ.get("KNOTS_GUIDANCE_NOTES") == "1"
+    lines.append("Rejected themes, with why:" if with_notes else "Rejected themes:")
+    lines += [f'- "{e["theme"]}"' + (f' — {e["note"]}' if with_notes and e.get("note") else "") for e in bad]
     return "\n".join(lines)
