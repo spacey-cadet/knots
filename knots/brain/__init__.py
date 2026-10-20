@@ -2,5 +2,6 @@
 from .critic import score, split
 from .guidance import guidance
 from .judge import assess
+from .themes import curate as curate_themes
 
-__all__ = ["score", "split", "guidance", "assess"]
+__all__ = ["score", "split", "guidance", "assess", "curate_themes"]

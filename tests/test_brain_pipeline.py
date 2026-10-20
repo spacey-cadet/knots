@@ -633,3 +633,104 @@ def test_model_card_has_a_ranking_section_with_numbers_only_from_the_file(tmp_pa
     assert "9 complete lists from 7 train sessions" in sect and "0.42 [0.32, 0.52]" in sect
     assert "60% of everything shown was good" in sect and "1 list(s) were left out" in sect
     assert "not yet measured (holdout sessions are unlabelled)" in sect and "**cohere**" in sect
+
+
+# ---------------------------------------------------------------- theme curation
+from knots.brain import themes as TH  # noqa: E402
+
+SAID = "I keep seeing memecoin threads on my Reddit feed, is this all just a bubble? Tell me more about the research."
+
+
+def test_quote_supported_ignores_case_and_punctuation_and_needs_real_words():
+    assert TH.quote_supported("is this all just a bubble", SAID)
+    assert TH.quote_supported("IS this ALL just a bubble?!", SAID)
+    assert TH.quote_supported("I keep seeing ... on my Reddit feed", SAID)          # ellipsis skips words, in order
+    assert not TH.quote_supported("Reddit feed ... I keep seeing", SAID)             # out of order
+    assert not TH.quote_supported("people feel anxious about money", SAID)           # never said
+    assert not TH.quote_supported("a bubble", SAID)                                  # real but under 3 words
+    assert not TH.quote_supported("", SAID) and not TH.quote_supported(None, SAID)
+
+
+def test_curate_drops_unquoted_themes_ranks_and_caps_at_five(monkeypatch):
+    monkeypatch.setattr(TH.judge, "assess", lambda text, themes: (list(themes), [], {}))
+    monkeypatch.setattr(TH.judge, "raw_score", lambda text, theme: None)
+    words = "alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu".split()
+    text = " ".join(f"{w} one two three." for w in words)
+    a = interest("a", implicit_themes=[f"t{i}" for i in range(4)] + ["invented", "unquoted"],
+                 theme_evidence={**{f"t{i}": f"{words[i]} one two three" for i in range(4)}, "invented": "never said this at all"})
+    b = interest("b", implicit_themes=["t4", "t5", "t0"],
+                 theme_evidence={"t4": f"{words[4]} one two three", "t5": f"{words[5]} one two three", "t0": f"{words[0]} one two"})
+    out = TH.curate([a, b], text, cap=5)
+    kept = [t for it in out for t in it.implicit_themes]
+    assert len(kept) == 5 and len(set(kept)) == 5                                     # cap holds, duplicate t0 counted once
+    assert "invented" in a.dropped_themes and "quote not found" in a.theme_dropped_why["invented"]
+    assert a.theme_dropped_why["unquoted"] == "no quote from the conversation"
+    assert any("over the limit of 5" in why for it in out for why in it.theme_dropped_why.values())
+    ranks = sorted(r for it in out for r in it.theme_rank.values())
+    assert ranks == [1, 2, 3, 4, 5]
+
+
+def test_curate_orders_by_judge_confidence_and_drops_what_the_judge_rejects(monkeypatch):
+    conf = {"fear of missing out": 0.9, "algorithmic amplification of risk": 0.6}
+    monkeypatch.setattr(TH.judge, "assess", lambda text, themes: (
+        [t for t in themes if t in conf], [t for t in themes if t not in conf], conf))
+    it = interest("memecoins", implicit_themes=["algorithmic amplification of risk", "fear of missing out", "moral panic"],
+                  theme_evidence={"algorithmic amplification of risk": "is this all just a bubble",
+                                  "fear of missing out": "I keep seeing memecoin threads on my Reddit feed",
+                                  "moral panic": "Tell me more about the research"})
+    TH.curate([it], SAID)
+    assert it.implicit_themes[0] == "fear of missing out" and it.theme_rank["fear of missing out"] == 1
+    assert it.theme_dropped_why["moral panic"] == "the judge expects this would be rejected"
+    rows = TH.ranked([it])
+    assert [r["theme"] for r in rows] == ["fear of missing out", "algorithmic amplification of risk"]
+    assert rows[0]["evidence"].startswith("I keep seeing") and [r["rank"] for r in rows] == [1, 2]
+
+
+def test_parse_themes_reads_quotes_and_legacy_strings_and_limits_to_five():
+    themes, ev = I._parse_themes({"themes": [{"theme": " Fear  of Missing Out ", "evidence": " is this  all just a bubble "},
+                                             {"theme": "fear of missing out", "evidence": "dup"}, {"theme": 7},
+                                             "bare string", *({"theme": f"x{i}", "evidence": "a b c"} for i in range(9))]})
+    assert themes[0] == "fear of missing out" and ev["fear of missing out"] == "is this all just a bubble"
+    assert "bare string" in themes and "bare string" not in ev and len(themes) == 5
+    legacy, lev = I._parse_themes({"implicit_themes": ["old style", 3]})
+    assert legacy == ["old style"] and lev == {}                                      # no quote, so curation will drop it
+
+
+def test_plan_exposes_ranked_themes_with_their_quotes(monkeypatch):
+    monkeypatch.setattr(TH.judge, "assess", lambda text, themes: (list(themes), [], {}))
+    it = interest("memecoins", implicit_themes=["fear of missing out"],
+                  theme_evidence={"fear of missing out": "I keep seeing memecoin threads on my Reddit feed"})
+    TH.curate([it], SAID)
+    plan = build_session_plan([it], [item("Margin Call", "film", "memecoins", tags=["memecoins"], rating=7.0)],
+                              extractor="heuristic", query=SAID)
+    assert plan["themes"] and plan["themes"][0]["theme"] == "fear of missing out"
+    assert plan["themes"][0]["evidence"].startswith("I keep seeing")
+    assert len(plan["themes"]) <= 5
+
+
+def test_run_eval_themes_command_writes_themes_run_and_leaves_pick_labels_alone(tmp_path, monkeypatch):
+    import argparse
+    R = _load_script("run_eval")
+    (tmp_path / "sessions.json").write_text(json.dumps([{"id": "s1", "texts": [SAID]}]))
+    for n, v in {"SESSIONS": "sessions.json", "RESULTS": "results.json", "THEMES_RUN": "themes_run.json",
+                 "LABELS": "labels.csv", "THEMES": "themes.csv", "PAIRS": "pairs.csv"}.items():
+        monkeypatch.setattr(R, n, tmp_path / v)
+    monkeypatch.setattr(R, "ROOT", tmp_path)
+    monkeypatch.setattr(R, "set_extractor", lambda *a: None)
+    (tmp_path / "labels.csv").write_text("sentinel")
+    monkeypatch.setattr(TH.judge, "assess", lambda text, themes: (list(themes), [], {}))
+
+    async def fake_extract(texts):
+        it = interest("memecoins", implicit_themes=["fear of missing out"],
+                      theme_evidence={"fear of missing out": "is this all just a bubble"})
+        TH.curate([it], texts[0])
+        return [it], "bedrock"
+    monkeypatch.setattr(R.extraction, "extract", fake_extract)
+    assert R.cmd_themes(argparse.Namespace(extractors="bedrock")) == 0
+    run = json.loads((tmp_path / "themes_run.json").read_text())["results"]
+    assert run[0]["ok"] and run[0]["interests"][0]["theme_rank"] == {"fear of missing out": 1}
+    rows = list(csv.DictReader(open(tmp_path / "themes.csv", encoding="utf-8-sig")))
+    assert rows[0]["theme"] == "fear of missing out" and rows[0]["evidence"] == "is this all just a bubble"
+    assert rows[0]["rank"] == "1" and rows[0]["supported"] == ""
+    assert (tmp_path / "labels.csv").read_text() == "sentinel"                         # pick sheet untouched
+    assert not (tmp_path / "results.json").exists()
