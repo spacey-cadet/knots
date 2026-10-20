@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from .brain.themes import ranked as ranked_themes
 from .catalogs import ContentItem
+from .contract import build_response
 from .extraction import Interest
 from .pairing import build_pairs
 from .ranking import rank_and_render
@@ -98,7 +99,7 @@ def build_session_plan(interests: list[Interest], items: list[ContentItem],
         "No catalog results right now (catalogs unavailable or no keys set), so I'm not guessing.")
     pairs = build_pairs(items, interests, query)
     themes = ranked_themes(interests, 5)
-    return {
+    plan = {
         "extractor": extractor,
         "threads": _threads(interests),
         "themes": themes,        # at most 5 for the conversation, best first, each with the quote it rests on
@@ -108,3 +109,5 @@ def build_session_plan(interests: list[Interest], items: list[ContentItem],
         "spoken": _spoken(interests, picks, pairs, themes),
         "ask": _ask(interests, themes),
     }
+    plan["response"] = build_response(plan, items, interests)   # the one shape Alexa, MCP and screens render from
+    return plan

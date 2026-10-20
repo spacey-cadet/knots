@@ -734,3 +734,83 @@ def test_run_eval_themes_command_writes_themes_run_and_leaves_pick_labels_alone(
     assert rows[0]["rank"] == "1" and rows[0]["supported"] == ""
     assert (tmp_path / "labels.csv").read_text() == "sentinel"                         # pick sheet untouched
     assert not (tmp_path / "results.json").exists()
+
+
+# ---------------------------------------------------------------- notes, contract, alexa
+from knots import alexa, contract, notes  # noqa: E402
+
+
+def film(**kw):
+    base = dict(title="Margin Call", content_type="movie", source_url="https://x/Margin-Call", topic="memecoins",
+                topic_overlap_score=0.8, matched_keywords=["memecoins"], rating=7.1, popularity=4200, year="2011",
+                abstract="A banker watches a crash unfold overnight. It is slow and talky.")
+    base.update(kw)
+    return ContentItem(**base)
+
+
+def test_note_uses_only_catalog_facts_and_the_persons_words():
+    it = film()
+    theme = {"theme": "fear of missing out", "evidence": "I keep seeing memecoin threads"}
+    n = notes.build_note(it, theme)
+    assert n.startswith("A banker watches a crash unfold overnight.")
+    assert "7.1/10 by 4,200 people" in n and "Well known" in n
+    assert "“I keep seeing memecoin threads”" in n
+    assert notes.check_numbers(n, notes.allowed_text(it, theme))
+    assert [f["source"] for f in notes.facts(it)] == ["catalog", "TMDB"]
+
+
+def test_note_never_invents_numbers_or_guesses_unknown_citations():
+    paper = item("A survey", "paper", abstract="We review the field.", is_survey=True, citations=None, status="preprint")
+    n = notes.build_note(paper)
+    assert "citation count not available" in n and not any(ch.isdigit() for ch in n)
+    assert all(f["label"] != "citations" for f in notes.facts(paper))
+    cited = item("Old paper", "paper", abstract="Classic.", citations=1520)
+    assert "Highly cited: 1,520 citations" in notes.build_note(cited)
+
+
+def test_rephrase_hook_is_rejected_when_it_adds_a_number():
+    it = film()
+    base = notes.build_note(it)
+    assert notes.build_note(it, rephrase=lambda t: t + " Won 12 Oscars.") == base
+    assert notes.build_note(it, rephrase=lambda t: "Reworded: " + t) == "Reworded: " + base
+    assert notes.build_note(it, rephrase=lambda t: 1 / 0) == base
+
+
+def test_contract_has_notes_themes_and_a_spoken_line_without_urls(monkeypatch):
+    monkeypatch.setattr(TH.judge, "assess", lambda text, themes: (list(themes), [], {}))
+    it = interest("memecoins", implicit_themes=["fear of missing out"],
+                  theme_evidence={"fear of missing out": "I keep seeing memecoin threads on my Reddit feed"})
+    TH.curate([it], SAID)
+    items = [film()]
+    plan = build_session_plan([it], items, extractor="heuristic", query=SAID)
+    r = plan["response"]
+    assert r["version"] == 1 and r["status"] in ("ok", "relaxed") and r["picks"]
+    p = r["picks"][0]
+    assert p["title"] == "Margin Call" and p["note"] and p["confidence"] in ("strong match", "possible match", "stretch")
+    assert r["themes"][0]["evidence"].startswith("I keep seeing") and "http" not in r["say"]
+    assert "Margin Call" in r["say"] and r["ask"]
+
+
+def test_contract_always_offers_a_pick_when_the_catalog_has_anything():
+    it = interest("memecoins")
+    items = [item("Barely related", "movie", "memecoins", score=0.05, abstract="Something else entirely.")]
+    r = contract.build_response({"picks": {"watch": [], "read": [], "explore": []}, "themes": [], "ask": "More?"}, items, [it])
+    assert r["status"] == "relaxed" and len(r["picks"]) == 1 and r["picks"][0]["confidence"] == "stretch"
+    assert "looser matches" in r["say"]
+
+
+def test_contract_is_honestly_empty_when_there_is_nothing_to_recommend():
+    r = contract.build_response({"picks": {"watch": [], "read": [], "explore": []}, "themes": [], "ask": "What next?"},
+                                [], [interest("memecoins")])
+    assert r["status"] == "empty" and r["picks"] == [] and "won't guess" in r["say"] and "What next?" in r["say"]
+
+
+def test_alexa_adapter_escapes_ssml_limits_length_and_keeps_the_session_open():
+    resp = {"say": "Try Tom & Jerry <3. " * 800, "ask": "Which one?", "picks": [{"title": "A&B", "year": "", "note": "n"}]}
+    out = alexa.to_alexa(resp)
+    ssml = out["response"]["outputSpeech"]["ssml"]
+    assert ssml.startswith("<speak>") and ssml.endswith("</speak>") and len(ssml) <= 8000
+    assert "&amp;" in ssml and "<3" not in ssml and "&lt;3" in ssml
+    assert out["response"]["shouldEndSession"] is False and out["response"]["reprompt"]
+    assert out["response"]["card"]["content"] == "A&B - n"
+    assert alexa.to_alexa(resp, end_session=True)["response"].get("reprompt") is None
