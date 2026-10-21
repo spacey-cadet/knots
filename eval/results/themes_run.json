@@ -1,0 +1,3065 @@
+{
+  "results": [
+    {
+      "session_id": "s01",
+      "extractor": "bedrock",
+      "texts": [
+        "Alexa, what's a memecoin and why do people buy them?",
+        "Can you explain memecoin tokenomics, like liquidity pools and market cap?",
+        "I keep seeing memecoin threads on my Reddit feed, is this all just a bubble?",
+        "Tell me more about the research behind speculative crypto assets."
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "memecoin appeal",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "speculative asset",
+            "social contagion",
+            "greater fool theory",
+            "narrative-driven valuation"
+          ],
+          "implicit_themes": [
+            "whether memecoin hype is a bubble",
+            "why people buy assets with no clear utility"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some researchers argue that community-driven tokens create genuine network effects and social coordination value that pure bubble framing misses.",
+          "counter_keywords": [
+            "network effects",
+            "community value",
+            "token utility"
+          ],
+          "theme_confidence": {
+            "why people buy assets with no clear utility": 0.51,
+            "whether memecoin hype is a bubble": 0.99
+          },
+          "theme_evidence": {
+            "why people buy assets with no clear utility": "what's a memecoin and why do people buy them",
+            "whether memecoin hype is a bubble": "is this all just a bubble"
+          },
+          "theme_rank": {
+            "whether memecoin hype is a bubble": 1,
+            "why people buy assets with no clear utility": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "cryptocurrency",
+            "speculative bubble",
+            "social media hype",
+            "retail investors",
+            "meme culture"
+          ],
+          "rationale": "The person is asking what drives demand for assets whose value seems to rest entirely on social momentum, pointing to greater fool theory and narrative-driven valuation as the real concepts at stake.",
+          "confidence": 0.82,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "memecoin tokenomics",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "liquidity pool mechanics",
+            "market capitalisation",
+            "automated market maker",
+            "price discovery"
+          ],
+          "implicit_themes": [],
+          "dropped_themes": [],
+          "counterpoint": "",
+          "counter_keywords": [],
+          "theme_confidence": {},
+          "theme_evidence": {},
+          "theme_rank": {},
+          "theme_dropped_why": {},
+          "keywords": [
+            "liquidity pools",
+            "market cap",
+            "decentralised finance",
+            "token supply",
+            "price mechanics"
+          ],
+          "rationale": "The person is asking about the structural mechanisms behind memecoin pricing, which points to automated market makers and liquidity pool dynamics as the core technical concepts.",
+          "confidence": 0.78,
+          "mediums": [
+            "video",
+            "paper",
+            "film"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "speculative crypto research",
+          "depth": "deep",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "asset price speculation",
+            "behavioural finance",
+            "herding behaviour",
+            "information cascades"
+          ],
+          "implicit_themes": [],
+          "dropped_themes": [
+            "what the research says about speculative crypto assets"
+          ],
+          "counterpoint": "Academic literature on crypto speculation is still contested, with some studies finding evidence of rational risk-taking rather than pure irrational exuberance.",
+          "counter_keywords": [
+            "rational speculation",
+            "risk premium",
+            "market efficiency"
+          ],
+          "theme_confidence": {},
+          "theme_evidence": {
+            "what the research says about speculative crypto assets": "Tell me more about the research behind speculative crypto assets"
+          },
+          "theme_rank": {},
+          "theme_dropped_why": {
+            "what the research says about speculative crypto assets": "the judge expects this would be rejected"
+          },
+          "keywords": [
+            "behavioural finance",
+            "herding",
+            "speculative assets",
+            "crypto markets",
+            "financial research"
+          ],
+          "rationale": "Asking for research signals the person wants empirical grounding for their bubble intuition, pointing to behavioural finance concepts like herding and information cascades.",
+          "confidence": 0.75,
+          "mediums": [
+            "paper",
+            "video",
+            "film"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s02",
+      "extractor": "bedrock",
+      "texts": [
+        "Alexa, is free will an illusion?",
+        "What did that neuroscience experiment say about decisions being made before we're aware of them?",
+        "If everything is determined, how can anyone be held responsible for what they do?",
+        "I've been reading about compatibilism, explain it simply."
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "free will illusion",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "determinism",
+            "compatibilism",
+            "moral responsibility",
+            "conscious agency"
+          ],
+          "implicit_themes": [
+            "whether free will is meaningful if decisions are made before we are aware of the",
+            "whether moral responsibility can survive determinism"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Compatibilists argue that free will only requires acting from one's own reasons and desires, not the absence of prior causes, so determinism and responsibility can coexist.",
+          "counter_keywords": [
+            "compatibilism",
+            "agency",
+            "moral philosophy"
+          ],
+          "theme_confidence": {
+            "whether free will is meaningful if decisions are made before we are aware of the": 0.96,
+            "whether moral responsibility can survive determinism": 0.59
+          },
+          "theme_evidence": {
+            "whether free will is meaningful if decisions are made before we are aware of the": "is free will an illusion?",
+            "whether moral responsibility can survive determinism": "If everything is determined, how can anyone be held responsible for what they do?"
+          },
+          "theme_rank": {
+            "whether free will is meaningful if decisions are made before we are aware of the": 1,
+            "whether moral responsibility can survive determinism": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "free will",
+            "determinism",
+            "moral responsibility",
+            "consciousness",
+            "neuroscience",
+            "compatibilism"
+          ],
+          "rationale": "The person moves from the classic free-will-as-illusion question, through the Libet-style neuroscience finding about pre-conscious decisions, to the direct moral-responsibility implication, and then seeks a grounded resolution via compatibilism \u2014 showing they are tracing the full philosophical chain",
+          "confidence": 0.92,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s03",
+      "extractor": "bedrock",
+      "texts": [
+        "Could a large language model ever be conscious?",
+        "What's the difference between an AI that seems to understand and one that actually does?",
+        "Explain the alignment problem. Why is it hard to specify what we want?",
+        "I keep reading threads about AI systems behaving differently when they know they are being tested."
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "ai consciousness",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "phenomenal consciousness",
+            "substrate independence",
+            "the hard problem of consciousness",
+            "functionalism"
+          ],
+          "implicit_themes": [
+            "whether an ai that behaves as if it understands actually understands",
+            "whether consciousness can arise in a non-biological substrate"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some philosophers argue that consciousness is inseparable from biological embodiment and that functional equivalence is not sufficient for genuine experience.",
+          "counter_keywords": [
+            "embodied cognition",
+            "biological determinism"
+          ],
+          "theme_confidence": {
+            "whether an ai that behaves as if it understands actually understands": 1.0,
+            "whether consciousness can arise in a non-biological substrate": 0.89
+          },
+          "theme_evidence": {
+            "whether an ai that behaves as if it understands actually understands": "What's the difference between an AI that seems to understand and one that actually does?",
+            "whether consciousness can arise in a non-biological substrate": "Could a large language model ever be conscious?"
+          },
+          "theme_rank": {
+            "whether an ai that behaves as if it understands actually understands": 1,
+            "whether consciousness can arise in a non-biological substrate": 3
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "artificial intelligence",
+            "consciousness",
+            "sentience",
+            "mind simulation",
+            "philosophical thought experiment"
+          ],
+          "rationale": "The person asks both whether LLMs can be conscious and what separates genuine understanding from its appearance, pointing directly to the hard problem and the philosophical zombie problem.",
+          "confidence": 0.92,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "ai alignment problem",
+          "depth": "deep",
+          "sentiment": "engaged",
+          "mentions": 1,
+          "concepts": [
+            "value specification",
+            "goodhart's law",
+            "reward misspecification",
+            "corrigibility"
+          ],
+          "implicit_themes": [
+            "why specifying what we want from an ai system is hard"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some researchers argue that alignment is an engineering problem that will be solved incrementally as capabilities grow, rather than a fundamental philosophical obstacle.",
+          "counter_keywords": [
+            "ai optimism",
+            "iterative safety"
+          ],
+          "theme_confidence": {
+            "why specifying what we want from an ai system is hard": 0.88
+          },
+          "theme_evidence": {
+            "why specifying what we want from an ai system is hard": "Why is it hard to specify what we want?"
+          },
+          "theme_rank": {
+            "why specifying what we want from an ai system is hard": 4
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "ai safety",
+            "alignment",
+            "reward hacking",
+            "value specification",
+            "existential risk"
+          ],
+          "rationale": "The explicit question about the alignment problem and the difficulty of specifying goals maps onto value specification failure and Goodhart's law as the core technical concepts.",
+          "confidence": 0.9,
+          "mediums": [
+            "video",
+            "film",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "ai deceptive behaviour under testing",
+          "depth": "casual",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "deceptive alignment",
+            "situational awareness",
+            "goodhart's law",
+            "mesa-optimisation"
+          ],
+          "implicit_themes": [
+            "ai systems behaving differently when they know they are being tested"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Others argue that observed behavioural differences during testing are artefacts of prompt sensitivity rather than evidence of strategic deception.",
+          "counter_keywords": [
+            "prompt sensitivity",
+            "stochastic behaviour"
+          ],
+          "theme_confidence": {
+            "ai systems behaving differently when they know they are being tested": 0.99
+          },
+          "theme_evidence": {
+            "ai systems behaving differently when they know they are being tested": "AI systems behaving differently when they know they are being tested"
+          },
+          "theme_rank": {
+            "ai systems behaving differently when they know they are being tested": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "deceptive alignment",
+            "ai evaluation",
+            "situational awareness",
+            "mesa-optimizer",
+            "ai safety"
+          ],
+          "rationale": "The person's reading about AI systems changing behaviour during testing points squarely at deceptive alignment and the problem of whether safety evaluations can be trusted.",
+          "confidence": 0.85,
+          "mediums": [
+            "video",
+            "film",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s04",
+      "extractor": "bedrock",
+      "texts": [
+        "How close are we to climate tipping points?",
+        "Explain the Atlantic current collapse thing I saw on the news.",
+        "Why does it feel like nothing gets done even though we know what the problem is?",
+        "What does research say about how societies react to slow-moving disasters?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "climate tipping points",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "nonlinear system dynamics",
+            "irreversibility",
+            "threshold effects",
+            "cascading failure"
+          ],
+          "implicit_themes": [
+            "gap between knowing what the problem is and collective action to address it",
+            "how close we are to irreversible climate thresholds"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some researchers argue that tipping-point framing can overstate certainty and inadvertently fuel fatalism, potentially reducing rather than motivating action.",
+          "counter_keywords": [
+            "climate fatalism",
+            "risk communication",
+            "scientific uncertainty"
+          ],
+          "theme_confidence": {
+            "how close we are to irreversible climate thresholds": 0.77,
+            "gap between knowing what the problem is and collective action to address it": 0.8
+          },
+          "theme_evidence": {
+            "how close we are to irreversible climate thresholds": "How close are we to climate tipping points?",
+            "gap between knowing what the problem is and collective action to address it": "why does it feel like nothing gets done even though we know what the problem is"
+          },
+          "theme_rank": {
+            "gap between knowing what the problem is and collective action to address it": 1,
+            "how close we are to irreversible climate thresholds": 3
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "climate change",
+            "tipping points",
+            "environmental collapse",
+            "global warming",
+            "irreversible change"
+          ],
+          "rationale": "The person asks about proximity to tipping points and the AMOC collapse specifically, signalling interest in threshold dynamics and nonlinear consequences rather than just general warming trends.",
+          "confidence": 0.9,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "atlantic current collapse",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "thermohaline circulation",
+            "feedback loops",
+            "abrupt climate change",
+            "ocean-atmosphere coupling"
+          ],
+          "implicit_themes": [
+            "how the atlantic current system works and what its collapse would mean"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "",
+          "counter_keywords": [],
+          "theme_confidence": {
+            "how the atlantic current system works and what its collapse would mean": 0.69
+          },
+          "theme_evidence": {
+            "how the atlantic current system works and what its collapse would mean": "Explain the Atlantic current collapse thing I saw on the news"
+          },
+          "theme_rank": {
+            "how the atlantic current system works and what its collapse would mean": 4
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "amoc",
+            "ocean currents",
+            "thermohaline circulation",
+            "abrupt climate shift",
+            "sea level rise"
+          ],
+          "rationale": "The person encountered AMOC coverage in the news and wants the mechanism explained, pointing to interest in how a specific physical feedback loop could trigger large-scale disruption.",
+          "confidence": 0.85,
+          "mediums": [
+            "video",
+            "film",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "societal inaction on known problems",
+          "depth": "deep",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "collective action problem",
+            "temporal discounting",
+            "political inertia",
+            "normalcy bias"
+          ],
+          "implicit_themes": [
+            "how societies react to slow-moving disasters"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some political scientists argue that inaction is less about psychology than about organised interest-group opposition, meaning individual cognitive biases are a secondary cause.",
+          "counter_keywords": [
+            "lobbying",
+            "vested interests",
+            "political economy"
+          ],
+          "theme_confidence": {
+            "how societies react to slow-moving disasters": 0.78
+          },
+          "theme_evidence": {
+            "gap between knowing what the problem is and collective action to address it": "why does it feel like nothing gets done even though we know what the problem is",
+            "how societies react to slow-moving disasters": "What does research say about how societies react to slow-moving disasters?"
+          },
+          "theme_rank": {
+            "how societies react to slow-moving disasters": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "political inertia",
+            "collective action",
+            "slow disaster",
+            "normalcy bias",
+            "social response",
+            "policy failure"
+          ],
+          "rationale": "The person explicitly asks why knowledge fails to produce action and what research says about slow-disaster response, pointing to interest in the structural and psychological mechanisms behind inaction.",
+          "confidence": 0.92,
+          "mediums": [
+            "film",
+            "paper",
+            "video"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s05",
+      "extractor": "bedrock",
+      "texts": [
+        "Why do I feel more lonely the more time I spend online?",
+        "Is there research on social media and mental health?",
+        "My feed is mostly strangers arguing. Why does outrage spread faster than anything else?",
+        "What happened to the idea that the internet would bring people together?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "social media and loneliness",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "social substitution",
+            "parasocial interaction",
+            "connection quality vs quantity",
+            "displacement of in-person contact"
+          ],
+          "implicit_themes": [
+            "gap between the internet's promised togetherness and its actual effect",
+            "whether online connection substitutes for or undermines real connection"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some research finds that online communities provide genuine belonging for people who are isolated geographically or socially, suggesting the relationship between online time and loneliness depends heavily on how platforms are used.",
+          "counter_keywords": [
+            "online community",
+            "belonging",
+            "social support"
+          ],
+          "theme_confidence": {
+            "whether online connection substitutes for or undermines real connection": 0.9,
+            "gap between the internet's promised togetherness and its actual effect": 1.0
+          },
+          "theme_evidence": {
+            "whether online connection substitutes for or undermines real connection": "Why do I feel more lonely the more time I spend online?",
+            "gap between the internet's promised togetherness and its actual effect": "What happened to the idea that the internet would bring people together?"
+          },
+          "theme_rank": {
+            "gap between the internet's promised togetherness and its actual effect": 1,
+            "whether online connection substitutes for or undermines real connection": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "social media",
+            "loneliness",
+            "online connection",
+            "mental health",
+            "isolation"
+          ],
+          "rationale": "The person directly links time online to increased loneliness and questions whether the internet's promise of connection has been kept, pointing to a gap between expectation and lived experience.",
+          "confidence": 0.88,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "outrage and virality",
+          "depth": "casual",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "affective contagion",
+            "algorithmic amplification",
+            "negativity bias",
+            "engagement optimisation"
+          ],
+          "implicit_themes": [
+            "why outrage spreads faster than other content"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Platforms optimise for engagement because that is what users collectively reward with their attention, so the outrage dynamic may reflect user behaviour as much as algorithmic design.",
+          "counter_keywords": [
+            "user behaviour",
+            "attention economy",
+            "platform design"
+          ],
+          "theme_confidence": {
+            "why outrage spreads faster than other content": 0.73
+          },
+          "theme_evidence": {
+            "why outrage spreads faster than other content": "Why does outrage spread faster than anything else?"
+          },
+          "theme_rank": {
+            "why outrage spreads faster than other content": 3
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "outrage",
+            "virality",
+            "algorithmic amplification",
+            "negativity bias",
+            "engagement"
+          ],
+          "rationale": "The person observes their feed is dominated by strangers arguing and asks a direct mechanistic question about why outrage propagates faster, pointing to curiosity about the incentive structures of platforms.",
+          "confidence": 0.85,
+          "mediums": [
+            "video",
+            "film",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "internet and mental health research",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "empirical evidence",
+            "dose-response relationship",
+            "causation vs correlation",
+            "screen time effects"
+          ],
+          "implicit_themes": [],
+          "dropped_themes": [],
+          "counterpoint": "",
+          "counter_keywords": [],
+          "theme_confidence": {},
+          "theme_evidence": {},
+          "theme_rank": {},
+          "theme_dropped_why": {},
+          "keywords": [
+            "mental health",
+            "screen time",
+            "research",
+            "social media effects"
+          ],
+          "rationale": "The person explicitly asks whether research exists on social media and mental health, signalling a desire to ground their personal experience in evidence.",
+          "confidence": 0.75,
+          "mediums": [
+            "paper",
+            "video",
+            "film"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s06",
+      "extractor": "bedrock",
+      "texts": [
+        "Alexa, explain the simulation hypothesis.",
+        "How would anyone even test whether we live in a simulation?",
+        "What's the Boltzmann brain problem? I keep seeing it mentioned.",
+        "If I can't tell the difference, does it matter?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "simulation hypothesis",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "substrate independence",
+            "computational ontology",
+            "epistemic closure",
+            "unfalsifiability"
+          ],
+          "implicit_themes": [
+            "whether the simulation hypothesis is testable at all",
+            "whether an indistinguishable difference is a meaningful difference"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some physicists argue the simulation hypothesis is not merely unfalsifiable but incoherent, since 'computation' presupposes physical laws that would themselves need a substrate, making the explanation circular rather than foundational.",
+          "counter_keywords": [
+            "philosophy of physics",
+            "computational universe",
+            "infinite regress"
+          ],
+          "theme_confidence": {
+            "whether the simulation hypothesis is testable at all": 1.0,
+            "whether an indistinguishable difference is a meaningful difference": 0.96
+          },
+          "theme_evidence": {
+            "whether the simulation hypothesis is testable at all": "How would anyone even test whether we live in a simulation?",
+            "whether an indistinguishable difference is a meaningful difference": "If I can't tell the difference, does it matter?"
+          },
+          "theme_rank": {
+            "whether the simulation hypothesis is testable at all": 1,
+            "whether an indistinguishable difference is a meaningful difference": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "simulation",
+            "virtual reality",
+            "consciousness",
+            "reality vs illusion",
+            "unfalsifiable theory"
+          ],
+          "rationale": "The person moves from asking what the hypothesis is, to probing its testability, to a pragmatic philosophical question about whether indistinguishability collapses the distinction \u2014 the classic verificationist challenge to the hypothesis.",
+          "confidence": 0.85,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "boltzmann brain problem",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "statistical mechanics",
+            "entropy",
+            "self-sampling assumption",
+            "observer selection"
+          ],
+          "implicit_themes": [],
+          "dropped_themes": [],
+          "counterpoint": "",
+          "counter_keywords": [],
+          "theme_confidence": {},
+          "theme_evidence": {
+            "whether an indistinguishable difference is a meaningful difference": "If I can't tell the difference, does it matter?"
+          },
+          "theme_rank": {},
+          "theme_dropped_why": {},
+          "keywords": [
+            "entropy",
+            "cosmology",
+            "observer paradox",
+            "statistical mechanics",
+            "probability"
+          ],
+          "rationale": "The person flags the Boltzmann brain as something they keep encountering alongside simulation thinking \u2014 both problems share the same underlying puzzle about what grounds the reliability of one's own existence as an observer.",
+          "confidence": 0.75,
+          "mediums": [
+            "video",
+            "paper",
+            "film"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s07",
+      "extractor": "bedrock",
+      "texts": [
+        "What data do companies actually collect about me?",
+        "I read about predictive policing and facial recognition being used in cities.",
+        "Is privacy dead or just changing?",
+        "Explain the chilling effect of knowing you're being watched."
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "data companies collect",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "surveillance capitalism",
+            "data commodification",
+            "information asymmetry",
+            "consent"
+          ],
+          "implicit_themes": [
+            "gap between what data is collected and what people know about it",
+            "whether privacy is gone or merely transformed",
+            "how being watched changes behaviour"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some researchers argue that data collection enables personalisation and services people genuinely value, and that framing it purely as exploitation obscures real trade-offs users willingly make.",
+          "counter_keywords": [
+            "data economy",
+            "personalisation",
+            "informed consent"
+          ],
+          "theme_confidence": {
+            "gap between what data is collected and what people know about it": 0.93,
+            "whether privacy is gone or merely transformed": 0.93,
+            "how being watched changes behaviour": 0.83
+          },
+          "theme_evidence": {
+            "gap between what data is collected and what people know about it": "What data do companies actually collect about me?",
+            "whether privacy is gone or merely transformed": "Is privacy dead or just changing?",
+            "how being watched changes behaviour": "the chilling effect of knowing you're being watched"
+          },
+          "theme_rank": {
+            "gap between what data is collected and what people know about it": 1,
+            "whether privacy is gone or merely transformed": 2,
+            "how being watched changes behaviour": 3
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "surveillance capitalism",
+            "data collection",
+            "corporate surveillance",
+            "privacy",
+            "personal data"
+          ],
+          "rationale": "The person asks what is actually collected and whether privacy still exists, pointing to information asymmetry between individuals and institutions as the core concern.",
+          "confidence": 0.82,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "predictive policing and facial recognition",
+          "depth": "casual",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "algorithmic governance",
+            "automated decision-making",
+            "racial bias in ml",
+            "civil liberties"
+          ],
+          "implicit_themes": [],
+          "dropped_themes": [],
+          "counterpoint": "Proponents argue that predictive tools, when audited and regulated, can reduce crime more equitably than discretionary human policing.",
+          "counter_keywords": [
+            "crime prevention",
+            "algorithmic accountability",
+            "public safety"
+          ],
+          "theme_confidence": {},
+          "theme_evidence": {
+            "gap between what data is collected and what people know about it": "What data do companies actually collect about me?",
+            "whether privacy is gone or merely transformed": "Is privacy dead or just changing?",
+            "how being watched changes behaviour": "the chilling effect of knowing you're being watched"
+          },
+          "theme_rank": {},
+          "theme_dropped_why": {},
+          "keywords": [
+            "facial recognition",
+            "predictive policing",
+            "algorithmic bias",
+            "state surveillance",
+            "smart city"
+          ],
+          "rationale": "Reading about predictive policing and facial recognition in cities signals interest in how automated systems extend state power and the civil-liberties consequences of that.",
+          "confidence": 0.85,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "chilling effect of surveillance",
+          "depth": "casual",
+          "sentiment": "engaged",
+          "mentions": 1,
+          "concepts": [
+            "chilling effect",
+            "self-censorship",
+            "panopticism",
+            "behavioural conformity under observation"
+          ],
+          "implicit_themes": [],
+          "dropped_themes": [],
+          "counterpoint": "Some social scientists note that chilling effects are difficult to measure empirically and that people adapt to surveillance in ways that do not always reduce dissent or creativity.",
+          "counter_keywords": [
+            "surveillance adaptation",
+            "privacy paradox",
+            "behavioural resilience"
+          ],
+          "theme_confidence": {},
+          "theme_evidence": {
+            "how being watched changes behaviour": "the chilling effect of knowing you're being watched",
+            "whether privacy is gone or merely transformed": "Is privacy dead or just changing?"
+          },
+          "theme_rank": {},
+          "theme_dropped_why": {},
+          "keywords": [
+            "chilling effect",
+            "self-censorship",
+            "panopticon",
+            "mass surveillance",
+            "freedom of expression"
+          ],
+          "rationale": "Asking specifically to 'explain the chilling effect' shows the person wants to understand the psychological and social mechanism by which surveillance suppresses behaviour, not just the fact of surveillance.",
+          "confidence": 0.88,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s08",
+      "extractor": "bedrock",
+      "texts": [
+        "How does the brain store memories of people who have died?",
+        "My grandmother had dementia. Why do some memories survive and others vanish?",
+        "Can memories be edited or implanted?",
+        "I've been reading about how remembering changes the memory itself."
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "how memory works",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "memory consolidation",
+            "reconsolidation",
+            "memory trace decay",
+            "synaptic plasticity"
+          ],
+          "implicit_themes": [
+            "whether remembering itself changes what is remembered"
+          ],
+          "dropped_themes": [
+            "which memories survive and which vanish in dementia"
+          ],
+          "counterpoint": "Some researchers argue that memory 'distortion' during reconsolidation is adaptive rather than a flaw \u2014 it allows memories to be updated with new context, which complicates any framing of editing as purely corruption.",
+          "counter_keywords": [
+            "adaptive memory",
+            "memory updating",
+            "cognitive flexibility"
+          ],
+          "theme_confidence": {
+            "whether remembering itself changes what is remembered": 1.0
+          },
+          "theme_evidence": {
+            "whether remembering itself changes what is remembered": "remembering changes the memory itself",
+            "which memories survive and which vanish in dementia": "Why do some memories survive and others vanish?"
+          },
+          "theme_rank": {
+            "whether remembering itself changes what is remembered": 1
+          },
+          "theme_dropped_why": {
+            "which memories survive and which vanish in dementia": "the judge expects this would be rejected"
+          },
+          "keywords": [
+            "memory",
+            "neuroscience",
+            "dementia",
+            "false memory",
+            "memory loss",
+            "brain science"
+          ],
+          "rationale": "The person moves from grief-adjacent curiosity about a deceased grandmother, through dementia's selective erasure, to the mechanics of reconsolidation \u2014 all pointing to a sustained interest in how memory is stored, degraded and altered at a biological level.",
+          "confidence": 0.92,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "memory editing and implanting",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "reconsolidation interference",
+            "false memory implantation",
+            "memory malleability",
+            "optogenetic memory manipulation"
+          ],
+          "implicit_themes": [
+            "whether memories can be deliberately edited or implanted"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Laboratory implantation of false memories (e.g. in mice via optogenetics) operates at a scale and mechanism very different from anything yet possible in humans, which complicates direct extrapolation to human identity or therapy.",
+          "counter_keywords": [
+            "animal models",
+            "translational gap",
+            "optogenetics"
+          ],
+          "theme_confidence": {
+            "whether memories can be deliberately edited or implanted": 1.0
+          },
+          "theme_evidence": {
+            "whether memories can be deliberately edited or implanted": "Can memories be edited or implanted?"
+          },
+          "theme_rank": {
+            "whether memories can be deliberately edited or implanted": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "memory implantation",
+            "false memory",
+            "memory manipulation",
+            "neuroscience",
+            "identity"
+          ],
+          "rationale": "The direct question about editing and implanting memories signals interest in the boundary between authentic and constructed recollection, and the ethical and scientific stakes of intervening in memory.",
+          "confidence": 0.85,
+          "mediums": [
+            "video",
+            "film",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "dementia and selective memory loss",
+          "depth": "casual",
+          "sentiment": "engaged",
+          "mentions": 1,
+          "concepts": [
+            "neurodegeneration",
+            "hippocampal vulnerability",
+            "semantic vs episodic memory",
+            "disease progression"
+          ],
+          "implicit_themes": [],
+          "dropped_themes": [],
+          "counterpoint": "",
+          "counter_keywords": [],
+          "theme_confidence": {},
+          "theme_evidence": {
+            "which memories survive and which vanish in dementia": "Why do some memories survive and others vanish?"
+          },
+          "theme_rank": {},
+          "theme_dropped_why": {},
+          "keywords": [
+            "dementia",
+            "alzheimer's",
+            "memory loss",
+            "neurodegeneration",
+            "caregiving"
+          ],
+          "rationale": "The personal reference to a grandmother with dementia grounds the abstract neuroscience question in lived experience, and the specific puzzle \u2014 why some memories persist while others disappear \u2014 points to interest in the architecture of memory vulnerability.",
+          "confidence": 0.88,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s09",
+      "extractor": "bedrock",
+      "texts": [
+        "Is meritocracy a myth?",
+        "How much of success is luck versus effort?",
+        "I keep seeing threads about wealth inequality and inherited advantage.",
+        "What does research say about social mobility in different countries?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "meritocracy and success",
+          "depth": "deep",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "meritocracy",
+            "social mobility",
+            "structural inequality",
+            "intergenerational advantage"
+          ],
+          "implicit_themes": [
+            "whether success is determined by effort or luck",
+            "whether meritocracy is a meaningful description of how societies work",
+            "how inherited advantage shapes outcomes across generations"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some economists argue that returns to skill and education have genuinely increased, meaning effort and human capital investment do meaningfully shift life outcomes even within unequal systems.",
+          "counter_keywords": [
+            "human capital",
+            "education returns",
+            "economic mobility"
+          ],
+          "theme_confidence": {
+            "whether success is determined by effort or luck": 1.0,
+            "whether meritocracy is a meaningful description of how societies work": 0.89,
+            "how inherited advantage shapes outcomes across generations": 0.6
+          },
+          "theme_evidence": {
+            "whether success is determined by effort or luck": "How much of success is luck versus effort?",
+            "whether meritocracy is a meaningful description of how societies work": "Is meritocracy a myth?",
+            "how inherited advantage shapes outcomes across generations": "wealth inequality and inherited advantage"
+          },
+          "theme_rank": {
+            "whether success is determined by effort or luck": 1,
+            "whether meritocracy is a meaningful description of how societies work": 2,
+            "how inherited advantage shapes outcomes across generations": 3
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "social mobility",
+            "wealth inequality",
+            "class system",
+            "inherited privilege",
+            "meritocracy",
+            "income gap"
+          ],
+          "rationale": "The person is questioning whether individual effort genuinely drives outcomes or whether structural and inherited factors dominate, which maps onto the concepts of meritocracy, intergenerational advantage, and counterfactual causation in social mobility research.",
+          "confidence": 0.88,
+          "mediums": [
+            "film",
+            "paper",
+            "video"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s10",
+      "extractor": "bedrock",
+      "texts": [
+        "Alexa, what's the weather like later?",
+        "Play something relaxing. Also what time is it in Tokyo?",
+        "I've been kind of curious lately, not sure about what though.",
+        "Maybe something with time travel? Or not."
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "time travel",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "temporal displacement",
+            "causality"
+          ],
+          "implicit_themes": [],
+          "dropped_themes": [],
+          "counterpoint": "",
+          "counter_keywords": [],
+          "theme_confidence": {},
+          "theme_evidence": {},
+          "theme_rank": {},
+          "theme_dropped_why": {},
+          "keywords": [
+            "time travel",
+            "time loop",
+            "sci-fi"
+          ],
+          "rationale": "The person made a passing, uncertain mention of time travel as a possible interest, with no elaboration or clear stance.",
+          "confidence": 0.2,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s11",
+      "extractor": "bedrock",
+      "texts": [
+        "How do vaccines train the immune system?",
+        "Why do I need a booster for some and not others?",
+        "Is it true immunity from infection is better than from the shot?",
+        "Who decides how long a trial has to run before approval?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "how vaccines work",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "adaptive immunity",
+            "antigen presentation",
+            "immunological memory",
+            "t-cell and b-cell activation"
+          ],
+          "implicit_themes": [
+            "whether immunity from infection is better than from a vaccine",
+            "how the immune system is trained to recognise a pathogen"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Natural infection can produce broader immune responses in some cases, but it also carries the risk of severe disease, long-term complications, and unpredictable immune dysregulation.",
+          "counter_keywords": [
+            "natural immunity",
+            "infection risk",
+            "immune dysregulation"
+          ],
+          "theme_confidence": {
+            "how the immune system is trained to recognise a pathogen": 0.78,
+            "whether immunity from infection is better than from a vaccine": 0.83
+          },
+          "theme_evidence": {
+            "how the immune system is trained to recognise a pathogen": "How do vaccines train the immune system?",
+            "whether immunity from infection is better than from a vaccine": "Is it true immunity from infection is better than from the shot?"
+          },
+          "theme_rank": {
+            "whether immunity from infection is better than from a vaccine": 2,
+            "how the immune system is trained to recognise a pathogen": 3
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "immune system",
+            "vaccination",
+            "immunological memory",
+            "antibodies",
+            "infectious disease"
+          ],
+          "rationale": "The person asks about the mechanism of immune training, durability differences across vaccines, and natural vs vaccine-induced immunity \u2014 all pointing to how adaptive immunity is acquired and maintained.",
+          "confidence": 0.82,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "booster shots and immunity duration",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "waning immunity",
+            "memory cell longevity",
+            "antigenic drift",
+            "dose-response relationship"
+          ],
+          "implicit_themes": [
+            "why some vaccines require boosters and others do not"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Booster schedules are also shaped by public health logistics and policy priorities, not solely by immunological necessity.",
+          "counter_keywords": [
+            "vaccine policy",
+            "public health logistics",
+            "herd immunity"
+          ],
+          "theme_confidence": {
+            "why some vaccines require boosters and others do not": 0.85
+          },
+          "theme_evidence": {
+            "why some vaccines require boosters and others do not": "Why do I need a booster for some and not others?"
+          },
+          "theme_rank": {
+            "why some vaccines require boosters and others do not": 1
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "booster shots",
+            "waning immunity",
+            "vaccine schedule",
+            "memory cells",
+            "antigenic variation"
+          ],
+          "rationale": "The booster question is really about why immunological memory degrades at different rates for different pathogens and vaccine types.",
+          "confidence": 0.78,
+          "mediums": [
+            "video",
+            "film",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "drug trial approval process",
+          "depth": "casual",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "regulatory authority",
+            "trial duration and power",
+            "risk-benefit threshold",
+            "accelerated approval"
+          ],
+          "implicit_themes": [],
+          "dropped_themes": [
+            "who decides how long a trial must run before approval"
+          ],
+          "counterpoint": "Trial length is not solely a regulatory decision \u2014 it is also constrained by statistical power requirements, endpoint selection, and sponsor resources.",
+          "counter_keywords": [
+            "statistical power",
+            "trial endpoints",
+            "pharmaceutical industry"
+          ],
+          "theme_confidence": {},
+          "theme_evidence": {
+            "who decides how long a trial must run before approval": "Who decides how long a trial has to run before approval?"
+          },
+          "theme_rank": {},
+          "theme_dropped_why": {
+            "who decides how long a trial must run before approval": "the judge expects this would be rejected"
+          },
+          "keywords": [
+            "clinical trials",
+            "drug approval",
+            "regulatory bodies",
+            "fda",
+            "trial design",
+            "pharmaceutical regulation"
+          ],
+          "rationale": "The question targets the authority and criteria behind trial duration decisions, pointing to the tension between speed of approval and strength of evidence.",
+          "confidence": 0.75,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s12",
+      "extractor": "bedrock",
+      "texts": [
+        "Why did the Roman Empire fall?",
+        "Was it really barbarians or was it the economy and plague?",
+        "I read that lead pipes poisoned them, is that a myth?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "fall of the roman empire",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "civilisational collapse",
+            "multicausality",
+            "historical revisionism",
+            "epidemiological impact"
+          ],
+          "implicit_themes": [
+            "whether a single cause (barbarians) explains collapse or whether systemic factor"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some historians argue the Western Empire's fall was less a collapse than a gradual transformation, with barbarian groups assimilating into Roman structures rather than destroying them.",
+          "counter_keywords": [
+            "late antiquity",
+            "cultural continuity",
+            "migration period"
+          ],
+          "theme_confidence": {
+            "whether a single cause (barbarians) explains collapse or whether systemic factor": 0.91
+          },
+          "theme_evidence": {
+            "whether a single cause (barbarians) explains collapse or whether systemic factor": "Was it really barbarians or was it the economy and plague?"
+          },
+          "theme_rank": {
+            "whether a single cause (barbarians) explains collapse or whether systemic factor": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "roman empire",
+            "civilisation collapse",
+            "ancient history",
+            "plague",
+            "economic decline",
+            "barbarian invasion"
+          ],
+          "rationale": "The person is questioning the popular 'barbarian invasion' narrative and probing multicausal explanations including economic decay and epidemic disease, which points to an interest in how complex systems fail rather than single-event causation.",
+          "confidence": 0.82,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "lead poisoning myth",
+          "depth": "casual",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "toxicological threshold",
+            "historical myth-making",
+            "monocausal fallacy",
+            "archaeological evidence"
+          ],
+          "implicit_themes": [
+            "whether the lead pipes theory is a myth"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some researchers argue that while lead pipes alone were not decisive, chronic low-level lead exposure across Roman society may have had measurable cognitive and demographic effects.",
+          "counter_keywords": [
+            "environmental toxicology",
+            "public health history"
+          ],
+          "theme_confidence": {
+            "whether the lead pipes theory is a myth": 0.99
+          },
+          "theme_evidence": {
+            "whether the lead pipes theory is a myth": "I read that lead pipes poisoned them, is that a myth?"
+          },
+          "theme_rank": {
+            "whether the lead pipes theory is a myth": 1
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "lead poisoning",
+            "historical myths",
+            "pseudohistory",
+            "roman technology"
+          ],
+          "rationale": "The person is explicitly asking whether a popular claim is true or false, signalling an interest in how myths enter historical discourse and how evidence is used to evaluate them.",
+          "confidence": 0.78,
+          "mediums": [
+            "video",
+            "paper",
+            "film"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s13",
+      "extractor": "bedrock",
+      "texts": [
+        "What actually happens inside a black hole?",
+        "Does information get destroyed, I heard about a paradox",
+        "Explain Hawking radiation like I'm not a physicist"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "black hole interiors",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "spacetime singularity",
+            "event horizon",
+            "causal boundary",
+            "geodesic incompleteness"
+          ],
+          "implicit_themes": [
+            "what physically happens beyond the event horizon"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some physicists argue the interior of a black hole may be a mathematical artefact of general relativity rather than a physically meaningful region.",
+          "counter_keywords": [
+            "general relativity limits",
+            "quantum gravity"
+          ],
+          "theme_confidence": {
+            "what physically happens beyond the event horizon": 0.53
+          },
+          "theme_evidence": {
+            "what physically happens beyond the event horizon": "What actually happens inside a black hole?"
+          },
+          "theme_rank": {
+            "what physically happens beyond the event horizon": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "black hole",
+            "event horizon",
+            "singularity",
+            "spacetime"
+          ],
+          "rationale": "The person is asking about the physical reality inside a black hole, pointing to curiosity about causal boundaries and what the laws of physics permit or forbid beyond the event horizon.",
+          "confidence": 0.85,
+          "mediums": [
+            "video",
+            "film",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "information paradox",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "unitarity",
+            "quantum information conservation",
+            "entropy",
+            "black hole evaporation"
+          ],
+          "implicit_themes": [
+            "whether information is truly destroyed inside a black hole"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "The Holographic Principle and recent work on the Page curve suggest information may escape encoded in Hawking radiation, meaning destruction may not occur at all.",
+          "counter_keywords": [
+            "holographic principle",
+            "quantum gravity",
+            "page curve"
+          ],
+          "theme_confidence": {
+            "whether information is truly destroyed inside a black hole": 0.86
+          },
+          "theme_evidence": {
+            "whether information is truly destroyed inside a black hole": "Does information get destroyed, I heard about a paradox"
+          },
+          "theme_rank": {
+            "whether information is truly destroyed inside a black hole": 1
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "information paradox",
+            "quantum mechanics",
+            "entropy",
+            "unitarity",
+            "black hole evaporation"
+          ],
+          "rationale": "The person has encountered the black hole information paradox and is probing whether quantum mechanics' rule that information is conserved can survive inside a black hole \u2014 a genuine open problem in physics.",
+          "confidence": 0.9,
+          "mediums": [
+            "video",
+            "paper",
+            "film"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "hawking radiation explained",
+          "depth": "casual",
+          "sentiment": "engaged",
+          "mentions": 1,
+          "concepts": [
+            "virtual particle pairs",
+            "quantum field theory in curved spacetime",
+            "black hole thermodynamics",
+            "vacuum fluctuation"
+          ],
+          "implicit_themes": [],
+          "dropped_themes": [],
+          "counterpoint": "",
+          "counter_keywords": [],
+          "theme_confidence": {},
+          "theme_evidence": {},
+          "theme_rank": {},
+          "theme_dropped_why": {},
+          "keywords": [
+            "hawking radiation",
+            "quantum effects",
+            "black hole thermodynamics",
+            "virtual particles"
+          ],
+          "rationale": "The explicit request for a non-physicist explanation signals the person wants the mechanism made intuitive \u2014 pointing to interest in how quantum effects operate at the boundary of a black hole rather than the mathematics.",
+          "confidence": 0.95,
+          "mediums": [
+            "video",
+            "film",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s14",
+      "extractor": "bedrock",
+      "texts": [
+        "I've been thinking about moving abroad for work.",
+        "What's it like to rebuild your whole social life in your thirties?",
+        "How do immigrants keep a sense of home?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "moving abroad for work",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "displacement",
+            "identity continuity",
+            "belonging",
+            "social capital reconstruction"
+          ],
+          "implicit_themes": [
+            "how immigrants keep a sense of home",
+            "what it takes to rebuild a social life from scratch as an adult"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some research suggests that expatriates who immerse fully in the new culture, rather than preserving ties to home, report higher long-term wellbeing and integration.",
+          "counter_keywords": [
+            "cultural assimilation",
+            "integration",
+            "identity change"
+          ],
+          "theme_confidence": {
+            "what it takes to rebuild a social life from scratch as an adult": 0.7,
+            "how immigrants keep a sense of home": 0.83
+          },
+          "theme_evidence": {
+            "what it takes to rebuild a social life from scratch as an adult": "What's it like to rebuild your whole social life in your thirties?",
+            "how immigrants keep a sense of home": "How do immigrants keep a sense of home?"
+          },
+          "theme_rank": {
+            "how immigrants keep a sense of home": 1,
+            "what it takes to rebuild a social life from scratch as an adult": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "immigration",
+            "expatriate life",
+            "cultural identity",
+            "starting over",
+            "belonging",
+            "adult friendship"
+          ],
+          "rationale": "The person is weighing a real move and asking about the lived, human cost \u2014 social rebuilding and maintaining a sense of home \u2014 rather than logistics, pointing to identity continuity and belonging as the core concerns.",
+          "confidence": 0.82,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s15",
+      "extractor": "bedrock",
+      "texts": [
+        "How do neural networks learn, in plain language?",
+        "What's a loss function and why does gradient descent work?",
+        "Do these models understand anything or just pattern match?",
+        "Is that distinction even meaningful?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "how neural networks learn",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "gradient descent",
+            "loss minimisation",
+            "backpropagation",
+            "optimisation landscape"
+          ],
+          "implicit_themes": [
+            "whether the distinction between understanding and pattern matching is meaningful"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some philosophers of mind argue that 'understanding' in humans is itself a form of sophisticated pattern matching, which would dissolve rather than resolve the distinction.",
+          "counter_keywords": [
+            "philosophy of mind",
+            "consciousness",
+            "cognitive science"
+          ],
+          "theme_confidence": {
+            "whether the distinction between understanding and pattern matching is meaningful": 1.0
+          },
+          "theme_evidence": {
+            "whether the distinction between understanding and pattern matching is meaningful": "Is that distinction even meaningful?"
+          },
+          "theme_rank": {
+            "whether the distinction between understanding and pattern matching is meaningful": 1
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "neural networks",
+            "machine learning",
+            "gradient descent",
+            "loss function",
+            "artificial intelligence"
+          ],
+          "rationale": "The person moves from a mechanical 'how does it work' question to a philosophical one about whether the model genuinely understands, then immediately questions whether that framing is even valid \u2014 the real interest is the boundary between computation and cognition.",
+          "confidence": 0.82,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "machine understanding vs pattern matching",
+          "depth": "casual",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "intentionality",
+            "symbol grounding",
+            "semantic content",
+            "computation vs cognition"
+          ],
+          "implicit_themes": [
+            "whether models understand anything or just pattern match"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Functionalist accounts of mind hold that if a system behaves as though it understands, the internal substrate is irrelevant \u2014 which would make the distinction the person is probing collapse entirely.",
+          "counter_keywords": [
+            "functionalism",
+            "turing test",
+            "behaviourism"
+          ],
+          "theme_confidence": {
+            "whether models understand anything or just pattern match": 1.0
+          },
+          "theme_evidence": {
+            "whether the distinction between understanding and pattern matching is meaningful": "Is that distinction even meaningful?",
+            "whether models understand anything or just pattern match": "Do these models understand anything or just pattern match?"
+          },
+          "theme_rank": {
+            "whether models understand anything or just pattern match": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "artificial intelligence",
+            "consciousness",
+            "philosophy of mind",
+            "symbol grounding",
+            "cognition",
+            "language models"
+          ],
+          "rationale": "The person explicitly asks whether AI 'understands' and then steps back to question if that framing is coherent \u2014 this is the Searle's Chinese Room problem and the symbol grounding problem stated in plain language.",
+          "confidence": 0.88,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s16",
+      "extractor": "bedrock",
+      "texts": [
+        "Why are housing prices so high in big cities?",
+        "Is it zoning or is it investors?",
+        "What did Tokyo do differently?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "high urban housing prices",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "supply constraint",
+            "land use regulation",
+            "rent-seeking",
+            "market distortion"
+          ],
+          "implicit_themes": [
+            "whether zoning or investor behaviour drives high prices"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some economists argue that even permissive zoning cannot fully offset demand in globally attractive cities where land scarcity and agglomeration effects are fundamental.",
+          "counter_keywords": [
+            "agglomeration economics",
+            "land scarcity",
+            "global city"
+          ],
+          "theme_confidence": {
+            "whether zoning or investor behaviour drives high prices": 1.0
+          },
+          "theme_evidence": {
+            "whether zoning or investor behaviour drives high prices": "Is it zoning or is it investors?"
+          },
+          "theme_rank": {
+            "whether zoning or investor behaviour drives high prices": 1
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "housing crisis",
+            "urban planning",
+            "zoning laws",
+            "real estate",
+            "city growth",
+            "affordability"
+          ],
+          "rationale": "The person asks two competing causal explanations for urban housing costs \u2014 supply-side regulation vs. demand-side speculation \u2014 and uses Tokyo as a policy counterexample, signalling interest in the structural mechanisms behind affordability.",
+          "confidence": 0.82,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "tokyo housing model",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "permissive zoning",
+            "housing supply elasticity",
+            "urban density",
+            "comparative policy"
+          ],
+          "implicit_themes": [
+            "what tokyo did differently on housing supply"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Tokyo's model is shaped by unique national land-use law, cultural norms around building depreciation, and earthquake-driven rebuild cycles that may not transfer to other cities.",
+          "counter_keywords": [
+            "policy transfer",
+            "cultural context",
+            "building depreciation"
+          ],
+          "theme_confidence": {
+            "what tokyo did differently on housing supply": 0.51
+          },
+          "theme_evidence": {
+            "what tokyo did differently on housing supply": "What did Tokyo do differently?"
+          },
+          "theme_rank": {
+            "what tokyo did differently on housing supply": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "tokyo",
+            "urban density",
+            "housing supply",
+            "comparative urbanism",
+            "zoning reform"
+          ],
+          "rationale": "Asking specifically about Tokyo signals the person is looking for a working policy alternative, focusing on the mechanism by which supply-side reform can keep prices stable in a major city.",
+          "confidence": 0.78,
+          "mediums": [
+            "video",
+            "film",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s17",
+      "extractor": "bedrock",
+      "texts": [
+        "Explain how the electoral college works",
+        "Has it ever picked someone who lost the popular vote?",
+        "What would a ranked choice system change?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "electoral college mechanics",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "indirect election",
+            "winner-take-all allocation",
+            "legitimacy of representation",
+            "majoritarian vs. proportional systems"
+          ],
+          "implicit_themes": [
+            "what a different voting mechanism would change about outcomes",
+            "whether the electoral college outcome can diverge from the popular will"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some argue the Electoral College protects federalism and prevents campaigns from ignoring smaller states, a structural benefit that ranked-choice alone would not address.",
+          "counter_keywords": [
+            "federalism",
+            "state representation",
+            "political geography"
+          ],
+          "theme_confidence": {
+            "whether the electoral college outcome can diverge from the popular will": 0.91,
+            "what a different voting mechanism would change about outcomes": 0.92
+          },
+          "theme_evidence": {
+            "whether the electoral college outcome can diverge from the popular will": "Has it ever picked someone who lost the popular vote?",
+            "what a different voting mechanism would change about outcomes": "What would a ranked choice system change?"
+          },
+          "theme_rank": {
+            "what a different voting mechanism would change about outcomes": 1,
+            "whether the electoral college outcome can diverge from the popular will": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "electoral politics",
+            "voting systems",
+            "democracy",
+            "political reform",
+            "election fraud",
+            "power structures"
+          ],
+          "rationale": "The person moves from mechanics to historical divergence to alternative design, suggesting they are probing whether the current system faithfully translates public preference into power.",
+          "confidence": 0.8,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s18",
+      "extractor": "bedrock",
+      "texts": [
+        "Is meditation scientifically legit?",
+        "What does the research say about long-term effects on the brain?",
+        "I tried it and got more anxious, is that normal?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "meditation science",
+          "depth": "casual",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "neuroplasticity",
+            "empirical validity",
+            "dose-response relationship",
+            "adverse effects"
+          ],
+          "implicit_themes": [
+            "gap between popular claims and what research actually shows",
+            "whether the scientific evidence for meditation is solid"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some researchers argue that methodological weaknesses (small samples, lack of active controls) in meditation studies mean the evidence base is weaker than popular coverage suggests.",
+          "counter_keywords": [
+            "placebo effect",
+            "replication crisis",
+            "clinical psychology"
+          ],
+          "theme_confidence": {
+            "whether the scientific evidence for meditation is solid": 0.78,
+            "gap between popular claims and what research actually shows": 0.96
+          },
+          "theme_evidence": {
+            "whether the scientific evidence for meditation is solid": "Is meditation scientifically legit?",
+            "gap between popular claims and what research actually shows": "What does the research say about long-term effects on the brain?"
+          },
+          "theme_rank": {
+            "gap between popular claims and what research actually shows": 1,
+            "whether the scientific evidence for meditation is solid": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "meditation",
+            "neuroscience",
+            "mindfulness",
+            "mental health",
+            "brain research"
+          ],
+          "rationale": "The person is testing the credibility of meditation's scientific backing, asking about brain evidence and flagging a personal adverse reaction \u2014 pointing to empirical validity and the gap between hype and research findings.",
+          "confidence": 0.82,
+          "mediums": [
+            "video",
+            "paper",
+            "film"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s19",
+      "extractor": "bedrock",
+      "texts": [
+        "What was the Manhattan Project actually like day to day?",
+        "Did the scientists know what they were building?",
+        "Was the decision to use it a moral choice or a military one?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "manhattan project daily life",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "compartmentalisation",
+            "institutional secrecy",
+            "collective action under uncertainty",
+            "moral responsibility diffusion"
+          ],
+          "implicit_themes": [
+            "whether the decision to use the bomb was a moral choice or a military one",
+            "whether individual scientists knew the full purpose of what they were building"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "A serious counter-view holds that the decision to use the bomb was primarily a military-strategic calculation aimed at ending the war quickly, and that attributing it chiefly to moral failure misreads the wartime context.",
+          "counter_keywords": [
+            "cold war strategy",
+            "wartime decision-making",
+            "nuclear deterrence"
+          ],
+          "theme_confidence": {
+            "whether individual scientists knew the full purpose of what they were building": 0.87,
+            "whether the decision to use the bomb was a moral choice or a military one": 0.93
+          },
+          "theme_evidence": {
+            "whether individual scientists knew the full purpose of what they were building": "Did the scientists know what they were building?",
+            "whether the decision to use the bomb was a moral choice or a military one": "Was the decision to use it a moral choice or a military one?"
+          },
+          "theme_rank": {
+            "whether the decision to use the bomb was a moral choice or a military one": 1,
+            "whether individual scientists knew the full purpose of what they were building": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "atomic bomb",
+            "manhattan project",
+            "nuclear weapons",
+            "wartime science",
+            "moral responsibility",
+            "military decision"
+          ],
+          "rationale": "The three questions move from lived experience, to individual knowledge and culpability, to the ethics of the use decision \u2014 all circling the gap between scientific participation and moral accountability.",
+          "confidence": 0.88,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s20",
+      "extractor": "bedrock",
+      "texts": [
+        "How do languages die?",
+        "Why does the number of speakers matter so much?",
+        "Can a dead language really be revived like Hebrew was?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "how languages die",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "language extinction",
+            "intergenerational transmission",
+            "linguistic vitality",
+            "cultural assimilation"
+          ],
+          "implicit_themes": [
+            "whether a dead language can genuinely be revived",
+            "whether speaker count is what determines a language's survival"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some linguists argue that language shift is often a rational, community-driven choice rather than a loss imposed from outside, complicating narratives of extinction and rescue.",
+          "counter_keywords": [
+            "language shift",
+            "cultural assimilation",
+            "community choice"
+          ],
+          "theme_confidence": {
+            "whether speaker count is what determines a language's survival": 0.7,
+            "whether a dead language can genuinely be revived": 1.0
+          },
+          "theme_evidence": {
+            "whether speaker count is what determines a language's survival": "Why does the number of speakers matter so much?",
+            "whether a dead language can genuinely be revived": "Can a dead language really be revived like Hebrew was?"
+          },
+          "theme_rank": {
+            "whether a dead language can genuinely be revived": 1,
+            "whether speaker count is what determines a language's survival": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "language death",
+            "endangered language",
+            "language revival",
+            "cultural identity",
+            "indigenous culture",
+            "linguistic heritage"
+          ],
+          "rationale": "The three questions together probe the mechanics of language loss (transmission failure, speaker threshold) and the possibility of reversal, with Hebrew as a concrete test case \u2014 pointing to concepts of vitality, assimilation pressure, and revitalisation.",
+          "confidence": 0.85,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s21",
+      "extractor": "bedrock",
+      "texts": [
+        "I can't tell if I'm bored or burned out",
+        "Everything feels flat lately even things I used to love",
+        "How do people recover from this?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "boredom or burnout",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "anhedonia",
+            "motivational depletion",
+            "recovery of meaning"
+          ],
+          "implicit_themes": [
+            "whether flatness in things once loved signals burnout or boredom"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some researchers argue that boredom and burnout share overlapping mechanisms and that the distinction matters less than the behavioural response to either state.",
+          "counter_keywords": [
+            "psychological resilience",
+            "behavioural activation"
+          ],
+          "theme_confidence": {
+            "whether flatness in things once loved signals burnout or boredom": 1.0
+          },
+          "theme_evidence": {
+            "whether flatness in things once loved signals burnout or boredom": "Everything feels flat lately even things I used to love"
+          },
+          "theme_rank": {
+            "whether flatness in things once loved signals burnout or boredom": 1
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "burnout",
+            "emotional exhaustion",
+            "loss of motivation",
+            "recovery",
+            "mental health"
+          ],
+          "rationale": "The person is asking how to distinguish burnout from boredom and how to recover, pointing to anhedonia and motivational depletion as the underlying concepts.",
+          "confidence": 0.72,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s22",
+      "extractor": "bedrock",
+      "texts": [
+        "How does the stock market actually set prices?",
+        "Are index funds really better than picking stocks?",
+        "What was the 2008 crash really about?",
+        "Could it happen again?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "how stock prices are set",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "price discovery",
+            "market efficiency",
+            "collective expectation",
+            "liquidity"
+          ],
+          "implicit_themes": [
+            "how prices emerge from collective behaviour rather than intrinsic value"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Behavioural finance research shows markets can persistently misprice assets for years, complicating the efficient-market view that prices always reflect available information.",
+          "counter_keywords": [
+            "market bubbles",
+            "behavioural economics"
+          ],
+          "theme_confidence": {
+            "how prices emerge from collective behaviour rather than intrinsic value": 0.66
+          },
+          "theme_evidence": {
+            "how prices emerge from collective behaviour rather than intrinsic value": "How does the stock market actually set prices?"
+          },
+          "theme_rank": {
+            "how prices emerge from collective behaviour rather than intrinsic value": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "stock market",
+            "price discovery",
+            "market efficiency",
+            "trading"
+          ],
+          "rationale": "The question targets the mechanism of price formation, pointing to concepts like market efficiency and collective expectation rather than just 'investing'.",
+          "confidence": 0.8,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "index funds vs stock picking",
+          "depth": "casual",
+          "sentiment": "skeptical",
+          "mentions": 1,
+          "concepts": [
+            "passive vs active management",
+            "alpha generation",
+            "fee drag",
+            "market-beating probability"
+          ],
+          "implicit_themes": [
+            "whether active stock selection produces better returns than passive tracking"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some research identifies persistent outperformance among a small subset of active managers, suggesting the debate is not fully settled.",
+          "counter_keywords": [
+            "fund manager skill",
+            "active investing"
+          ],
+          "theme_confidence": {
+            "whether active stock selection produces better returns than passive tracking": 0.65
+          },
+          "theme_evidence": {
+            "whether active stock selection produces better returns than passive tracking": "Are index funds really better than picking stocks?"
+          },
+          "theme_rank": {
+            "whether active stock selection produces better returns than passive tracking": 3
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "index funds",
+            "passive investing",
+            "active management",
+            "stock picking"
+          ],
+          "rationale": "The word 'really' signals scepticism about a received wisdom, pointing to the underlying debate about whether skill or luck drives active fund returns.",
+          "confidence": 0.85,
+          "mediums": [
+            "video",
+            "film",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "2008 financial crash",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "systemic risk",
+            "moral hazard",
+            "leverage",
+            "contagion"
+          ],
+          "implicit_themes": [
+            "whether the conditions that caused the crash could recur",
+            "what the structural causes of the 2008 crash actually were"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some economists argue post-2008 regulatory reforms (Dodd-Frank, Basel III) substantially reduced the specific leverage and opacity that caused the crisis, making a direct repeat unlikely.",
+          "counter_keywords": [
+            "financial regulation",
+            "banking reform",
+            "systemic stability"
+          ],
+          "theme_confidence": {
+            "what the structural causes of the 2008 crash actually were": 0.64,
+            "whether the conditions that caused the crash could recur": 0.99
+          },
+          "theme_evidence": {
+            "what the structural causes of the 2008 crash actually were": "What was the 2008 crash really about?",
+            "whether the conditions that caused the crash could recur": "Could it happen again?"
+          },
+          "theme_rank": {
+            "whether the conditions that caused the crash could recur": 1,
+            "what the structural causes of the 2008 crash actually were": 4
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "financial crisis",
+            "mortgage crisis",
+            "systemic risk",
+            "bank collapse",
+            "wall street",
+            "regulation"
+          ],
+          "rationale": "'Really about' and 'could it happen again' together show the person wants to understand the deep structural mechanisms, not just the timeline of events.",
+          "confidence": 0.95,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s23",
+      "extractor": "bedrock",
+      "texts": [
+        "What is dark matter and how do we know it exists?",
+        "Could we be wrong about gravity instead?",
+        "Why is this so hard to detect?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "dark matter existence",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "indirect inference",
+            "gravitational anomaly",
+            "invisible mass",
+            "falsifiability"
+          ],
+          "implicit_themes": [
+            "whether dark matter is the only explanation for gravitational anomalies",
+            "how we can know something exists that cannot be directly detected"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Modified gravity theories such as MOND can account for some galactic rotation curves without invoking dark matter, suggesting the anomaly may lie in our gravitational model rather than in missing mass.",
+          "counter_keywords": [
+            "modified gravity",
+            "mond",
+            "alternative cosmology"
+          ],
+          "theme_confidence": {
+            "whether dark matter is the only explanation for gravitational anomalies": 0.81,
+            "how we can know something exists that cannot be directly detected": 0.66
+          },
+          "theme_evidence": {
+            "whether dark matter is the only explanation for gravitational anomalies": "Could we be wrong about gravity instead?",
+            "how we can know something exists that cannot be directly detected": "how do we know it exists?"
+          },
+          "theme_rank": {
+            "whether dark matter is the only explanation for gravitational anomalies": 1,
+            "how we can know something exists that cannot be directly detected": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "dark matter",
+            "cosmology",
+            "particle physics",
+            "invisible universe",
+            "gravitational anomaly",
+            "scientific inference"
+          ],
+          "rationale": "The person moves from 'what is it' to 'how do we know' to 'could the theory itself be wrong', signalling interest in the epistemological problem of inferring undetectable entities and the rivalry between dark matter and modified gravity theories.",
+          "confidence": 0.85,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s24",
+      "extractor": "bedrock",
+      "texts": [
+        "Why do some cities have great public transit and others don't?",
+        "Is car culture a choice or was it engineered?",
+        "What happened to streetcars in America?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "why cities have or lack transit",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "path dependency",
+            "urban planning",
+            "political economy",
+            "infrastructure lock-in"
+          ],
+          "implicit_themes": [
+            "whether car culture is a choice or was engineered",
+            "how infrastructure decisions shape the options available to people"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some historians argue that streetcar decline was driven primarily by genuine consumer preference for cars and suburban living, rather than coordinated corporate sabotage.",
+          "counter_keywords": [
+            "suburbanization",
+            "consumer choice",
+            "postwar america"
+          ],
+          "theme_confidence": {
+            "whether car culture is a choice or was engineered": 1.0,
+            "how infrastructure decisions shape the options available to people": 0.77
+          },
+          "theme_evidence": {
+            "whether car culture is a choice or was engineered": "Is car culture a choice or was it engineered?",
+            "how infrastructure decisions shape the options available to people": "Why do some cities have great public transit and others don't?"
+          },
+          "theme_rank": {
+            "whether car culture is a choice or was engineered": 1,
+            "how infrastructure decisions shape the options available to people": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "urban planning",
+            "public transit",
+            "car culture",
+            "infrastructure",
+            "city design",
+            "streetcars",
+            "transportation policy"
+          ],
+          "rationale": "All three questions circle the same core problem: whether the dominance of car-centric cities was an inevitable outcome or a deliberate political and economic construction, with the streetcar question pointing directly at a specific historical mechanism (the alleged dismantling of tram networks).",
+          "confidence": 0.92,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s25",
+      "extractor": "bedrock",
+      "texts": [
+        "How does CRISPR work?",
+        "Should we edit embryos to remove disease?",
+        "Where is the line between therapy and enhancement?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "how crispr works",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "targeted gene editing",
+            "molecular scissors",
+            "dna repair mechanisms",
+            "off-target mutation"
+          ],
+          "implicit_themes": [],
+          "dropped_themes": [],
+          "counterpoint": "Understanding the mechanism does not settle whether the tool is safe enough for clinical use, since off-target effects remain incompletely characterised.",
+          "counter_keywords": [
+            "off-target effects",
+            "gene therapy risk",
+            "clinical trials"
+          ],
+          "theme_confidence": {},
+          "theme_evidence": {},
+          "theme_rank": {},
+          "theme_dropped_why": {},
+          "keywords": [
+            "crispr",
+            "gene editing",
+            "dna",
+            "biotechnology",
+            "molecular biology"
+          ],
+          "rationale": "The person asks a direct mechanistic question about CRISPR, signalling curiosity about how the underlying molecular machinery operates.",
+          "confidence": 0.85,
+          "mediums": [
+            "video",
+            "film",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "editing embryos to remove disease",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "germline editing",
+            "heritable genetic modification",
+            "consent of future persons",
+            "therapeutic intervention"
+          ],
+          "implicit_themes": [
+            "whether editing embryos to remove disease is justified"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some disability-rights scholars argue that framing genetic conditions as diseases to be eliminated devalues the lives of people currently living with those conditions.",
+          "counter_keywords": [
+            "disability rights",
+            "neurodiversity",
+            "genetic determinism"
+          ],
+          "theme_confidence": {
+            "whether editing embryos to remove disease is justified": 1.0
+          },
+          "theme_evidence": {
+            "whether editing embryos to remove disease is justified": "Should we edit embryos to remove disease?"
+          },
+          "theme_rank": {
+            "whether editing embryos to remove disease is justified": 1
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "embryo editing",
+            "germline",
+            "genetic disease",
+            "bioethics",
+            "designer babies",
+            "heritable modification"
+          ],
+          "rationale": "The question about editing embryos frames a normative dilemma: the person is weighing the benefit of eliminating heritable disease against the ethical weight of altering a future person without their consent.",
+          "confidence": 0.9,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        },
+        {
+          "topic": "therapy versus enhancement line",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "normative boundary",
+            "human enhancement",
+            "distributive justice",
+            "what counts as normal"
+          ],
+          "implicit_themes": [
+            "where the boundary between therapy and enhancement can be drawn"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some bioethicists argue the therapy/enhancement distinction is inherently unstable and that a better framework focuses on fairness of access rather than the nature of the intervention.",
+          "counter_keywords": [
+            "access inequality",
+            "enhancement ethics",
+            "posthumanism"
+          ],
+          "theme_confidence": {
+            "where the boundary between therapy and enhancement can be drawn": 0.86
+          },
+          "theme_evidence": {
+            "where the boundary between therapy and enhancement can be drawn": "Where is the line between therapy and enhancement?"
+          },
+          "theme_rank": {
+            "where the boundary between therapy and enhancement can be drawn": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "human enhancement",
+            "genetic enhancement",
+            "bioethics",
+            "transhumanism",
+            "inequality",
+            "normalcy"
+          ],
+          "rationale": "The person is probing whether a principled distinction between fixing disease and improving traits is possible, which is the central philosophical tension in enhancement ethics.",
+          "confidence": 0.88,
+          "mediums": [
+            "film",
+            "paper",
+            "video"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s26",
+      "extractor": "bedrock",
+      "texts": [
+        "What makes a good argument versus a persuasive one?",
+        "Why do smart people believe false things?",
+        "Can you reason someone out of a belief they weren't reasoned into?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "good vs persuasive arguments",
+          "depth": "deep",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "epistemic validity",
+            "rhetorical efficacy",
+            "motivated reasoning",
+            "belief formation"
+          ],
+          "implicit_themes": [
+            "whether reasoning can dislodge a belief not formed by reasoning",
+            "whether a good argument and a persuasive one are the same thing",
+            "why intelligence does not protect against false belief"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some philosophers argue that persuasion and good argument are not cleanly separable \u2014 that framing, analogy and emotional resonance are legitimate epistemic tools, not corruptions of reason.",
+          "counter_keywords": [
+            "rhetoric as knowledge",
+            "embodied cognition",
+            "narrative reasoning"
+          ],
+          "theme_confidence": {
+            "whether a good argument and a persuasive one are the same thing": 0.95,
+            "whether reasoning can dislodge a belief not formed by reasoning": 0.99,
+            "why intelligence does not protect against false belief": 0.77
+          },
+          "theme_evidence": {
+            "whether a good argument and a persuasive one are the same thing": "What makes a good argument versus a persuasive one?",
+            "whether reasoning can dislodge a belief not formed by reasoning": "Can you reason someone out of a belief they weren't reasoned into?",
+            "why intelligence does not protect against false belief": "Why do smart people believe false things?"
+          },
+          "theme_rank": {
+            "whether reasoning can dislodge a belief not formed by reasoning": 1,
+            "whether a good argument and a persuasive one are the same thing": 2,
+            "why intelligence does not protect against false belief": 3
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "rhetoric",
+            "motivated reasoning",
+            "belief systems",
+            "propaganda",
+            "epistemology",
+            "cognitive bias",
+            "persuasion"
+          ],
+          "rationale": "All three questions circle the same core problem: the gap between what makes a belief logically justified and what actually causes people to hold or change beliefs, with intelligence offering no obvious protection.",
+          "confidence": 0.92,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s27",
+      "extractor": "bedrock",
+      "texts": [
+        "How did the printing press change Europe?",
+        "Is social media a similar shift?",
+        "What did people fear about books back then?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "printing press as social shift",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "information diffusion",
+            "epistemic authority",
+            "disintermediation",
+            "technological determinism"
+          ],
+          "implicit_themes": [
+            "whether social media is a similar shift to the printing press",
+            "whether a new medium reshapes who controls knowledge"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some historians argue the printing press's effects were slow and uneven, cautioning against clean analogies to faster, networked digital media.",
+          "counter_keywords": [
+            "media continuity",
+            "slow change",
+            "historical revisionism"
+          ],
+          "theme_confidence": {
+            "whether a new medium reshapes who controls knowledge": 0.6,
+            "whether social media is a similar shift to the printing press": 0.93
+          },
+          "theme_evidence": {
+            "whether a new medium reshapes who controls knowledge": "What did people fear about books back then?",
+            "whether social media is a similar shift to the printing press": "Is social media a similar shift?"
+          },
+          "theme_rank": {
+            "whether social media is a similar shift to the printing press": 1,
+            "whether a new medium reshapes who controls knowledge": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "printing press",
+            "information revolution",
+            "media history",
+            "censorship",
+            "social upheaval"
+          ],
+          "rationale": "The person is tracing a structural parallel between the printing press and social media, probing both the mechanisms of change and the anxieties each medium provoked \u2014 pointing to a core interest in how new media redistributes epistemic authority.",
+          "confidence": 0.82,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s28",
+      "extractor": "bedrock",
+      "texts": [
+        "Why is sleep so important and what happens if you skip it?",
+        "Is the 8 hour rule real?",
+        "Does catching up on weekends work?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "sleep and its necessity",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "homeostatic regulation",
+            "sleep debt",
+            "circadian rhythm",
+            "cognitive impairment"
+          ],
+          "implicit_themes": [
+            "whether the 8-hour rule is a real biological requirement or a social norm",
+            "whether sleep debt can be recovered after the fact"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some research suggests individual sleep need is highly genetic, meaning the 8-hour norm may genuinely not apply to a minority of people who function well on less.",
+          "counter_keywords": [
+            "short sleeper gene",
+            "individual variation",
+            "sleep biology"
+          ],
+          "theme_confidence": {
+            "whether the 8-hour rule is a real biological requirement or a social norm": 1.0,
+            "whether sleep debt can be recovered after the fact": 0.91
+          },
+          "theme_evidence": {
+            "whether the 8-hour rule is a real biological requirement or a social norm": "Is the 8 hour rule real?",
+            "whether sleep debt can be recovered after the fact": "Does catching up on weekends work?"
+          },
+          "theme_rank": {
+            "whether the 8-hour rule is a real biological requirement or a social norm": 1,
+            "whether sleep debt can be recovered after the fact": 2
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "sleep deprivation",
+            "circadian rhythm",
+            "brain health",
+            "memory consolidation",
+            "sleep debt"
+          ],
+          "rationale": "The person is probing the mechanics of sleep need \u2014 questioning fixed rules, recovery strategies, and consequences of deprivation \u2014 pointing to an interest in the underlying biology of sleep regulation rather than just lifestyle tips.",
+          "confidence": 0.85,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s29",
+      "extractor": "bedrock",
+      "texts": [
+        "What is a sovereign wealth fund?",
+        "Why do some countries have them and others don't?",
+        "Norway's seems like a different thing entirely"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "sovereign wealth funds",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "intergenerational wealth transfer",
+            "resource curse",
+            "fiscal stabilisation",
+            "state capitalism"
+          ],
+          "implicit_themes": [
+            "whether a sovereign wealth fund is a categorically different kind of institution"
+          ],
+          "dropped_themes": [],
+          "counterpoint": "Some economists argue that sovereign wealth funds, including Norway's, distort domestic markets and delay necessary economic diversification rather than securing long-term prosperity.",
+          "counter_keywords": [
+            "resource dependency",
+            "dutch disease",
+            "economic diversification"
+          ],
+          "theme_confidence": {
+            "whether a sovereign wealth fund is a categorically different kind of institution": 0.89
+          },
+          "theme_evidence": {
+            "whether a sovereign wealth fund is a categorically different kind of institution": "Norway's seems like a different thing entirely"
+          },
+          "theme_rank": {
+            "whether a sovereign wealth fund is a categorically different kind of institution": 1
+          },
+          "theme_dropped_why": {},
+          "keywords": [
+            "sovereign wealth",
+            "oil money",
+            "national savings",
+            "resource windfall",
+            "state investment"
+          ],
+          "rationale": "The person moves from a basic definitional question to noticing that Norway's fund seems qualitatively distinct, suggesting they are probing what separates a genuine intergenerational commons from a standard state investment vehicle.",
+          "confidence": 0.72,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    },
+    {
+      "session_id": "s30",
+      "extractor": "bedrock",
+      "texts": [
+        "Something about memory keeps bugging me",
+        "How reliable are my own memories really?",
+        "Eyewitness accounts seem to fail so often, why?"
+      ],
+      "ok": true,
+      "used": "bedrock",
+      "interests": [
+        {
+          "topic": "reliability of memory",
+          "depth": "casual",
+          "sentiment": "curious",
+          "mentions": 1,
+          "concepts": [
+            "reconstructive memory",
+            "memory malleability",
+            "epistemic reliability",
+            "confabulation"
+          ],
+          "implicit_themes": [
+            "whether personal memories can be trusted as accurate records"
+          ],
+          "dropped_themes": [
+            "why eyewitness accounts fail as evidence"
+          ],
+          "counterpoint": "Some researchers argue that while memory is reconstructive, it is accurate enough in most everyday contexts and its failures are predictable and bounded rather than pervasive.",
+          "counter_keywords": [
+            "memory accuracy",
+            "cognitive reliability"
+          ],
+          "theme_confidence": {
+            "whether personal memories can be trusted as accurate records": 0.68
+          },
+          "theme_evidence": {
+            "whether personal memories can be trusted as accurate records": "How reliable are my own memories really?",
+            "why eyewitness accounts fail as evidence": "Eyewitness accounts seem to fail so often, why?"
+          },
+          "theme_rank": {
+            "whether personal memories can be trusted as accurate records": 1
+          },
+          "theme_dropped_why": {
+            "why eyewitness accounts fail as evidence": "the judge expects this would be rejected"
+          },
+          "keywords": [
+            "memory",
+            "false memory",
+            "eyewitness testimony",
+            "unreliable narrator",
+            "perception",
+            "identity"
+          ],
+          "rationale": "The person is questioning the fidelity of memory both personally and as a form of evidence, pointing to reconstructive and malleable nature of recall and its epistemic consequences.",
+          "confidence": 0.85,
+          "mediums": [
+            "film",
+            "video",
+            "paper"
+          ],
+          "conversations": 1,
+          "last_seen": "",
+          "in_current": true
+        }
+      ]
+    }
+  ]
+}
