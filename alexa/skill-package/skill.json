@@ -1,0 +1,53 @@
+{
+  "manifest": {
+    "manifestVersion": "1.0",
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "name": "Knots Partner",
+          "summary": "A thinking partner that turns what you are curious about into things to watch, read and explore.",
+          "description": "Tell Knots what you have been thinking about and it suggests a film, series, documentary, video or paper that makes the idea concrete, with a reason for each. Say good pick or not for me and it learns what fits you.",
+          "examplePhrases": [
+            "Alexa, open knots partner",
+            "Alexa, ask knots partner what should I explore",
+            "Alexa, ask knots partner about memecoins"
+          ],
+          "keywords": [
+            "recommendations",
+            "films",
+            "research",
+            "papers",
+            "documentaries"
+          ]
+        }
+      },
+      "isAvailableWorldwide": false,
+      "distributionCountries": [
+        "US"
+      ],
+      "category": "EDUCATION_AND_REFERENCE",
+      "testingInstructions": "Say: open knots partner. Then: about memecoins. Then: good pick. Picks come from TMDB, YouTube and arXiv."
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "https://YOUR-DOMAIN/alexa",
+          "sslCertificateType": "Trusted"
+        }
+      }
+    },
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "usesPersonalInfo": false,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false,
+      "locales": {
+        "en-US": {
+          "privacyPolicyUrl": "https://YOUR-DOMAIN/privacy",
+          "termsOfUseUrl": ""
+        }
+      }
+    }
+  }
+}

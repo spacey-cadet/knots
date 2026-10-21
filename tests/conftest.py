@@ -2,6 +2,16 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
+def _isolated_event_log(monkeypatch, tmp_path):
+    """Tools that show picks log impressions; no test may write into the repository's data/ folder."""
+    from knots import feedback
+    monkeypatch.setenv("KNOTS_EVENT_LOG", str(tmp_path / "events.jsonl"))
+    feedback._log = None
+    yield
+    feedback._log = None
+
+
+@pytest.fixture(autouse=True)
 def _fresh_embedder_state(monkeypatch):
     """The Titan circuit breaker and the embedding cache are process-wide; isolate every test from them."""
     from knots import catalogs, embeddings, fitmodel

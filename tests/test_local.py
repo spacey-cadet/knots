@@ -834,6 +834,7 @@ def test_titan_embedder_request_and_fallback(monkeypatch):
 
 def test_tools_remember_forget_and_stay_stateless_without_a_user_id(monkeypatch, tmp_path):
     import server
+    monkeypatch.setenv("KNOTS_ALLOW_CLIENT_USER_ID", "1")   # development mode: a user_id argument counts as an identity
     store, db = _mem(monkeypatch, tmp_path)
     db.unlink()                                                               # prove it is only created when used
     _use(monkeypatch, FakeBedrock(MODEL_OUTPUT))
@@ -854,7 +855,10 @@ def test_tools_remember_forget_and_stay_stateless_without_a_user_id(monkeypatch,
     known = call("what_do_you_remember", {"user_id": "alex"})
     assert known["remembered_conversations"] == 2 and known["threads"] and "never your words" in known["stores"]
     assert call("what_do_you_remember", {"user_id": "someone else"})["remembered_conversations"] == 0
-    assert call("forget_me", {"user_id": "alex"}) == {"deleted": 2}
+    from knots import feedback
+    assert sum(e.get("user") == "alex" for e in feedback.event_log().read()) == 3    # one impression per identified call
+    assert call("forget_me", {"user_id": "alex"}) == {"deleted": 2, "events_deleted": 3}
+    assert not [e for e in feedback.event_log().read() if e.get("user") == "alex"]   # forgetting clears the log too
     assert call("what_do_you_remember", {"user_id": "alex"})["remembered_conversations"] == 0
 
 
@@ -1017,7 +1021,10 @@ def test_engine_is_the_single_door(monkeypatch):
     for name in ("server.py", "eval/run_eval.py"):
         src = (root / name).read_text()
         imported = set(re.findall(r"^\s*(?:from|import) knots(?:\.(\w+))?", src, re.M))
-        assert imported <= {"", "engine"} or imported <= {"", "engine", "catalogs"}, (name, imported)
+        # the server may also use identity, rate limiting, feedback logging and the Alexa transport: none of those
+        # recommend anything. The two checks below are the real guard against recommendation logic in server.py.
+        plumbing = {"identity", "ratelimit", "feedback", "alexa_skill"}
+        assert imported <= {"", "engine", "catalogs"} | plumbing, (name, imported)
     assert "rank_and_render" not in (root / "server.py").read_text()
     assert "build_session_plan" not in (root / "server.py").read_text()
 

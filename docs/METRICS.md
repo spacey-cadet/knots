@@ -104,7 +104,8 @@ the minimum number of answers and the eased new-label requirement are env-tunabl
 
 ## Not wired
 
-Nothing in `server.py` writes events yet. That needs the same two things as the profile code: a verified identity
-(derive it from the OAuth token; pass a salted hash as `user`, never a caller-supplied id) and somewhere to host
-the log. `EventLog.forget(user)` exists so `forget_me` can honour deletion. The first events to record are
-`impression` (when a response is built) and `feedback` (from a listener follow-up such as "was that a good pick?").
+`impression` and `feedback` events are now written by the server (`knots/feedback.py`: `thinking_partner`, the
+`rate_pick` tool and the Alexa skill), under a salted hash of a verified identity, and `forget_me` removes them.
+`python eval/monitor.py` reads the log. Not written yet: `engage` (asked for more, opened, saved) and
+`reformulate` events, so engagement and reformulation rates read 0 until something records them. Nothing starts a
+retrain automatically; the monitor reports whether one is due and a person runs it.
