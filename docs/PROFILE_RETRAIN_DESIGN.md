@@ -21,8 +21,12 @@ It is a keyword read, crude on purpose: it is a dial for ordering watch / read /
 Trains only on human labels (`source` = `user` or `expert`). Model output, notes and `error_type` never train.
 Trigger (defaults, all env-tunable): >= 200 usable labels from >= 20 people, >= 100 new since the last training,
 each person capped at 25 (newest kept), latest label per (person, session, url) wins.
+An online alert (a quality drop or a score-distribution shift against the baseline frozen at promotion) lowers only
+the new-label requirement to 50; it never lowers the totals or the number of people, and implicit signals are never
+labels. See `docs/METRICS.md`.
 A challenger must beat the champion on a FROZEN expert holdout by >= +0.02 P@3 with NDCG@5 no worse than -0.01.
-Versions are kept in a `Registry`; `rollback()` restores the previous champion.
+Versions are kept in a `Registry`, each with the online baseline it was promoted with; `rollback()` restores the
+previous champion and its baseline.
 
 ## Decided
 Human-only labels; per-person cap; frozen expert holdout; margin gate; versioned rollback; profile is a capped prior.
@@ -35,6 +39,6 @@ Human-only labels; per-person cap; frozen expert holdout; margin gate; versioned
 - Whether s24-s30 stay the only holdout once listener labels exist.
 
 ## Not wired
-No server code calls `profile.update`, `prior`, `blend_mode` or `retrain` yet: they need a verified identity
+No server code calls `profile.update`, `prior`, `blend_mode`, `retrain` or the `online` event log yet: they need a verified identity
 (derive it from the OAuth token on account linking; never trust a caller-supplied `user_id` on a public endpoint)
 and a store. The contract already accepts `mode`.
