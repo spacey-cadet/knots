@@ -67,8 +67,9 @@ LABEL_COLS = ["session_id", "session_text", "thread", "kind", "type", "title", "
               "url", "evidence", "reasoning", "live", "good", "reason", "note", "extractor", "split"]
 ERROR_TYPES = ("", "over_psychologizing", "terminological_overreach", "narrative_projection",
                "binary_imposition", "normative_expansion", "causal_projection", "other")
-THEME_COLS = ["session_id", "session_text", "topic", "theme", "rationale",
+THEME_COLS = ["session_id", "session_text", "topic", "theme", "evidence", "rank", "rationale",
               "supported", "error_type", "note", "extractor", "split"]
+THEMES_RUN = HERE / "results" / "themes_run.json"   # output of `run_eval.py themes`; the freshest theme source
 PAIR_COLS = ["session_id", "session_text", "pair_id", "concept", "watch_title", "watch_url",
              "learn_title", "learn_url", "pair_score", "bridge", "good", "note", "extractor", "split"]
 
@@ -238,13 +239,50 @@ def cmd_run(args) -> int:
     return 0
 
 
-def build_label_sheets(results: list[dict]) -> None:
+def cmd_themes(args) -> int:
+    """Extraction only: no catalogs, no YouTube, no embeddings of items. Writes themes_run.json and rebuilds
+    themes.csv. results.json and labels.csv (picks) are left exactly as they were."""
+    sessions = json.loads(SESSIONS.read_text())
+    specs = [s.strip() for s in args.extractors.split(",") if s.strip()]
+    entries, errors = [], 0
+    for sess in sessions:
+        for spec in specs:
+            mode, model = parse_spec(spec)
+            entry = {"session_id": sess["id"], "extractor": spec, "texts": sess["texts"]}
+            try:
+                set_extractor(mode, model)
+                extraction._HOLDOUT = sess["id"]
+                found, used = asyncio.run(extraction.extract(sess["texts"]))
+                entry.update(ok=True, used=used, interests=[i.to_dict() for i in found])
+                n = sum(len(i.implicit_themes) for i in found)
+                dropped = sum(len(i.dropped_themes) for i in found)
+                print(f"  {sess['id']}  {spec:<42} ok   {n} themes kept, {dropped} dropped")
+            except Exception as e:  # noqa: BLE001
+                errors += 1
+                entry.update(ok=False, error=f"{type(e).__name__}: {e}")
+                print(f"  {sess['id']}  {spec:<42} FAIL {type(e).__name__}: {str(e)[:90]}")
+            entries.append(entry)
+    THEMES_RUN.parent.mkdir(exist_ok=True)
+    THEMES_RUN.write_text(json.dumps({"results": entries}, indent=2))
+    build_label_sheets([], themes_only=True)
+    print(f"\nSaved {THEMES_RUN.relative_to(ROOT)}; label themes in {THEMES.relative_to(ROOT)} "
+          "(columns: supported = y/n; the quote it rests on is in `evidence`). Picks and their labels are untouched.")
+    return 1 if errors else 0
+
+
+def build_label_sheets(results: list[dict], themes_only: bool = False) -> None:
     old_labels = {(r["session_id"], r["extractor"], r["url"]): r for r in read_csv(LABELS)}
     old_themes = {(r["session_id"], r["extractor"], r["topic"], r["theme"]): r for r in read_csv(THEMES)}
     old_pairs = {(r["session_id"], r["extractor"], r["pair_id"]): r for r in read_csv(PAIRS)}
     splits = session_splits()
 
     pick_rows, theme_rows, pair_rows = [], [], []
+    theme_source = [e for e in results if e.get("ok")]
+    if THEMES_RUN.exists():                      # themes are extracted and labelled apart from picks (see cmd_themes)
+        try:
+            theme_source = json.loads(THEMES_RUN.read_text())["results"]
+        except (OSError, ValueError, KeyError):
+            pass
     for e in results:
         if not e.get("ok"):
             continue
@@ -274,12 +312,16 @@ def build_label_sheets(results: list[dict]) -> None:
                 "good": prev.get("good", ""), "note": prev.get("note", ""),
                 "extractor": e["extractor"], "split": splits.get(e["session_id"], "train"),
             })
+    for e in theme_source:
+        text = " / ".join(e["texts"])
         for it in e["interests"]:
             for theme in it.get("implicit_themes", []):
                 prev = old_themes.get((e["session_id"], e["extractor"], it["topic"], theme), {})
                 theme_rows.append({
                     "session_id": e["session_id"], "session_text": text, "topic": it["topic"],
                     "theme": theme, "rationale": it.get("rationale", ""),
+                    "evidence": (it.get("theme_evidence") or {}).get(theme, ""),
+                    "rank": (it.get("theme_rank") or {}).get(theme, ""),
                     "supported": prev.get("supported", ""), "error_type": prev.get("error_type", ""),
                     "note": prev.get("note", ""),
                     "extractor": e["extractor"], "split": splits.get(e["session_id"], "train"),
@@ -297,9 +339,10 @@ def build_label_sheets(results: list[dict]) -> None:
             random.Random(sid).shuffle(group)
             rows.extend(group)
 
-    write_csv(LABELS, LABEL_COLS, pick_rows)
     write_csv(THEMES, THEME_COLS, theme_rows)
-    write_csv(PAIRS, PAIR_COLS, pair_rows)
+    if not themes_only:                          # `themes` must never touch the pick or pair sheets
+        write_csv(LABELS, LABEL_COLS, pick_rows)
+        write_csv(PAIRS, PAIR_COLS, pair_rows)
 
 
 # ---------------------------------------------------------------------------
@@ -530,6 +573,9 @@ def main() -> int:
                    help="live YouTube searches allowed per quota day (tracked on disk; resets midnight Pacific). "
                         "Stops cleanly when spent instead of failing runs one by one. Also KNOTS_YOUTUBE_BUDGET")
     r.set_defaults(fn=cmd_run)
+    t = sub.add_parser("themes", help="re-extract themes only (no catalogs); rebuilds themes.csv, keeps pick labels")
+    t.add_argument("--extractors", default="bedrock", help="comma list, as for `run` (default: bedrock)")
+    t.set_defaults(fn=cmd_themes)
     lb = sub.add_parser("label", help="open the local labelling tool (saves into the CSVs)")
     lb.add_argument("--port", type=int, default=8765)
     lb.add_argument("--no-browser", action="store_true", help="do not open a browser tab automatically")

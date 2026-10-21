@@ -42,7 +42,8 @@ SAMPLE_SESSION = [
 MODEL_OUTPUT = {"interests": [{
     "topic": "memecoins",
     "concepts": ["collective belief", "reflexivity"],
-    "implicit_themes": ["algorithmic amplification of risk", "fear of missing out"],
+    "themes": [{"theme": "algorithmic amplification of risk", "evidence": "is this all just a bubble"},
+               {"theme": "fear of missing out", "evidence": "I keep seeing memecoin threads on my Reddit feed"}],
     "keywords": ["financial crisis", "stock market", "greed"],
     "rationale": "Asking why people buy them and whether it's a bubble points at belief creating value.",
     "depth": "deep", "sentiment": "skeptical", "confidence": 0.8,

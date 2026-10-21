@@ -633,3 +633,284 @@ def test_model_card_has_a_ranking_section_with_numbers_only_from_the_file(tmp_pa
     assert "9 complete lists from 7 train sessions" in sect and "0.42 [0.32, 0.52]" in sect
     assert "60% of everything shown was good" in sect and "1 list(s) were left out" in sect
     assert "not yet measured (holdout sessions are unlabelled)" in sect and "**cohere**" in sect
+
+
+# ---------------------------------------------------------------- theme curation
+from knots.brain import themes as TH  # noqa: E402
+
+SAID = "I keep seeing memecoin threads on my Reddit feed, is this all just a bubble? Tell me more about the research."
+
+
+def test_quote_supported_ignores_case_and_punctuation_and_needs_real_words():
+    assert TH.quote_supported("is this all just a bubble", SAID)
+    assert TH.quote_supported("IS this ALL just a bubble?!", SAID)
+    assert TH.quote_supported("I keep seeing ... on my Reddit feed", SAID)          # ellipsis skips words, in order
+    assert not TH.quote_supported("Reddit feed ... I keep seeing", SAID)             # out of order
+    assert not TH.quote_supported("people feel anxious about money", SAID)           # never said
+    assert not TH.quote_supported("a bubble", SAID)                                  # real but under 3 words
+    assert not TH.quote_supported("", SAID) and not TH.quote_supported(None, SAID)
+
+
+def test_curate_drops_unquoted_themes_ranks_and_caps_at_five(monkeypatch):
+    monkeypatch.setattr(TH.judge, "assess", lambda text, themes: (list(themes), [], {}))
+    monkeypatch.setattr(TH.judge, "raw_score", lambda text, theme: None)
+    words = "alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu".split()
+    text = " ".join(f"{w} one two three." for w in words)
+    a = interest("a", implicit_themes=[f"t{i}" for i in range(4)] + ["invented", "unquoted"],
+                 theme_evidence={**{f"t{i}": f"{words[i]} one two three" for i in range(4)}, "invented": "never said this at all"})
+    b = interest("b", implicit_themes=["t4", "t5", "t0"],
+                 theme_evidence={"t4": f"{words[4]} one two three", "t5": f"{words[5]} one two three", "t0": f"{words[0]} one two"})
+    out = TH.curate([a, b], text, cap=5)
+    kept = [t for it in out for t in it.implicit_themes]
+    assert len(kept) == 5 and len(set(kept)) == 5                                     # cap holds, duplicate t0 counted once
+    assert "invented" in a.dropped_themes and "quote not found" in a.theme_dropped_why["invented"]
+    assert a.theme_dropped_why["unquoted"] == "no quote from the conversation"
+    assert any("over the limit of 5" in why for it in out for why in it.theme_dropped_why.values())
+    ranks = sorted(r for it in out for r in it.theme_rank.values())
+    assert ranks == [1, 2, 3, 4, 5]
+
+
+def test_curate_orders_by_judge_confidence_and_drops_what_the_judge_rejects(monkeypatch):
+    conf = {"fear of missing out": 0.9, "algorithmic amplification of risk": 0.6}
+    monkeypatch.setattr(TH.judge, "assess", lambda text, themes: (
+        [t for t in themes if t in conf], [t for t in themes if t not in conf], conf))
+    it = interest("memecoins", implicit_themes=["algorithmic amplification of risk", "fear of missing out", "moral panic"],
+                  theme_evidence={"algorithmic amplification of risk": "is this all just a bubble",
+                                  "fear of missing out": "I keep seeing memecoin threads on my Reddit feed",
+                                  "moral panic": "Tell me more about the research"})
+    TH.curate([it], SAID)
+    assert it.implicit_themes[0] == "fear of missing out" and it.theme_rank["fear of missing out"] == 1
+    assert it.theme_dropped_why["moral panic"] == "the judge expects this would be rejected"
+    rows = TH.ranked([it])
+    assert [r["theme"] for r in rows] == ["fear of missing out", "algorithmic amplification of risk"]
+    assert rows[0]["evidence"].startswith("I keep seeing") and [r["rank"] for r in rows] == [1, 2]
+
+
+def test_parse_themes_reads_quotes_and_legacy_strings_and_limits_to_five():
+    themes, ev = I._parse_themes({"themes": [{"theme": " Fear  of Missing Out ", "evidence": " is this  all just a bubble "},
+                                             {"theme": "fear of missing out", "evidence": "dup"}, {"theme": 7},
+                                             "bare string", *({"theme": f"x{i}", "evidence": "a b c"} for i in range(9))]})
+    assert themes[0] == "fear of missing out" and ev["fear of missing out"] == "is this all just a bubble"
+    assert "bare string" in themes and "bare string" not in ev and len(themes) == 5
+    legacy, lev = I._parse_themes({"implicit_themes": ["old style", 3]})
+    assert legacy == ["old style"] and lev == {}                                      # no quote, so curation will drop it
+
+
+def test_plan_exposes_ranked_themes_with_their_quotes(monkeypatch):
+    monkeypatch.setattr(TH.judge, "assess", lambda text, themes: (list(themes), [], {}))
+    it = interest("memecoins", implicit_themes=["fear of missing out"],
+                  theme_evidence={"fear of missing out": "I keep seeing memecoin threads on my Reddit feed"})
+    TH.curate([it], SAID)
+    plan = build_session_plan([it], [item("Margin Call", "film", "memecoins", tags=["memecoins"], rating=7.0)],
+                              extractor="heuristic", query=SAID)
+    assert plan["themes"] and plan["themes"][0]["theme"] == "fear of missing out"
+    assert plan["themes"][0]["evidence"].startswith("I keep seeing")
+    assert len(plan["themes"]) <= 5
+
+
+def test_run_eval_themes_command_writes_themes_run_and_leaves_pick_labels_alone(tmp_path, monkeypatch):
+    import argparse
+    R = _load_script("run_eval")
+    (tmp_path / "sessions.json").write_text(json.dumps([{"id": "s1", "texts": [SAID]}]))
+    for n, v in {"SESSIONS": "sessions.json", "RESULTS": "results.json", "THEMES_RUN": "themes_run.json",
+                 "LABELS": "labels.csv", "THEMES": "themes.csv", "PAIRS": "pairs.csv"}.items():
+        monkeypatch.setattr(R, n, tmp_path / v)
+    monkeypatch.setattr(R, "ROOT", tmp_path)
+    monkeypatch.setattr(R, "set_extractor", lambda *a: None)
+    (tmp_path / "labels.csv").write_text("sentinel")
+    monkeypatch.setattr(TH.judge, "assess", lambda text, themes: (list(themes), [], {}))
+
+    async def fake_extract(texts):
+        it = interest("memecoins", implicit_themes=["fear of missing out"],
+                      theme_evidence={"fear of missing out": "is this all just a bubble"})
+        TH.curate([it], texts[0])
+        return [it], "bedrock"
+    monkeypatch.setattr(R.extraction, "extract", fake_extract)
+    assert R.cmd_themes(argparse.Namespace(extractors="bedrock")) == 0
+    run = json.loads((tmp_path / "themes_run.json").read_text())["results"]
+    assert run[0]["ok"] and run[0]["interests"][0]["theme_rank"] == {"fear of missing out": 1}
+    rows = list(csv.DictReader(open(tmp_path / "themes.csv", encoding="utf-8-sig")))
+    assert rows[0]["theme"] == "fear of missing out" and rows[0]["evidence"] == "is this all just a bubble"
+    assert rows[0]["rank"] == "1" and rows[0]["supported"] == ""
+    assert (tmp_path / "labels.csv").read_text() == "sentinel"                         # pick sheet untouched
+    assert not (tmp_path / "results.json").exists()
+
+
+# ---------------------------------------------------------------- notes, contract, alexa
+from knots import alexa, contract, notes  # noqa: E402
+
+
+def film(**kw):
+    base = dict(title="Margin Call", content_type="movie", source_url="https://x/Margin-Call", topic="memecoins",
+                topic_overlap_score=0.8, matched_keywords=["memecoins"], rating=7.1, popularity=4200, year="2011",
+                abstract="A banker watches a crash unfold overnight. It is slow and talky.")
+    base.update(kw)
+    return ContentItem(**base)
+
+
+def test_note_uses_only_catalog_facts_and_the_persons_words():
+    it = film()
+    theme = {"theme": "fear of missing out", "evidence": "I keep seeing memecoin threads"}
+    n = notes.build_note(it, theme)
+    assert n.startswith("A banker watches a crash unfold overnight.")
+    assert "7.1/10 by 4,200 people" in n and "Well known" in n
+    assert "“I keep seeing memecoin threads”" in n
+    assert notes.check_numbers(n, notes.allowed_text(it, theme))
+    assert [f["source"] for f in notes.facts(it)] == ["catalog", "TMDB"]
+
+
+def test_note_never_invents_numbers_or_guesses_unknown_citations():
+    paper = item("A survey", "paper", abstract="We review the field.", is_survey=True, citations=None, status="preprint")
+    n = notes.build_note(paper)
+    assert "citation count not available" in n and not any(ch.isdigit() for ch in n)
+    assert all(f["label"] != "citations" for f in notes.facts(paper))
+    cited = item("Old paper", "paper", abstract="Classic.", citations=1520)
+    assert "Highly cited: 1,520 citations" in notes.build_note(cited)
+
+
+def test_rephrase_hook_is_rejected_when_it_adds_a_number():
+    it = film()
+    base = notes.build_note(it)
+    assert notes.build_note(it, rephrase=lambda t: t + " Won 12 Oscars.") == base
+    assert notes.build_note(it, rephrase=lambda t: "Reworded: " + t) == "Reworded: " + base
+    assert notes.build_note(it, rephrase=lambda t: 1 / 0) == base
+
+
+def test_contract_has_notes_themes_and_a_spoken_line_without_urls(monkeypatch):
+    monkeypatch.setattr(TH.judge, "assess", lambda text, themes: (list(themes), [], {}))
+    it = interest("memecoins", implicit_themes=["fear of missing out"],
+                  theme_evidence={"fear of missing out": "I keep seeing memecoin threads on my Reddit feed"})
+    TH.curate([it], SAID)
+    items = [film()]
+    plan = build_session_plan([it], items, extractor="heuristic", query=SAID)
+    r = plan["response"]
+    assert r["version"] == 1 and r["status"] in ("ok", "relaxed") and r["picks"]
+    p = r["picks"][0]
+    assert p["title"] == "Margin Call" and p["note"] and p["confidence"] in ("strong match", "possible match", "stretch")
+    assert r["themes"][0]["evidence"].startswith("I keep seeing") and "http" not in r["say"]
+    assert "Margin Call" in r["say"] and r["ask"]
+
+
+def test_contract_always_offers_a_pick_when_the_catalog_has_anything():
+    it = interest("memecoins")
+    items = [item("Barely related", "movie", "memecoins", score=0.05, abstract="Something else entirely.")]
+    r = contract.build_response({"picks": {"watch": [], "read": [], "explore": []}, "themes": [], "ask": "More?"}, items, [it])
+    assert r["status"] == "relaxed" and len(r["picks"]) == 1 and r["picks"][0]["confidence"] == "stretch"
+    assert "looser matches" in r["say"]
+
+
+def test_contract_is_honestly_empty_when_there_is_nothing_to_recommend():
+    r = contract.build_response({"picks": {"watch": [], "read": [], "explore": []}, "themes": [], "ask": "What next?"},
+                                [], [interest("memecoins")])
+    assert r["status"] == "empty" and r["picks"] == [] and "won't guess" in r["say"] and "What next?" in r["say"]
+
+
+def test_alexa_adapter_escapes_ssml_limits_length_and_keeps_the_session_open():
+    resp = {"say": "Try Tom & Jerry <3. " * 800, "ask": "Which one?", "picks": [{"title": "A&B", "year": "", "note": "n"}]}
+    out = alexa.to_alexa(resp)
+    ssml = out["response"]["outputSpeech"]["ssml"]
+    assert ssml.startswith("<speak>") and ssml.endswith("</speak>") and len(ssml) <= 8000
+    assert "&amp;" in ssml and "<3" not in ssml and "&lt;3" in ssml
+    assert out["response"]["shouldEndSession"] is False and out["response"]["reprompt"]
+    assert out["response"]["card"]["content"] == "A&B - n"
+    assert alexa.to_alexa(resp, end_session=True)["response"].get("reprompt") is None
+
+
+# ---------------------------------------------------------------- profile + retrain
+from knots import profile as PF  # noqa: E402
+from knots import retrain as RT  # noqa: E402
+
+
+def unit(i, dim=8, j=None, mix=0.0):
+    v = [0.0] * dim
+    v[i] = 1.0
+    if j is not None:
+        v[j] = mix
+    return v
+
+
+def test_profile_stays_bounded_merges_similar_and_decays(monkeypatch):
+    p = PF.Profile()
+    day = 86400.0
+    PF.update(p, [("memecoins", unit(0), 1.0)], "titan", now=0)
+    PF.update(p, [("crypto speculation", unit(0, j=1, mix=0.1), 0.6)], "titan", now=day)
+    assert len(p.slots) == 1 and p.slots[0].n == 2                                  # merged, not duplicated
+    for k in range(60):                                                              # far more topics than slots
+        PF.update(p, [(f"t{k}", [1.0 if i == k else 0.0 for i in range(64)], 1.0)], "titan", now=day * (2 + k))
+    before = p.slots[0].weight
+    PF.update(p, [], "titan", now=day * 400)                                         # a long silence
+    assert not p.slots or p.slots[0].weight < before
+
+
+def test_profile_never_mixes_embedders_and_serialises():
+    p = PF.update(PF.Profile(), [("a", unit(0), 1.0)], "titan", now=1)
+    assert PF.prior(p, unit(0), "hashed") == 0.0                                    # other space: no influence
+    PF.update(p, [("b", unit(1), 1.0)], "hashed", now=2)
+    assert p.embedder == "hashed" and [s.topic for s in p.slots] == ["b"]            # reset, not blended
+    q = PF.Profile.from_dict(json.loads(json.dumps(p.to_dict())))
+    assert q.slots[0].topic == "b" and q.embedder == "hashed"
+
+
+def test_profile_prior_is_capped_so_the_session_always_wins():
+    p = PF.update(PF.Profile(), [("a", unit(0), 5.0)], "titan", now=1)
+    assert 0 < PF.prior(p, unit(0), "titan") <= PF.PRIOR_CAP
+    assert PF.prior(p, unit(3), "titan") == 0.0
+
+
+def test_session_mode_reads_wording_and_blends_with_a_slow_average():
+    assert PF.session_mode(["Alexa, can you explain how does tokenomics work? I want to understand the research"]) > 0.7
+    assert PF.session_mode(["something fun, I'm bored, movie night, just want to chill"]) < 0.3
+    assert PF.session_mode(["hello there"]) is None
+    long_run = PF.Profile(learn_play=0.9)
+    m = PF.blend_mode(0.1, long_run)                                                 # a playful night for a serious learner
+    assert m["label"] in ("play", "mixed") and m["learn_vs_play"] < 0.5 and m["from_session"]
+    assert PF.blend_mode(None, long_run)["label"] == "learn" and PF.blend_mode(None, None)["label"] == "mixed"
+    p = PF.update(PF.Profile(learn_play=0.9), [], "x", now=1, session_mode=0.1)
+    assert 0.8 < p.learn_play < 0.9                                                  # moves slowly
+
+
+def lab(user, url, good="y", source="user", ts=0, sid="s1"):
+    return {"user": user, "url": url, "good": good, "source": source, "ts": ts, "session_id": sid}
+
+
+def test_retrain_uses_only_human_labels_dedupes_and_caps_each_person():
+    pol = RT.Policy(min_labels=5, min_users=2, per_user_cap=3, min_new=1)
+    rows = [lab("a", f"u{i}", ts=i) for i in range(10)] + [lab("b", "x"), lab("b", "y", source="model"),
+                                                          lab("c", "z", good="")]
+    rows.append(lab("b", "x", good="n", ts=5))                                       # later label replaces the earlier one
+    el = RT.eligible(rows, pol)
+    assert sum(r["user"] == "a" for r in el) == 3 and not any(r["source"] == "model" for r in el)
+    assert [r["good"] for r in el if r["user"] == "b"] == ["n"] and not any(r["user"] == "c" for r in el)
+
+
+def test_retrain_waits_for_enough_labels_from_enough_people():
+    pol = RT.Policy(min_labels=6, min_users=3, per_user_cap=10, min_new=2)
+    few = [lab("a", f"u{i}") for i in range(8)]
+    ok, why = RT.should_retrain(few, {}, pol)
+    assert not ok and "1 people, need 3" in why
+    many = few + [lab("b", "p"), lab("c", "q")]
+    assert RT.should_retrain(many, {}, pol)[0]
+    assert not RT.should_retrain(many, {"trained_on": 9}, pol)[0]                    # not enough NEW labels
+
+
+def test_gate_demands_a_real_gain_without_regression_and_registry_can_roll_back(tmp_path):
+    champ = {"p@3": 0.70, "ndcg@5": 0.80}
+    assert RT.gate(champ, {"p@3": 0.73, "ndcg@5": 0.80})["promote"]
+    assert not RT.gate(champ, {"p@3": 0.71, "ndcg@5": 0.85})["promote"]              # too small a gain
+    bad = RT.gate(champ, {"p@3": 0.80, "ndcg@5": 0.70})
+    assert not bad["promote"] and "ndcg@5" in bad["reason"]                          # regressed elsewhere
+    reg = RT.Registry(tmp_path)
+    v1 = reg.register({"w": 1}, champ, 200); reg.promote(v1, 200)
+    v2 = reg.register({"w": 2}, {"p@3": 0.74, "ndcg@5": 0.8}, 400); reg.promote(v2, 400)
+    assert reg.champion()["artifact"] == {"w": 2}
+    assert reg.rollback() == v1 and reg.champion()["artifact"] == {"w": 1}
+    assert reg.rollback() is None
+
+
+def test_golden_contract_and_alexa_responses_have_not_drifted():
+    sys.path.insert(0, str(ROOT / "tests"))
+    import make_golden
+    r, a = make_golden.build()
+    assert r == json.loads((ROOT / "tests" / "golden" / "response_ok.json").read_text())
+    assert a == json.loads((ROOT / "tests" / "golden" / "alexa_ok.json").read_text())
+    assert "“" not in r["say"] and len(r["say"]) < 400                           # short and quote-free for the ear

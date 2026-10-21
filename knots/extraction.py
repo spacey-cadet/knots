@@ -81,6 +81,9 @@ class Interest:
     counterpoint: str = ""                                     # one sentence: a view that would complicate theirs (opt-in challenge slot)
     counter_keywords: list[str] = field(default_factory=list)  # film-tag-style phrases for that view
     theme_confidence: dict = field(default_factory=dict)       # kept theme -> calibrated P(supported); empty if uncalibrated
+    theme_evidence: dict = field(default_factory=dict)         # theme -> exact quote from the person's text it rests on
+    theme_rank: dict = field(default_factory=dict)             # kept theme -> 1-based rank within the conversation
+    theme_dropped_why: dict = field(default_factory=dict)      # dropped theme -> reason (audit only; never shown)
     keywords: list[str] = field(default_factory=list)          # short film-metadata-style phrases
     rationale: str = ""             # one line: why these concepts/themes follow from the text
     confidence: float = 0.5
@@ -191,10 +194,14 @@ Go beneath the surface. People rarely name the real subject. For each interest:
 - topic: the surface subject in the person's own words (2-4 words).
 - concepts: the abstract or hard ideas actually at stake (e.g. "self-reference", \
 "entropy", "moral hazard", "free will"). Prefer the precise concept over the buzzword.
-- implicit_themes: undercurrents the person never said but the text implies \
-(e.g. a question about memecoins can imply "collective belief creating value", \
-"fear of missing out", "trust without institutions"). Only include themes the text \
-genuinely supports; do not invent drama.
+- themes: what the person is really asking underneath, and ONLY what their own words support. \
+Give at most 5 themes for the WHOLE conversation (not per interest), most important first. Each is \
+a short plain statement of a question, stance or mechanism (e.g. "whether hype can sustain real \
+value", "gap between price and what a token does"). Each MUST carry `evidence`: an EXACT quote \
+(at least 3 words) copied from the person's text that the theme rests on. A theme without an exact \
+quote is discarded. Never name a feeling the person did not express, never introduce a term they \
+did not use or clearly imply, never add a dramatic arc or an "X versus Y" they did not draw. \
+Fewer is better; an empty list is a good answer.
 - keywords: 3-8 short lowercase phrases (1-3 words) in the style of film database \
 tags ("time loop", "artificial intelligence", "financial crisis", "unreliable narrator"). \
 These are used to search film metadata, so make them concrete and film-tag-like, not essays.
@@ -228,7 +235,12 @@ _TOOL_SPEC = {
                         "properties": {
                             "topic": {"type": "string"},
                             "concepts": {"type": "array", "items": {"type": "string"}},
-                            "implicit_themes": {"type": "array", "items": {"type": "string"}},
+                            "themes": {"type": "array", "maxItems": 5, "items": {
+                                "type": "object",
+                                "properties": {"theme": {"type": "string"},
+                                               "evidence": {"type": "string",
+                                                            "description": "exact quote from the person's text"}},
+                                "required": ["theme", "evidence"]}},
                             "keywords": {"type": "array", "items": {"type": "string"}},
                             "rationale": {"type": "string"},
                             "counterpoint": {"type": "string"},
@@ -288,6 +300,32 @@ def _clean_mediums(v) -> list[str]:
     return given + [m for m in MEDIUMS if m not in given]
 
 
+def _parse_themes(it: dict) -> tuple[list[str], dict[str, str]]:
+    """Themes and their quotes from model output. Accepts [{theme, evidence}] and, for older callers, a plain
+    list of strings under `implicit_themes` (which has no quote, so it will not survive curation)."""
+    pairs: list[tuple[object, object]] = []
+    for x in it.get("themes") or []:
+        if isinstance(x, dict):
+            pairs.append((x.get("theme"), x.get("evidence")))
+        elif isinstance(x, str):
+            pairs.append((x, ""))
+    if not pairs:
+        pairs = [(x, "") for x in (it.get("implicit_themes") or []) if isinstance(x, str)]
+    themes, evidence = [], {}
+    for theme, quote in pairs:
+        if not isinstance(theme, str):
+            continue
+        t = re.sub(r"\s+", " ", theme).strip().lower()[:80]
+        if not t or t in evidence or t in themes:
+            continue
+        themes.append(t)
+        if isinstance(quote, str) and quote.strip():
+            evidence[t] = re.sub(r"\s+", " ", quote).strip()[:240]
+        if len(themes) >= 5:
+            break
+    return themes, evidence
+
+
 def _parse_interests(raw: dict) -> list[Interest]:
     """Validate and normalise model output. The model is untrusted: clamp
     everything, drop malformed entries, never trust types."""
@@ -312,11 +350,12 @@ def _parse_interests(raw: dict) -> list[Interest]:
         keywords = _clean_list(it.get("keywords"), 8)
         if not concepts and not keywords:
             continue
+        themes, theme_evidence = _parse_themes(it)
         out.append(Interest(
             topic=re.sub(r"\s+", " ", topic).strip().lower()[:60],
             depth=depth, sentiment=sentiment, mentions=1,
             concepts=concepts,
-            implicit_themes=_clean_list(it.get("implicit_themes"), 4),
+            implicit_themes=themes, theme_evidence=theme_evidence,
             keywords=keywords,
             rationale=str(it.get("rationale", ""))[:300],
             counterpoint=str(it.get("counterpoint", ""))[:240],
@@ -366,8 +405,7 @@ def bedrock_extract(session_texts: list[str]) -> list[Interest]:
         inferenceConfig={"maxTokens": 1500, "temperature": 0.2},
     )
     interests = _parse_interests(_extract_from_response(resp))
-    for it in interests:  # the judge: drop themes the author's labels say they would reject
-        it.implicit_themes, it.dropped_themes, it.theme_confidence = brain.assess(text, it.implicit_themes)
+    brain.curate_themes(interests, text)   # quote check, then the judge, then the cap of 5 for the conversation
     if len(_cache) > 256:
         _cache.clear()
     _cache[key] = interests

@@ -13,7 +13,9 @@ Output is shaped for both surfaces Alexa+ has:
 
 from __future__ import annotations
 
+from .brain.themes import ranked as ranked_themes
 from .catalogs import ContentItem
+from .contract import build_response
 from .extraction import Interest
 from .pairing import build_pairs
 from .ranking import rank_and_render
@@ -34,6 +36,7 @@ def _threads(interests: list[Interest]) -> list[dict]:
         "concepts": i.concepts,
         "underneath": i.implicit_themes,   # what the text implies but never says
         "underneath_confidence": i.theme_confidence,   # calibrated P(supported) per theme; {} if uncalibrated
+        "underneath_evidence": {t: i.theme_evidence.get(t, "") for t in i.implicit_themes},   # the quote each rests on
         "withheld_themes": len(i.dropped_themes),     # themes the judge held back rather than overreach
         "why_i_think_so": i.rationale,
         "confidence": round(i.confidence, 2),
@@ -44,13 +47,15 @@ def _threads(interests: list[Interest]) -> list[dict]:
     } for i in interests]
 
 
-def _spoken(interests: list[Interest], picks: dict[str, list[dict]], pairs: list[dict] | None = None) -> str:
+def _spoken(interests: list[Interest], picks: dict[str, list[dict]], pairs: list[dict] | None = None,
+            themes: list[dict] | None = None) -> str:
     lead = interests[0]
     sentence = f"It sounds like you're circling {_join([i.topic for i in interests[:2]])}."
     if lead.conversations > 1:
         sentence += f" You've come back to {lead.topic} across {lead.conversations} conversations."
-    if lead.implicit_themes:
-        sentence += f" Underneath it, I hear {lead.implicit_themes[0]}."
+    top = (themes[0]["theme"] if themes else (lead.implicit_themes[0] if lead.implicit_themes else ""))
+    if top:
+        sentence += f" Underneath it, I hear {top}."
     # lead with the format that suits this person's lead thread, then the others
     phrasing = {
         "film": ("watch", "To see it on screen, try {t}."),
@@ -68,11 +73,12 @@ def _spoken(interests: list[Interest], picks: dict[str, list[dict]], pairs: list
     return sentence
 
 
-def _ask(interests: list[Interest]) -> str:
+def _ask(interests: list[Interest], themes: list[dict] | None = None) -> str:
     lead = interests[0]
-    if lead.implicit_themes:
+    top = (themes[0]["theme"] if themes else (lead.implicit_themes[0] if lead.implicit_themes else ""))
+    if top:
         return (f"Is it {lead.topic} itself that's pulling you in, "
-                f"or the question of {lead.implicit_themes[0]}?")
+                f"or the question of {top}?")
     return f"Do you want to go deeper into {lead.topic}, or see where it shows up elsewhere?"
 
 
@@ -92,12 +98,16 @@ def build_session_plan(interests: list[Interest], items: list[ContentItem],
     note = "" if any(picks.values()) else (
         "No catalog results right now (catalogs unavailable or no keys set), so I'm not guessing.")
     pairs = build_pairs(items, interests, query)
-    return {
+    themes = ranked_themes(interests, 5)
+    plan = {
         "extractor": extractor,
         "threads": _threads(interests),
+        "themes": themes,        # at most 5 for the conversation, best first, each with the quote it rests on
         "picks": picks,
         "pairs": pairs,          # watch-and-learn double features, only when both halves are sourced
         "note": note,
-        "spoken": _spoken(interests, picks, pairs),
-        "ask": _ask(interests),
+        "spoken": _spoken(interests, picks, pairs, themes),
+        "ask": _ask(interests, themes),
     }
+    plan["response"] = build_response(plan, items, interests)   # the one shape Alexa, MCP and screens render from
+    return plan

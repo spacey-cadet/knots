@@ -173,7 +173,12 @@ def merge_interests(per_conversation: list[tuple[Conversation, float, list[Inter
             sentiment=newest_member[2].sentiment,
             mentions=sum(m[2].mentions for m in members),
             concepts=_ordered_union([m[2].concepts for m in members], 4),
-            implicit_themes=_ordered_union([m[2].implicit_themes for m in members], 4),
+            implicit_themes=(themes := _ordered_union([m[2].implicit_themes for m in members], 4)),
+            theme_evidence={t: q for t in themes for m in members
+                            if (q := m[2].theme_evidence.get(t))} if members else {},
+            theme_rank={t: min(m[2].theme_rank.get(t, 99) for m in members) for t in themes},
+            theme_confidence={t: m[2].theme_confidence[t] for t in themes for m in members
+                              if t in m[2].theme_confidence},
             keywords=_ordered_union([m[2].keywords for m in members], 8),
             rationale=best.rationale,
             confidence=min(1.0, best.confidence + RECURRENCE_CONF_BONUS * (n - 1)),

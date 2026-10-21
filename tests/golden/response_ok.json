@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "status": "ok",
+  "say": "Underneath it, I hear fear of missing out. Try Margin Call, a film from 2011. A banker watches a crash unfold overnight. Well known: rated 7.1/10 by 4,200 people. Is it memecoins itself that's pulling you in, or the question of fear of missing out?",
+  "picks": [
+    {
+      "title": "Margin Call",
+      "type": "movie",
+      "year": "2011",
+      "url": "https://www.themoviedb.org/movie/59436",
+      "matched_topic": "memecoins",
+      "note": "A banker watches a crash unfold overnight. Well known: rated 7.1/10 by 4,200 people. It speaks to fear of missing out, which you touched on with \u201cI keep seeing memecoin threads on my Reddit feed\u201d.",
+      "spoken_note": "A banker watches a crash unfold overnight. Well known: rated 7.1/10 by 4,200 people.",
+      "why": "You've been engaging with memecoins; Margin Call explores similar themes on screen. It also speaks to something you didn't say out loud: fear of missing out. Matched on: memecoins.",
+      "facts": [
+        {
+          "label": "year",
+          "value": "2011",
+          "source": "catalog"
+        },
+        {
+          "label": "rating",
+          "value": "7.1/10 from 4,200 ratings",
+          "source": "TMDB"
+        }
+      ],
+      "confidence": "strong match"
+    }
+  ],
+  "themes": [
+    {
+      "theme": "fear of missing out",
+      "evidence": "I keep seeing memecoin threads on my Reddit feed",
+      "rank": 1
+    }
+  ],
+  "ask": "Is it memecoins itself that's pulling you in, or the question of fear of missing out?",
+  "extractor": "bedrock"
+}

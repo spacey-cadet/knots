@@ -317,10 +317,11 @@ function themeCard(r) {
   return el('div', { class: 'card' },
     rubric(), sessionBlock(r), el('hr'),
     el('p', { class: 'eyebrow' }, `Knots thinks they are circling: ${r.topic}`),
-    el('p', { class: 'eyebrow' }, 'Claimed unstated theme'),
+    el('p', { class: 'eyebrow' }, r.rank ? `Claimed theme (ranked #${r.rank} for the conversation)` : 'Claimed theme'),
     el('p', { class: 'claim' }, r.theme),
+    r.evidence ? [el('p', { class: 'eyebrow' }, 'The words it rests on'), el('p', { class: 'quiet' }, `\u201c${r.evidence}\u201d`)] : null,
     r.rationale ? [el('p', { class: 'eyebrow' }, "The model's reasoning"), el('p', { class: 'quiet' }, r.rationale)] : null,
-    el('p', { class: 'question' }, 'Does the session text genuinely imply this theme?'),
+    el('p', { class: 'question' }, 'Is this theme really there in what was said (not invented, not over-read)?'),
     noteBox(r), actions(r), reasonRow(r));
 }
 
