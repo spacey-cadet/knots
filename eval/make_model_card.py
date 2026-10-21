@@ -110,9 +110,56 @@ def ranking_section(ranking: dict | None) -> list[str]:
                 "would have scored, not what the live system returned.", ""]
 
 
+def _cell(v: dict | None) -> str:
+    if not v or v.get("mean") != v.get("mean"):
+        return "n/a"
+    return f"{v['mean']:.2f} [{v['ci90'][0]:.2f}, {v['ci90'][1]:.2f}]"
+
+
+def beyond_section(beyond: dict | None) -> list[str]:
+    L = ["## Beyond accuracy (variety, novelty, spread, surprise)", ""]
+    if not beyond:
+        return L + ["Not yet measured: run `python eval/eval_beyond.py`.", ""]
+    k = beyond.get("k", 3)
+    cols = [("p@3", "P@3"), ("ild", "Diversity (ILD)"), ("novelty", "Novelty"), ("unexpectedness", "Unexpectedness"),
+            ("serendipity", "Serendipity"), ("creativity", "Creativity")]
+    L += [f"Top {k} picks of each list, same lists and orderings as the ranking table, so read the two together. "
+          "None of these says \"better\": higher novelty means rarer items, higher unexpectedness means further from what "
+          "the person literally said, and serendipity and creativity count only picks the labeller marked good. "
+          "Novelty and unexpectedness are percentiles against every pick shown in the run, so they mean \"more or less "
+          "than a typical shown pick\". Creativity has no standard definition; this is a novelty-surprise-value proxy "
+          "(definitions in `docs/METRICS.md`). Intervals resample sessions.", ""]
+    emb = beyond.get("ild_embedder")
+    if emb is None:
+        L += ["Diversity (ILD) was not computed (no embedding model was used for this run).", ""]
+    elif emb == "hashed":
+        L += ["**Warning:** the picks were embedded with the offline hashed embedder, which is lexical only, so ILD is a "
+              "word-overlap measure here. Re-run with Bedrock configured before reading it.", ""]
+    else:
+        L += [f"Picks were embedded with **{emb}** for diversity.", ""]
+    for scope in [n for n in beyond if isinstance(beyond[n], dict) and "labelled" in beyond[n]]:
+        sc = beyond[scope]
+        res = sc.get("labelled")
+        if not res:
+            continue
+        L += [f"**{scope}**: {sc.get('labelled_lists', 0)} complete lists.", "",
+              "| Order | " + " | ".join(n for _, n in cols) + " |", "| --- " * (len(cols) + 1) + "|"]
+        for order in [o for o in ("as read aloud", "fit score", "popularity", "random (chance)") if o in res]:
+            L.append(f"| {order} | " + " | ".join(_cell(res[order].get(c)) for c, _ in cols) + " |")
+        cov = ((sc.get("all_shown") or {}).get("as read aloud") or {}).get("coverage")
+        if cov and cov.get("slots"):
+            L += ["", f"Coverage of what was shown ({sc.get('all_shown_lists', 0)} lists, top {k} each): "
+                  f"{cov['distinct_items']:g} distinct items in {cov['slots']:g} slots "
+                  f"(unique share {cov['unique_share']:.2f}, Gini {cov['gini']:.2f}, most repeated item "
+                  f"{cov['top_item_share']:.0%} of slots). There is no catalog denominator, so this is repetition, not "
+                  "the fraction of a catalog reached."]
+        L.append("")
+    return L + ["Holdout sessions are not used here until they are labelled.", ""]
+
+
 def main() -> int:
     brain, rank, pairs = load("metrics_brain.json"), load("metrics_rank.json"), load("metrics_pairs.json")
-    ranking = load("metrics_ranking.json")
+    ranking, beyond = load("metrics_ranking.json"), load("metrics_beyond.json")
     L = ["# Knots model card", "",
          f"Generated {date.today().isoformat()} from `eval/results/metrics_*.json` by `eval/make_model_card.py`. "
          "Numbers below are copied from those files, not written by hand.", "",
@@ -159,7 +206,7 @@ def main() -> int:
     else:
         L.append("Not yet measured: " + (rank or {}).get("reason", "run `python eval/train_rank.py`.") +
                  " Until trained, ranking uses documented hand-set prior weights and cards show **no** confidence number.")
-    L += [""] + ranking_section(ranking)
+    L += [""] + ranking_section(ranking) + beyond_section(beyond)
     L += ["", "## Watch-and-learn pairs", ""]
     if pairs and pairs.get("all"):
         for k in ("train", "holdout"):

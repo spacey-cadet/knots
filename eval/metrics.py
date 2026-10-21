@@ -169,7 +169,7 @@ def summarize_rankings(groups: list[dict], ks=(1, 3, 5), n_boot: int = 2000, see
     draws = [np.concatenate([by_session[sessions[j]] for j in rng.integers(0, len(sessions), len(sessions))]).astype(int)
              for _ in range(n_boot)] if sessions else []
     out: dict = {"lists": len(groups), "sessions": len(sessions),
-                 "lists_without_a_good_pick": sum(1 for p in per if p["map"] != p["map"])}
+                 "lists_without_a_good_pick": sum(1 for p in per if "map" in p and p["map"] != p["map"])}
     for name in names:
         vals = np.array([p[name] for p in per], float)
         boots = [_nanmean(vals[d]) for d in draws]

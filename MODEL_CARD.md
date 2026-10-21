@@ -1,6 +1,6 @@
 # Knots model card
 
-Generated 2026-10-20 from `eval/results/metrics_*.json` by `eval/make_model_card.py`. Numbers below are copied from those files, not written by hand.
+Generated 2026-10-21 from `eval/results/metrics_*.json` by `eval/make_model_card.py`. Numbers below are copied from those files, not written by hand.
 
 ## What it is
 
@@ -99,6 +99,47 @@ Holdout: not yet measured (holdout sessions are unlabelled).
 Holdout: not yet measured (holdout sessions are unlabelled).
 
 Rows other than "as read aloud" re-order the same picks, so they show what a different ordering rule would have scored, not what the live system returned.
+
+## Beyond accuracy (variety, novelty, spread, surprise)
+
+Top 3 picks of each list, same lists and orderings as the ranking table, so read the two together. None of these says "better": higher novelty means rarer items, higher unexpectedness means further from what the person literally said, and serendipity and creativity count only picks the labeller marked good. Novelty and unexpectedness are percentiles against every pick shown in the run, so they mean "more or less than a typical shown pick". Creativity has no standard definition; this is a novelty-surprise-value proxy (definitions in `docs/METRICS.md`). Intervals resample sessions.
+
+Diversity (ILD) was not computed (no embedding model was used for this run).
+
+**all extractors**: 48 complete lists.
+
+| Order | P@3 | Diversity (ILD) | Novelty | Unexpectedness | Serendipity | Creativity |
+| --- | --- | --- | --- | --- | --- | --- |
+| as read aloud | 0.60 [0.52, 0.67] | n/a | 0.49 [0.45, 0.53] | 0.50 [0.47, 0.53] | 0.29 [0.25, 0.33] | 0.27 [0.22, 0.32] |
+| fit score | 0.62 [0.54, 0.70] | n/a | 0.50 [0.46, 0.54] | 0.44 [0.41, 0.47] | 0.26 [0.22, 0.31] | 0.26 [0.22, 0.31] |
+| popularity | 0.62 [0.55, 0.69] | n/a | 0.44 [0.39, 0.49] | 0.52 [0.49, 0.54] | 0.29 [0.25, 0.33] | 0.26 [0.21, 0.31] |
+| random (chance) | 0.56 [0.49, 0.64] | n/a | 0.51 [0.47, 0.54] | 0.50 [0.48, 0.53] | 0.26 [0.23, 0.30] | 0.26 [0.21, 0.30] |
+
+Coverage of what was shown (48 lists, top 3 each): 130 distinct items in 137 slots (unique share 0.95, Gini 0.05, most repeated item 2% of slots). There is no catalog denominator, so this is repetition, not the fraction of a catalog reached.
+
+**bedrock**: 24 complete lists.
+
+| Order | P@3 | Diversity (ILD) | Novelty | Unexpectedness | Serendipity | Creativity |
+| --- | --- | --- | --- | --- | --- | --- |
+| as read aloud | 0.76 [0.69, 0.83] | n/a | 0.52 [0.46, 0.57] | 0.48 [0.43, 0.53] | 0.35 [0.30, 0.40] | 0.34 [0.28, 0.39] |
+| fit score | 0.76 [0.68, 0.83] | n/a | 0.56 [0.50, 0.61] | 0.39 [0.34, 0.44] | 0.28 [0.23, 0.34] | 0.32 [0.26, 0.38] |
+| popularity | 0.79 [0.71, 0.85] | n/a | 0.48 [0.41, 0.54] | 0.45 [0.41, 0.50] | 0.35 [0.30, 0.40] | 0.33 [0.27, 0.38] |
+| random (chance) | 0.74 [0.67, 0.81] | n/a | 0.54 [0.49, 0.59] | 0.46 [0.41, 0.50] | 0.33 [0.28, 0.37] | 0.33 [0.28, 0.38] |
+
+Coverage of what was shown (24 lists, top 3 each): 65 distinct items in 69 slots (unique share 0.94, Gini 0.06, most repeated item 4% of slots). There is no catalog denominator, so this is repetition, not the fraction of a catalog reached.
+
+**heuristic**: 24 complete lists.
+
+| Order | P@3 | Diversity (ILD) | Novelty | Unexpectedness | Serendipity | Creativity |
+| --- | --- | --- | --- | --- | --- | --- |
+| as read aloud | 0.44 [0.32, 0.56] | n/a | 0.46 [0.41, 0.51] | 0.52 [0.50, 0.54] | 0.22 [0.16, 0.29] | 0.20 [0.13, 0.27] |
+| fit score | 0.48 [0.37, 0.59] | n/a | 0.44 [0.38, 0.50] | 0.50 [0.48, 0.52] | 0.24 [0.18, 0.30] | 0.20 [0.14, 0.27] |
+| popularity | 0.45 [0.34, 0.56] | n/a | 0.41 [0.35, 0.47] | 0.58 [0.56, 0.60] | 0.23 [0.18, 0.29] | 0.19 [0.13, 0.25] |
+| random (chance) | 0.40 [0.30, 0.50] | n/a | 0.47 [0.42, 0.52] | 0.55 [0.54, 0.56] | 0.20 [0.15, 0.26] | 0.19 [0.13, 0.25] |
+
+Coverage of what was shown (24 lists, top 3 each): 67 distinct items in 68 slots (unique share 0.99, Gini 0.01, most repeated item 3% of slots). There is no catalog denominator, so this is repetition, not the fraction of a catalog reached.
+
+Holdout sessions are not used here until they are labelled.
 
 
 ## Watch-and-learn pairs

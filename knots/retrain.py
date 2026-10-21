@@ -25,6 +25,7 @@ class Policy:
     min_users: int = int(os.environ.get("KNOTS_RETRAIN_MIN_USERS", "20"))         # M
     per_user_cap: int = int(os.environ.get("KNOTS_RETRAIN_PER_USER_CAP", "25"))
     min_new: int = int(os.environ.get("KNOTS_RETRAIN_MIN_NEW", "100"))            # new eligible labels since last train
+    alert_min_new: int = int(os.environ.get("KNOTS_RETRAIN_ALERT_MIN_NEW", "50")) # same, when an online alert says the model may be stale
     margin: float = 0.02                                                          # headline metric must improve by this
     tolerance: float = 0.01                                                       # the other metric may not drop more
 
@@ -44,7 +45,13 @@ def eligible(labels: list[dict], policy: Policy) -> list[dict]:
     return out
 
 
-def should_retrain(labels: list[dict], state: dict, policy: Policy | None = None) -> tuple[bool, str]:
+def should_retrain(labels: list[dict], state: dict, policy: Policy | None = None,
+                   alerts: list[dict] | None = None) -> tuple[bool, str]:
+    """Volume trigger, optionally eased by online alerts (see knots/online.py).
+
+    An alert that a retrain could fix lowers only `min_new` (to `alert_min_new`). The total number of labels and
+    the number of distinct people are never lowered, and online signals are never labels: a retrain still trains
+    on human verdicts only, and still has to pass `gate`."""
     policy = policy or Policy()
     rows = eligible(labels, policy)
     users = len({r.get("user", "") for r in rows})
@@ -53,9 +60,13 @@ def should_retrain(labels: list[dict], state: dict, policy: Policy | None = None
     if users < policy.min_users:
         return False, f"labels come from {users} people, need {policy.min_users}"
     new = len(rows) - int(state.get("trained_on", 0))
-    if new < policy.min_new:
-        return False, f"only {new} new usable labels since the last training, need {policy.min_new}"
-    return True, f"{len(rows)} usable labels from {users} people ({new} new)"
+    need, because = policy.min_new, ""
+    if alerts:
+        need = min(policy.min_new, policy.alert_min_new)
+        because = " (online alert: " + "; ".join(a["kind"] for a in alerts) + ")"
+    if new < need:
+        return False, f"only {new} new usable labels since the last training, need {need}{because}"
+    return True, f"{len(rows)} usable labels from {users} people ({new} new){because}"
 
 
 def gate(champion: dict, challenger: dict, policy: Policy | None = None, headline: str = "p@3",
@@ -84,7 +95,7 @@ class Registry:
         try:
             return json.loads(self.state_path.read_text())
         except (OSError, ValueError):
-            return {"champion": None, "history": [], "trained_on": 0}
+            return {"champion": None, "history": [], "trained_on": 0, "baseline": None}
 
     def _save(self, st: dict) -> None:
         self.state_path.write_text(json.dumps(st, indent=1))
@@ -97,18 +108,24 @@ class Registry:
              "artifact": artifact}, indent=1))
         return version
 
-    def promote(self, version: str, trained_on: int) -> None:
+    def promote(self, version: str, trained_on: int, baseline: dict | None = None) -> None:
+        """`baseline` (from online.make_baseline) freezes what normal looked like for this champion, so later
+        windows of online metrics have something to be compared with. Rollback restores the one it replaced."""
         st = self.state()
         if st["champion"]:
-            st["history"].append(st["champion"])
-        st["champion"], st["trained_on"] = version, trained_on
+            st["history"].append({"version": st["champion"], "baseline": st.get("baseline")})
+        st["champion"], st["trained_on"], st["baseline"] = version, trained_on, baseline
         self._save(st)
 
     def rollback(self) -> str | None:
         st = self.state()
         if not st["history"]:
             return None
-        st["champion"] = st["history"].pop()
+        prev = st["history"].pop()
+        if isinstance(prev, dict):                         # history written with baselines
+            st["champion"], st["baseline"] = prev["version"], prev.get("baseline")
+        else:                                              # history written before baselines existed
+            st["champion"], st["baseline"] = prev, None
         self._save(st)
         return st["champion"]
 

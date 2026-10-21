@@ -1,0 +1,110 @@
+# Metrics beyond accuracy, and the online metrics behind retraining
+
+Code: `knots/beyond.py` (the definitions), `eval/eval_beyond.py` (offline report), `knots/online.py` (online
+metrics and retrain triggers), `knots/retrain.py` (the decision and the gate). The server is not wired to the
+online part yet: see "Not wired".
+
+## 1. Offline: beyond accuracy
+
+Run `python eval/eval_beyond.py` after `eval_rank.py`. It uses the same lists and orderings and the same
+session-resampled 90% intervals, at the headline cut (top 3), so every row can be read next to P@3. It also writes
+`eval/results/metrics_beyond.json`, which `make_model_card.py` turns into a section of the model card.
+
+Higher means "more of the named thing", not "better". They are there to show a trade-off with accuracy, and a
+ranker that wins on P@3 by showing only famous, obvious picks should be visible as exactly that.
+
+| Metric | Definition | Needs labels |
+| --- | --- | --- |
+| Diversity (`ild`) | mean pairwise cosine distance between the picks' vectors | no |
+| `format_spread` | entropy of the picks' formats over log(list length); 1 = every pick a different format | no |
+| `topic_spread` | distinct matched topics / picks | no |
+| Novelty | 1 - popularity percentile within the pick's source (TMDB votes, video views, paper citations) | no |
+| Unexpectedness | 1 - mean percentile of keyword overlap and session similarity: how far the pick sits from what the person literally said | no |
+| `interest_coverage` | share of the session's own interests that at least one shown pick answers | no |
+| Serendipity | mean over picks of `good * unexpectedness`; also `serendipitous_share`, the share of good picks with unexpectedness >= 0.5 | yes |
+| Creativity | mean over picks of `good * sqrt(novelty * unexpectedness)`; also `creative_hit`, 1 if a list has a good pick with novelty and unexpectedness both >= 0.5 | yes |
+| Coverage | across all lists: distinct items, `unique_share` (distinct / slots), `gini` of how often items repeat, `top_item_share` | no |
+
+### How to read them honestly
+
+- **Percentiles, not absolutes.** Novelty and unexpectedness are percentiles against every pick shown in the run
+  (the pool), so 0.5 means "typical shown pick" and the numbers move if the pool does. Popularity is only compared
+  inside one source, because votes, views and citations are not on one scale.
+- **Unknown stays unknown.** A paper with no citation count has no novelty; a list of one pick has no diversity; a
+  source with fewer than 5 reference picks has no percentile. These are left out of the mean, never counted as 0.
+- **Creativity is a proxy.** Recommender evaluation has no accepted definition. This follows the usual
+  novelty-surprise-value reading using the data a pick carries. It overlaps with serendipity by construction;
+  creativity additionally needs the item itself to be rare. It cannot see whether a pick was a clever bridge between
+  ideas, only that it was good, rare and far from the person's words.
+- **Diversity needs a real embedder.** With the offline hashed embedder it is a word-overlap measure and sits near
+  0.9 whatever is shown. The report and model card say which embedder was used and warn when it was hashed.
+- **Coverage has no catalog denominator.** TMDB, YouTube and arXiv cannot be enumerated here, so coverage is how
+  repeated the shown items are, not what fraction of a catalog was reached. It is a point value with no interval:
+  resampling sessions with replacement repeats sessions, which manufactures the repetition coverage measures.
+  Repetition also grows with the number of slots, so compare rows from the same lists, not across scopes.
+- **Same limits as the accuracy numbers.** Only shown picks are labelled, serendipity and creativity use only
+  fully labelled lists, and there are few sessions and one labeller.
+
+## 2. Online metrics
+
+Computed from an append-only event log (`EventLog`, JSON lines; no conversation text is logged). Events:
+`impression` (a list was shown, with each pick's position and an `exploration` flag), `feedback` (explicit good /
+not good), `engage` (implicit positive) and `reformulate` (implicit negative).
+
+`window_metrics` reports, for a window of events:
+
+- **Positive rate** of explicit answers with a 90% Wilson interval, the same among positions 1-3, and the label
+  yield (answers per pick shown).
+- **Exploration gap**: positive rate of ranked picks against exploration picks. If a pick shown regardless of rank
+  is liked as often as a top-ranked one, the ranking is adding little. It reads `None` until an exploration slot
+  exists (designed, not built).
+- **Engagement rate** and **reformulation rate** (share of sessions with each), **repeat rate** (share of picks a
+  person had already been shown), **empty** and **relaxed** rates from the response contract's `status`.
+- **Beyond-accuracy on what was actually shown**: format and topic spread, coverage, and novelty and
+  unexpectedness against a frozen reference pool.
+
+Feedback exists only for picks that were shown, so it is biased toward what the model already favours; the position
+and exploration flags are recorded so that can be measured and corrected later.
+
+**Percentile metrics online need a frozen pool.** Against the window's own picks, novelty averages 0.5 by
+construction whatever is shown. `make_baseline` freezes the reference pool when a model is promoted, and
+without one novelty and unexpectedness are reported as `None`.
+
+## 3. What triggers a retrain
+
+Before this, the only trigger was label volume (`retrain.should_retrain`). Now:
+
+1. **Volume** (unchanged): at least `min_labels` usable labels from at least `min_users` people, and at least
+   `min_new` new ones since the last training. Defaults 200 / 20 / 100.
+2. **Online alerts** compare the latest window (default 14 days) with the baseline frozen at promotion
+   (`Registry.promote(..., baseline=make_baseline(events))`; rollback restores the previous champion's baseline).
+
+| Alert | Fires when | Can a retrain fix it? |
+| --- | --- | --- |
+| `quality_drop` | at least 40 answers, and even the optimistic end of the current positive rate is 0.10 below the baseline | yes |
+| `score_drift` | population stability index of the served fit scores against the baseline is at least 0.25 (100+ picks each side) | yes |
+| `retrieval` | empty + relaxed lists rose by 0.15 or more (30+ lists) | no: check the catalogs |
+| `filter_bubble` | novelty or unexpectedness fell by 0.15 or more, or repeat rate rose by 0.15 or more | no: consider the exploration slot |
+
+A retrain-relevant alert lowers **only** the new-label requirement (`min_new` 100 to `alert_min_new` 50).
+It never lowers the total labels or the number of distinct people, so one enthusiast cannot start a retrain.
+`retrain_decision(labels, events, state)` returns the decision, the reason, the alerts and the window metrics.
+
+Two rules do not change:
+
+- **Online signals never train.** Only explicit listener feedback becomes a label (`labels_from_events`);
+  engagement and reformulation can raise an alert but are never labels.
+- **Alerts decide when to try, never whether it ships.** The challenger still has to beat the champion on the
+  frozen expert holdout by at least +0.02 P@3 with NDCG@5 no worse than -0.01.
+
+All thresholds are untuned defaults and placeholders until there is real listener traffic to look at. The window,
+the minimum number of answers and the eased new-label requirement are env-tunable
+(`KNOTS_MONITOR_WINDOW_DAYS`, `KNOTS_MONITOR_MIN_FEEDBACK`, `KNOTS_RETRAIN_ALERT_MIN_NEW`); the rest are fields of
+`MonitorPolicy` in `knots/online.py`.
+
+## Not wired
+
+Nothing in `server.py` writes events yet. That needs the same two things as the profile code: a verified identity
+(derive it from the OAuth token; pass a salted hash as `user`, never a caller-supplied id) and somewhere to host
+the log. `EventLog.forget(user)` exists so `forget_me` can honour deletion. The first events to record are
+`impression` (when a response is built) and `feedback` (from a listener follow-up such as "was that a good pick?").
