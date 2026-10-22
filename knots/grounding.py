@@ -24,6 +24,17 @@ Evidence types (a pick earns each at most once):
   overreach rate = share of shown picks labelled not supported. A gate, not a metric to maximise: a change that
                    raises diversity but also raises overreach is rejected (see `retrain.gate`).
 
+Creative and grounded. Creativity is only credited when the link is also defensible, so reaching further cannot raise it:
+
+  strict   1 if the pick is good, supported, backed by at least MIN_TYPES (2) evidence types AND far from what the person
+           said (unexpectedness >= FAR, 0.5); else 0. Reported as a rate with its count (k of n picks): a rate over few
+           picks is unstable, so the count is always shown.
+  soft     good * supported * min(E, 3)/3 * unexpectedness. Every pick contributes a little, so it moves less than the
+           strict count. It still pays for distance, but only on picks that are good, supported and evidenced; a pick
+           that overreaches, is bad, or has no evidence scores 0 however far it is.
+
+A pick whose unexpectedness is unknown is left out of both (unknown stays unknown, as in serendipity).
+
 With co_mention absent, a pick needs all three live types to reach the cap, so today the metric is deliberately
 hard to max out. Every number depends on what the stored data can show; the eval says how many picks it could link.
 """
@@ -34,6 +45,8 @@ import os
 TYPES = ("keyword", "theme_quote", "overview_sim", "co_mention")
 CAP = 3
 FILM_TYPES = ("movie", "series", "doc")
+MIN_TYPES = 2           # evidence types a creative pick must have
+FAR = 0.5               # unexpectedness at or above this counts as "far from what the person said"
 
 
 def sim_min() -> float:
@@ -80,3 +93,18 @@ def score(n_types: int) -> float:
 
 def pick_grounding(good: int, supported: int, n_types: int) -> float:
     return good * supported * score(n_types)
+
+
+def creative_grounded(good: int, supported: int, n_types: int, unexpectedness: float | None) -> float | None:
+    """Strict 0/1: good, supported, at least MIN_TYPES evidence types, and far from the person's words. None when the
+    unexpectedness is unknown."""
+    if unexpectedness is None or unexpectedness != unexpectedness:
+        return None
+    return 1.0 if (good and supported and n_types >= MIN_TYPES and unexpectedness >= FAR) else 0.0
+
+
+def creative_grounded_soft(good: int, supported: int, n_types: int, unexpectedness: float | None) -> float | None:
+    """good * supported * min(E,3)/3 * unexpectedness; None when the unexpectedness is unknown."""
+    if unexpectedness is None or unexpectedness != unexpectedness:
+        return None
+    return pick_grounding(good, supported, n_types) * unexpectedness

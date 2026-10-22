@@ -44,7 +44,7 @@ from knots import grounding as G  # noqa: E402
 
 OUT = ROOT / "eval" / "results" / "metrics_beyond.json"
 K = 3
-HEADLINE = ("p@3", "ild", "grounding", "theme_coverage", "overreach")
+HEADLINE = ("p@3", "ild", "grounding", "creative_grounded", "creative_grounded_soft", "theme_coverage", "overreach")
 DIAGNOSTICS = ("novelty", "unexpectedness", "serendipity", "format_spread", "interest_coverage", "evidence_mean")
 COLUMNS = HEADLINE + DIAGNOSTICS
 LABEL_FREE = ("ild", "format_spread", "novelty", "unexpectedness", "interest_coverage", "evidence_mean")
@@ -63,6 +63,10 @@ DEFINITIONS = {
                  "(TMDB keyword, quoted theme, overview similarity; co-mention is not available yet). Distance earns nothing",
     "theme_coverage": "share of the session's linkable supported themes served by at least one good, supported pick",
     "overreach": "GATE: share of shown picks labelled not supported (proxy: bad with reason 'relevance'); lower is better",
+    "creative_grounded": "STRICT: share of picks that are good, supported, backed by >= 2 evidence types AND far from "
+                         "what the person said (unexpectedness >= 0.5). Reported with its count; reaching further cannot raise it",
+    "creative_grounded_soft": "SOFT: mean of good * supported * min(E,3)/3 * unexpectedness; any pick that is bad, "
+                              "overreaching or unevidenced scores 0 however far it is",
     "evidence_mean": "mean number of evidence types per pick (0 to 3)",
     "interest_coverage": "share of the session's own interests that at least one shown pick answers",
     "unique_share": "distinct items / slots shown across all lists (1 = no item is ever repeated); point value, no interval",
@@ -100,6 +104,11 @@ def embed_cards(cards: list[dict]) -> tuple[dict[str, list[float]], str]:
     urls = list(distinct)
     vecs, name = embed_many([B.card_text(distinct[u]) for u in urls])
     return dict(zip(urls, vecs)), name
+
+
+def _mean_known(vals) -> float:
+    vals = [v for v in vals if v is not None]
+    return sum(vals) / len(vals) if vals else float("nan")
 
 
 def _norm(s) -> str:
@@ -165,6 +174,11 @@ def _row(e: dict, cards: list[dict], lab: dict | None, pool: B.Pool, vec: dict |
             sup = [ctx.is_supported((sid, ext, c["url"]), r) for c, r in zip(cards, rels)]
             m["grounding"] = sum(G.pick_grounding(r, u, len(t)) for r, u, t in zip(rels, sup, types)) / len(cards)
             m["overreach"] = sum(1 - u for u in sup) / len(cards)
+            unx = [pool.unexpectedness(c) for c in cards]
+            strict = [G.creative_grounded(r, u, len(t), x) for r, u, t, x in zip(rels, sup, types, unx)]
+            soft = [G.creative_grounded_soft(r, u, len(t), x) for r, u, t, x in zip(rels, sup, types, unx)]
+            m["creative_grounded"] = _mean_known(strict)
+            m["creative_grounded_soft"] = _mean_known(soft)
             themes = ctx.list_themes(e)
             served = sum(1 for topic, _ in themes if any(
                 _norm(c.get("matched_topic")) == topic and r and u for c, r, u in zip(cards, rels, sup)))
@@ -253,7 +267,7 @@ def table(res: dict, names: tuple[str, ...]) -> list[str]:
     return rows
 
 
-def evidence_report(lists, lab: dict, ctx: Context, k: int = K) -> dict:
+def evidence_report(lists, lab: dict, ctx: Context, k: int = K, pool: B.Pool | None = None) -> dict:
     """What the evidence could and could not see, and how much the similarity threshold matters (the picks are the
     top k as read aloud; no intervals: this is a check on the definition, not a result)."""
     picks = [(e, c) for e, cards in lists for c in cards[:k]]
@@ -262,12 +276,25 @@ def evidence_report(lists, lab: dict, ctx: Context, k: int = K) -> dict:
         for t in ctx.types(e, c):
             counts[t] += 1
     linkable = sum(1 for e, c in picks if ctx.quoted(e, c) is not False)
+    qualified = known = 0
+    sessions_q = set()
+    pool = pool or B.Pool([c for _, cards in lists for c in cards])
+    for e, c in picks:
+        key = (e["session_id"], e["extractor"], c["url"])
+        good = 1 if lab[key] == "y" else 0
+        v = G.creative_grounded(good, ctx.is_supported(key, good), len(ctx.types(e, c)), pool.unexpectedness(c))
+        if v is not None:
+            known += 1
+            if v:
+                qualified += 1
+                sessions_q.add(e["session_id"])
     sens = {}
     for t in SIM_SENSITIVITY:
         rows = rows_for(lists, lab, B.Pool([]), None, "as read aloud", k, ctx.with_sim(t))
         vals = [r["metrics"]["grounding"] for r in rows]
         sens[f"{t:.2f}"] = round(sum(vals) / len(vals), 3) if vals else None
     return {"picks": len(picks), "fired": counts, "picks_with_a_quoted_theme": sum(1 for e, c in picks if ctx.quoted(e, c) is not False and ctx.quoted(e, c) is not None) + sum(1 for e, c in picks if ctx.quoted(e, c) is None and "theme_quote" in (c.get("evidence_types") or [])),
+            "creative_grounded_picks": {"qualified": qualified, "of": known, "sessions": len(sessions_q)},
             "grounding_by_sim_threshold": sens, "default_sim_threshold": ctx.sim_min or G.sim_min()}
 
 
@@ -331,7 +358,7 @@ def main(argv=None) -> int:
               "all_shown": evaluate(shown, None, pool, vec, ctx=ctx), "all_shown_lists": len(shown),
               "holdout": evaluate(built["holdout"], built["lab"], pool, vec, ctx=ctx)}
         if built["train"]:
-            sc["evidence"] = evidence_report(built["train"], built["lab"], ctx)
+            sc["evidence"] = evidence_report(built["train"], built["lab"], ctx, pool=pool)
         out[label] = sc
         print(f"\n== {label}: top {K}; {len(built['train'])} labelled lists, {len(shown)} lists in all ==")
         if sc["labelled"]:
@@ -341,6 +368,9 @@ def main(argv=None) -> int:
             print("\n".join("  " + r for r in table(sc["labelled"], DIAGNOSTICS)))
             ev = sc.get("evidence")
             if ev:
+                cg = ev["creative_grounded_picks"]
+                print(f"  creative & grounded (strict): {cg['qualified']} of {cg['of']} picks, in {cg['sessions']} sessions;"
+                      " a rate over so few picks is unstable, read the count.")
                 print(f"  evidence fired over {ev['picks']} picks: {ev['fired']}; Grounding@{K} at similarity "
                       f"threshold {ev['grounding_by_sim_threshold']} (default {ev['default_sim_threshold']})")
                 print(f"  theme coverage was measurable on {sc['labelled']['as read aloud'].get('theme_coverage_lists', 0)}"

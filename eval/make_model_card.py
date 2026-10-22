@@ -122,11 +122,14 @@ def beyond_section(beyond: dict | None) -> list[str]:
         return L + ["Not yet measured: run `python eval/eval_beyond.py`.", ""]
     k = beyond.get("k", 3)
     cols = [("p@3", "P@3"), ("ild", "Diversity (ILD)"), ("grounding", "Grounding@3"),
+            ("creative_grounded", "Creative & grounded (strict)"), ("creative_grounded_soft", "Creative & grounded (soft)"),
             ("theme_coverage", "Theme coverage"), ("overreach", "Overreach (gate, lower is better)")]
     diag = [("novelty", "Novelty"), ("unexpectedness", "Unexpectedness"), ("serendipity", "Serendipity")]
     L += [f"Top {k} picks of each list, same lists and orderings as the ranking table, so read the two together. "
           "Grounding@3 is how much independent evidence backs each good pick (keyword, quoted theme, overview "
-          "similarity); distance earns nothing. The overreach rate is a gate: a change that raises diversity but also "
+          "similarity); distance earns nothing. Creative & grounded credits distance only on picks that are also good, "
+          "supported and backed by at least two evidence types, so reaching further cannot raise it; its strict form is "
+          "a rate over few picks (the eval prints the count), so read the soft form for movement. The overreach rate is a gate: a change that raises diversity but also "
           "raises overreach is rejected. Novelty, unexpectedness and serendipity are diagnostics that describe what "
           "was shown and are not to be maximised. Grounding and overreach use a proxy for \"supported\" until picks "
           "carry a human label, and theme coverage is understated until the eval is re-run (definitions in "

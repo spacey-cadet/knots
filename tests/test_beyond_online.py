@@ -379,3 +379,34 @@ def test_eval_reports_grounding_overreach_and_theme_coverage():
     assert res["theme_coverage"]["mean"] == pytest.approx(0.5, abs=1e-3)         # t0 served by a good pick; t1 only by a bad one
     rep = EB.evidence_report(built["train"], built["lab"], ctx)
     assert rep["picks"] == 3 and set(rep["grounding_by_sim_threshold"]) == {"0.25", "0.30", "0.35"}
+
+
+def test_creative_grounded_cannot_be_raised_by_overreach():
+    from knots import grounding as G
+    assert G.creative_grounded(1, 1, 2, 0.8) == 1.0
+    assert G.creative_grounded(1, 1, 1, 0.9) == 0.0          # far but only one kind of evidence
+    assert G.creative_grounded(1, 1, 3, 0.2) == 0.0          # well evidenced but near: not creative
+    assert G.creative_grounded(0, 1, 3, 0.9) == 0.0          # bad
+    assert G.creative_grounded(1, 0, 3, 0.9) == 0.0          # unsupported (overreach)
+    assert G.creative_grounded(1, 1, 3, None) is None        # unknown stays unknown
+    assert G.creative_grounded_soft(1, 1, 3, 0.9) == pytest.approx(0.9)
+    assert G.creative_grounded_soft(1, 0, 3, 1.0) == 0 and G.creative_grounded_soft(0, 1, 3, 1.0) == 0
+    assert G.creative_grounded_soft(1, 1, 0, 1.0) == 0       # far with no evidence earns nothing
+    # more distance on an unsupported or unevidenced pick never raises either form
+    for far in (0.5, 0.9, 1.0):
+        assert G.creative_grounded(1, 0, 3, far) == 0 and G.creative_grounded_soft(1, 1, 0, far) == 0
+
+
+def test_eval_reports_creative_grounded_with_counts():
+    EB = _load_script("eval_beyond")
+    cs = [card(f"c{i}", votes=1000 * (i + 1), overlap=float(10 - 5 * i), sim=0.9 - 0.4 * i, topic="t0") | {"evidence": ["k"]}
+          for i in range(3)]
+    e = _entry("s1", "bedrock", cs, topics=("t0",))
+    labels = [{"session_id": "s1", "extractor": "bedrock", "url": c["url"], "good": "y", "reason": ""} for c in cs]
+    built = EB.ER.build_lists([e], labels, {"s1": "train"}, None)
+    ctx = EB.load_context(labels)
+    pool = EB.B.Pool(cs, min_pool=1)
+    res = EB.evaluate(built["train"], built["lab"], pool, None, ctx=ctx)["as read aloud"]
+    assert 0 <= res["creative_grounded"]["mean"] <= 1 and 0 <= res["creative_grounded_soft"]["mean"] <= 1
+    ev = EB.evidence_report(built["train"], built["lab"], ctx, pool=pool)["creative_grounded_picks"]
+    assert ev["of"] == 3 and 0 <= ev["qualified"] <= 3
