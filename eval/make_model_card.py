@@ -121,14 +121,19 @@ def beyond_section(beyond: dict | None) -> list[str]:
     if not beyond:
         return L + ["Not yet measured: run `python eval/eval_beyond.py`.", ""]
     k = beyond.get("k", 3)
-    cols = [("p@3", "P@3"), ("ild", "Diversity (ILD)"), ("novelty", "Novelty"), ("unexpectedness", "Unexpectedness"),
-            ("serendipity", "Serendipity"), ("creativity", "Creativity")]
+    cols = [("p@3", "P@3"), ("ild", "Diversity (ILD)"), ("grounding", "Grounding@3"),
+            ("creative_grounded", "Creative & grounded (strict)"), ("creative_grounded_soft", "Creative & grounded (soft)"),
+            ("theme_coverage", "Theme coverage"), ("overreach", "Overreach (gate, lower is better)")]
+    diag = [("novelty", "Novelty"), ("unexpectedness", "Unexpectedness"), ("serendipity", "Serendipity")]
     L += [f"Top {k} picks of each list, same lists and orderings as the ranking table, so read the two together. "
-          "None of these says \"better\": higher novelty means rarer items, higher unexpectedness means further from what "
-          "the person literally said, and serendipity and creativity count only picks the labeller marked good. "
-          "Novelty and unexpectedness are percentiles against every pick shown in the run, so they mean \"more or less "
-          "than a typical shown pick\". Creativity has no standard definition; this is a novelty-surprise-value proxy "
-          "(definitions in `docs/METRICS.md`). Intervals resample sessions.", ""]
+          "Grounding@3 is how much independent evidence backs each good pick (keyword, quoted theme, overview "
+          "similarity); distance earns nothing. Creative & grounded credits distance only on picks that are also good, "
+          "supported and backed by at least two evidence types, so reaching further cannot raise it; its strict form is "
+          "a rate over few picks (the eval prints the count), so read the soft form for movement. The overreach rate is a gate: a change that raises diversity but also "
+          "raises overreach is rejected. Novelty, unexpectedness and serendipity are diagnostics that describe what "
+          "was shown and are not to be maximised. Grounding and overreach use a proxy for \"supported\" until picks "
+          "carry a human label, and theme coverage is understated until the eval is re-run (definitions in "
+          "`docs/METRICS.md`). Intervals resample sessions.", ""]
     emb = beyond.get("ild_embedder")
     if emb is None:
         L += ["Diversity (ILD) was not computed (no embedding model was used for this run).", ""]
@@ -146,6 +151,8 @@ def beyond_section(beyond: dict | None) -> list[str]:
               "| Order | " + " | ".join(n for _, n in cols) + " |", "| --- " * (len(cols) + 1) + "|"]
         for order in [o for o in ("as read aloud", "fit score", "popularity", "random (chance)") if o in res]:
             L.append(f"| {order} | " + " | ".join(_cell(res[order].get(c)) for c, _ in cols) + " |")
+        L += ["", "Diagnostics: " + "; ".join(
+            f"{n} {_cell(((res.get('as read aloud') or {}).get(c)))}" for c, n in diag)]
         cov = ((sc.get("all_shown") or {}).get("as read aloud") or {}).get("coverage")
         if cov and cov.get("slots"):
             L += ["", f"Coverage of what was shown ({sc.get('all_shown_lists', 0)} lists, top {k} each): "

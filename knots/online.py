@@ -62,6 +62,7 @@ def pick_record(card: dict, position: int, exploration: bool = False) -> dict:
     return {"url": card.get("url", ""), "type": card.get("type", ""), "matched_topic": card.get("matched_topic", ""),
             "position": int(position), "exploration": bool(exploration), "fit_score": card.get("fit_score"),
             "votes": card.get("votes"), "citations": card.get("citations"),
+            "evidence_types": list(card.get("evidence_types") or []),
             "fit_features": {"overlap": ff.get("overlap"), "sim_session": ff.get("sim_session")}}
 
 

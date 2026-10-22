@@ -1,5 +1,5 @@
 """
-Beyond-accuracy metrics for a list of recommended picks: diversity, novelty, coverage, serendipity, creativity.
+Beyond-accuracy metrics for a list of recommended picks: diversity, novelty, coverage, serendipity.
 
 Pure functions on pick dicts (the cards a plan already carries), with no I/O, so the offline eval
 (`eval/eval_beyond.py`) and the online monitor (`knots/online.py`) compute exactly the same numbers.
@@ -27,13 +27,12 @@ Definitions (each in 0..1 unless stated; higher is "more" of the named thing, no
                    what the person literally said. The obvious recommendation scores 0.
   serendipity      mean over picks of  good * unexpectedness      (valuable AND not obvious; needs labels)
   serendipitous_share   share of the GOOD picks with unexpectedness >= 0.5
-  creativity       mean over picks of  good * sqrt(novelty * unexpectedness)   (valuable, rare AND not obvious;
-                   a geometric mean so a pick that is obvious, or famous, cannot score high on the other alone)
-  creative_hit     1 if the list has a pick that is good, novelty >= 0.5 and unexpectedness >= 0.5, else 0.
 
-"Creativity" has no accepted single definition in recommender evaluation. This one follows the usual
-novelty-surprise-value reading (Boden) with the data a pick carries; treat it as a proxy, and note it overlaps
-with serendipity by construction (creativity additionally needs the item itself to be rare).
+Distance is never rewarded as a goal. Serendipity, novelty and unexpectedness are DESCRIPTIONS of what was shown and
+are not to be maximised: they say nothing about whether a link is real. What is "hard work" is measured by
+`knots/grounding.py` (the evidence behind a link), and the overreach rate is the gate that stops reaching further
+from being mistaken for improvement. An earlier "creativity" metric (good * sqrt(novelty * unexpectedness)) paid for
+distance, which rewards far-fetched picks, and was removed.
 """
 from __future__ import annotations
 
@@ -197,9 +196,6 @@ def list_metrics(cards: list[dict], rels: list[int] | None = None, pool: Pool | 
     out["serendipity"] = _mean([r * u for r, u in zip(rels, unx) if u is not None])
     good_unx = [u for r, u in zip(rels, unx) if r and u is not None]
     out["serendipitous_share"] = _mean([1.0 if u >= HALF else 0.0 for u in good_unx])
-    both = [(r, n, u) for r, n, u in zip(rels, nov, unx) if n is not None and u is not None]
-    out["creativity"] = _mean([r * math.sqrt(n * u) for r, n, u in both])
-    out["creative_hit"] = (1.0 if any(r and n >= HALF and u >= HALF for r, n, u in both) else 0.0) if both else NAN
     return out
 
 

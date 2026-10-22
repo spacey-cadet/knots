@@ -61,17 +61,17 @@ def test_ild_format_spread_and_topic_spread():
     assert B.interest_coverage([card("a")], []) is None
 
 
-def test_serendipity_and_creativity_need_a_good_pick_that_is_unexpected_and_for_creativity_also_rare():
+def test_serendipity_needs_a_good_pick_that_is_unexpected_and_creativity_is_gone():
     pool = B.Pool(film_pool())
     rare_far = card("rf", votes=1, overlap=-5, sim=-5)          # rare AND far from the person's words
     famous_far = card("ff", votes=10**7, overlap=-5, sim=-5)    # far, but everyone has seen it
     rare_near = card("rn", votes=1, overlap=19, sim=19)         # rare, but exactly what they said
     m = B.list_metrics([rare_far, famous_far, rare_near], [1, 1, 1], pool)
     assert m["serendipity"] == pytest.approx((1 + 1 + 0) / 3, abs=0.1)          # only the two far picks are unexpected
-    assert m["creativity"] == pytest.approx(1 / 3, abs=0.1)                      # only rare AND far counts fully
-    assert m["creative_hit"] == 1.0 and m["serendipitous_share"] == pytest.approx(2 / 3, abs=0.01)
+    assert "creativity" not in m and "creative_hit" not in m                     # distance is not rewarded
+    assert m["serendipitous_share"] == pytest.approx(2 / 3, abs=0.01)
     bad = B.list_metrics([rare_far, famous_far, rare_near], [0, 0, 0], pool)     # nothing good: nothing serendipitous
-    assert bad["serendipity"] == 0 and bad["creativity"] == 0 and bad["creative_hit"] == 0.0
+    assert bad["serendipity"] == 0
     assert math.isnan(bad["serendipitous_share"])                                # no good picks to take a share of
     assert "serendipity" not in B.list_metrics([rare_far], None, pool)           # label-free call omits them
 
@@ -80,7 +80,7 @@ def test_unknown_values_are_left_out_not_zeroed():
     pool = B.Pool(film_pool())
     unknown_pop = card("u", "paper", votes=None, citations=None, overlap=-5, sim=-5)
     m = B.list_metrics([unknown_pop], [1], pool)
-    assert math.isnan(m["novelty"]) and math.isnan(m["creativity"]) and math.isnan(m["creative_hit"])
+    assert math.isnan(m["novelty"])
     assert m["serendipity"] > 0.9                    # its unexpectedness IS known, so serendipity still counts it
 
 
@@ -118,7 +118,7 @@ def test_eval_beyond_reports_labelled_and_label_free_blocks_and_never_gives_cove
     built = EB.ER.build_lists(results, labels, splits, None)
     pool = EB.B.Pool([c for cs in cards.values() for c in cs], min_pool=3)
     labelled = EB.evaluate(built["train"], built["lab"], pool, None)
-    assert "serendipity" in labelled["as read aloud"] and "creativity" in labelled["as read aloud"]
+    assert "serendipity" in labelled["as read aloud"] and "creativity" not in labelled["as read aloud"]
     assert labelled["as read aloud"]["p@3"]["mean"] == pytest.approx(1 / 3, abs=1e-3)
     assert labelled["as read aloud"]["interest_coverage"]["mean"] == 1.0                  # both interests answered
     shown = EB.shown_lists(results, splits, None)
@@ -321,7 +321,7 @@ def test_model_card_has_a_beyond_accuracy_section_with_numbers_only_from_the_fil
     cell = lambda m: {"mean": m, "ci90": [round(m - 0.05, 3), round(m + 0.05, 3)]}  # noqa: E731
     nan = {"mean": float("nan"), "ci90": [float("nan")] * 2}
     row = {"p@3": cell(0.61), "ild": nan, "novelty": cell(0.47), "unexpectedness": cell(0.52),
-           "serendipity": cell(0.33), "creativity": cell(0.29),
+           "serendipity": cell(0.33), "grounding": cell(0.29), "overreach": cell(0.08), "theme_coverage": nan,
            "coverage": {"slots": 90, "distinct_items": 81, "unique_share": 0.9, "gini": 0.07, "top_item_share": 0.02}}
     (tmp_path / "metrics_beyond.json").write_text(json.dumps({
         "k": 3, "ild_embedder": "hashed",
@@ -333,3 +333,80 @@ def test_model_card_has_a_beyond_accuracy_section_with_numbers_only_from_the_fil
     assert "| as read aloud |" in sect and "| random (chance) |" in sect and "| n/a |" in sect   # unknown ILD is n/a, not 0
     assert "hashed embedder" in sect and "12 complete lists" in sect           # the lexical-embedder warning is shown
     assert "81 distinct items in 90 slots" in sect and "not the fraction of a catalog" in sect
+
+
+# ---- Grounding -----------------------------------------------------------------------------------------------
+
+def test_grounding_pays_for_evidence_not_distance():
+    from knots import grounding as G
+    assert G.evidence_types("movie", ["memecoin"], 0.4, True) == ["keyword", "theme_quote", "overview_sim"]
+    assert G.evidence_types("video", ["x"], 0.1, True) == []                     # a video's "match" is not evidence
+    assert G.evidence_types("paper", None, 0.5, True) == ["overview_sim"]
+    assert G.evidence_types("movie", None, None, False) == []                    # missing facts never fire a type
+    assert G.pick_grounding(1, 1, 3) == 1.0 and G.pick_grounding(1, 1, 1) == pytest.approx(1 / 3)
+    assert G.pick_grounding(0, 1, 3) == 0 and G.pick_grounding(1, 0, 3) == 0
+    assert G.pick_grounding(1, 1, 9) == 1.0                                      # capped
+    near = G.evidence_types("movie", ["a"], 0.9, False)
+    far = G.evidence_types("movie", ["a"], 0.31, False)
+    assert near == far                                                           # nearer scores the same
+
+
+def test_overreach_proxy_and_gate():
+    EB = _load_script("eval_beyond")
+    ctx = EB.Context(reasons={("s", "e", "u1"): "relevance", ("s", "e", "u2"): "taste"})
+    assert ctx.is_supported(("s", "e", "u1"), 0) == 0                            # bad because the link was wrong
+    assert ctx.is_supported(("s", "e", "u2"), 0) == 1                            # bad for taste: still supported
+    assert ctx.is_supported(("s", "e", "u1"), 1) == 1
+    ctx2 = EB.Context(supported={("s", "e", "u2"): "n"})
+    assert ctx2.is_supported(("s", "e", "u2"), 1) == 0                           # an explicit label wins
+    from knots import retrain
+    pol = retrain.Policy()
+    assert pol.overreach_tolerance == 0.02
+
+
+def test_eval_reports_grounding_overreach_and_theme_coverage():
+    EB = _load_script("eval_beyond")
+    cs = [card(f"g{i}", votes=1000, overlap=1.0, sim=0.5 - 0.1 * i, topic=f"t{i % 2}") | {"evidence": ["k"]} for i in range(3)]
+    e = _entry("s1", "bedrock", cs, topics=("t0", "t1"))
+    labels = [{"session_id": "s1", "extractor": "bedrock", "url": c["url"], "good": g, "reason": r}
+              for c, g, r in zip(cs, "yny", ("", "relevance", ""))]
+    built = EB.ER.build_lists([e], labels, {"s1": "train"}, None)
+    ctx = EB.load_context(labels)
+    ctx.themes[("s1", "bedrock")] = [{"topic": "t0", "theme": "a"}, {"topic": "t1", "theme": "b"}]
+    res = EB.evaluate(built["train"], built["lab"], EB.B.Pool([], min_pool=1), None, ctx=ctx)["as read aloud"]
+    assert res["overreach"]["mean"] == pytest.approx(1 / 3, abs=1e-3)            # one pick labelled relevance-bad
+    assert 0 < res["grounding"]["mean"] <= 1
+    assert res["theme_coverage"]["mean"] == pytest.approx(0.5, abs=1e-3)         # t0 served by a good pick; t1 only by a bad one
+    rep = EB.evidence_report(built["train"], built["lab"], ctx)
+    assert rep["picks"] == 3 and set(rep["grounding_by_sim_threshold"]) == {"0.25", "0.30", "0.35"}
+
+
+def test_creative_grounded_cannot_be_raised_by_overreach():
+    from knots import grounding as G
+    assert G.creative_grounded(1, 1, 2, 0.8) == 1.0
+    assert G.creative_grounded(1, 1, 1, 0.9) == 0.0          # far but only one kind of evidence
+    assert G.creative_grounded(1, 1, 3, 0.2) == 0.0          # well evidenced but near: not creative
+    assert G.creative_grounded(0, 1, 3, 0.9) == 0.0          # bad
+    assert G.creative_grounded(1, 0, 3, 0.9) == 0.0          # unsupported (overreach)
+    assert G.creative_grounded(1, 1, 3, None) is None        # unknown stays unknown
+    assert G.creative_grounded_soft(1, 1, 3, 0.9) == pytest.approx(0.9)
+    assert G.creative_grounded_soft(1, 0, 3, 1.0) == 0 and G.creative_grounded_soft(0, 1, 3, 1.0) == 0
+    assert G.creative_grounded_soft(1, 1, 0, 1.0) == 0       # far with no evidence earns nothing
+    # more distance on an unsupported or unevidenced pick never raises either form
+    for far in (0.5, 0.9, 1.0):
+        assert G.creative_grounded(1, 0, 3, far) == 0 and G.creative_grounded_soft(1, 1, 0, far) == 0
+
+
+def test_eval_reports_creative_grounded_with_counts():
+    EB = _load_script("eval_beyond")
+    cs = [card(f"c{i}", votes=1000 * (i + 1), overlap=float(10 - 5 * i), sim=0.9 - 0.4 * i, topic="t0") | {"evidence": ["k"]}
+          for i in range(3)]
+    e = _entry("s1", "bedrock", cs, topics=("t0",))
+    labels = [{"session_id": "s1", "extractor": "bedrock", "url": c["url"], "good": "y", "reason": ""} for c in cs]
+    built = EB.ER.build_lists([e], labels, {"s1": "train"}, None)
+    ctx = EB.load_context(labels)
+    pool = EB.B.Pool(cs, min_pool=1)
+    res = EB.evaluate(built["train"], built["lab"], pool, None, ctx=ctx)["as read aloud"]
+    assert 0 <= res["creative_grounded"]["mean"] <= 1 and 0 <= res["creative_grounded_soft"]["mean"] <= 1
+    ev = EB.evidence_report(built["train"], built["lab"], ctx, pool=pool)["creative_grounded_picks"]
+    assert ev["of"] == 3 and 0 <= ev["qualified"] <= 3
