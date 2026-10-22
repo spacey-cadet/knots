@@ -59,7 +59,7 @@ class Run:
     query: str = ""          # what the person said (newest kept): ranking compares candidates to it
 
     def plan(self) -> dict:
-        """The thinking-partner view. Always has `threads`, `picks`, `spoken` and `ask`."""
+        """The knots-partner view. Always has `threads`, `picks`, `spoken` and `ask`."""
         if not self.interests:
             out = {"extractor": self.extractor, "threads": [],
                    "picks": {"watch": [], "read": [], "explore": []},

@@ -2,7 +2,7 @@
 Offline tests: no network, no AWS credentials, no API keys.
 
     python -m pytest -q                  # the tests
-    python tests/test_local.py           # the tests, then a sample thinking_partner session
+    python tests/test_local.py           # the tests, then a sample knots_partner session
 
 Bedrock is exercised through a fake client that returns the same response shape
 the real Converse API does, so the parsing, validation and fallback logic that
@@ -844,13 +844,13 @@ def test_tools_remember_forget_and_stay_stateless_without_a_user_id(monkeypatch,
         out = asyncio.run(server.mcp.call_tool(name, args))
         return json.loads((out[0] if isinstance(out, tuple) else out)[0].text)
 
-    call("thinking_partner", {"session_texts": SAMPLE_SESSION})              # no user_id: stateless
+    call("knots_partner", {"session_texts": SAMPLE_SESSION})              # no user_id: stateless
     assert not db.exists()
-    first = call("thinking_partner", {"session_texts": [MEME_TEXT], "user_id": "alex"})
+    first = call("knots_partner", {"session_texts": [MEME_TEXT], "user_id": "alex"})
     assert first["memory"]["stored_new"] == 1 and first["memory"]["recalled"] == 0
-    second = call("thinking_partner", {"session_texts": [MEME_TEXT + " again please"], "user_id": "alex"})
+    second = call("knots_partner", {"session_texts": [MEME_TEXT + " again please"], "user_id": "alex"})
     assert second["memory"]["recalled"] == 1 and "across 2 conversations" in second["spoken"]
-    quiet = call("thinking_partner", {"user_id": "alex"})                     # nothing said: profile mode
+    quiet = call("knots_partner", {"user_id": "alex"})                     # nothing said: profile mode
     assert quiet["extractor"] == "profile" and quiet["threads"]
     known = call("what_do_you_remember", {"user_id": "alex"})
     assert known["remembered_conversations"] == 2 and known["threads"] and "never your words" in known["stores"]
@@ -990,7 +990,7 @@ def test_tools_accept_conversations_and_the_plan_says_it_came_back(monkeypatch):
     fake = FakeBedrock(MODEL_OUTPUT)
     _use(monkeypatch, fake)
     _offline_catalogs(monkeypatch)
-    out = asyncio.run(server.mcp.call_tool("thinking_partner", {"conversations": [
+    out = asyncio.run(server.mcp.call_tool("knots_partner", {"conversations": [
         {"turns": ["what is a memecoin?"], "timestamp": "2026-10-10T08:00:00Z"},
         {"turns": ["is crypto a bubble?"], "timestamp": "2026-10-14T08:00:00Z"},
         {"turns": ["tokenomics of memecoins"], "timestamp": "2026-10-15T08:00:00Z"}]}))
@@ -1011,7 +1011,7 @@ def test_tools_still_accept_the_old_flat_input(monkeypatch):
 def test_server_exposes_tools():
     import server
     names = {t.name for t in asyncio.run(server.mcp.list_tools())}
-    assert {"thinking_partner", "get_recommendations", "extract_interests", "search_content"} <= names
+    assert {"knots_partner", "get_recommendations", "extract_interests", "search_content"} <= names
 
 
 def test_engine_is_the_single_door(monkeypatch):
@@ -1046,7 +1046,7 @@ if __name__ == "__main__":
         os.environ["EXTRACTOR"] = "heuristic"
         os.environ["KNOTS_OFFLINE"] = "1"   # sample output uses the explicit offline mock catalogs
         os.environ.pop("TMDB_API_KEY", None)
-        print("\n=== Sample thinking_partner output (offline, heuristic) ===")
+        print("\n=== Sample knots_partner output (offline, heuristic) ===")
         print(json.dumps(asyncio.run(engine.plan(session_texts=SAMPLE_SESSION)), indent=2))
     sys.exit(code)
 

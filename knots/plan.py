@@ -1,5 +1,5 @@
 """
-Thinking-partner mode: the "what are we doing today?" experience.
+Knots-partner mode: the "what are we doing today?" experience.
 
 Instead of returning a flat ranked list, this answers like a person you think
 with: it says what it thinks you're circling (including what's underneath),

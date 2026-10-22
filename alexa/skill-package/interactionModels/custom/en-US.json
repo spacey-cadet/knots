@@ -9,7 +9,7 @@
         { "name": "AMAZON.NavigateHomeIntent", "samples": [] },
         { "name": "AMAZON.FallbackIntent", "samples": [] },
         {
-          "name": "ThinkingPartnerIntent",
+          "name": "KnotsPartnerIntent",
           "slots": [{ "name": "topic", "type": "AMAZON.SearchQuery" }],
           "samples": [
             "what are we doing today",

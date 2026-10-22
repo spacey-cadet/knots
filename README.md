@@ -88,7 +88,7 @@ facts held (shared tags that literally appear in both). The floors and the ladde
 
 ## Challenge me (opt-in)
 
-`thinking_partner(..., challenge_me=True)` (or `KNOTS_CHALLENGE=1`) reserves one slot
+`knots_partner(..., challenge_me=True)` (or `KNOTS_CHALLENGE=1`) reserves one slot
 for a well-rated title found with the extractor's `counter_keywords`: a serious view that
 complicates yours. The card says what it pushes back on. Off by default.
 
@@ -124,7 +124,7 @@ tests/                  offline tests (no network, no keys)
 
 ```python
 from knots import engine
-plan = await engine.plan(session_texts=["..."], user_id="alex")   # same as the thinking_partner tool
+plan = await engine.plan(session_texts=["..."], user_id="alex")   # same as the knots_partner tool
 ```
 
 ## How it works
@@ -157,7 +157,7 @@ session text ──► understanding ──► retrieval ──► quality gate 
 
 | Tool | Use |
 | --- | --- |
-| `thinking_partner(session_texts, include_videos=True, challenge_me=False)` | "What are we doing today?" Threads, what's underneath (with confidence), grouped picks with reasons and receipts, watch-and-learn pairs, spoken line, follow-up question, and a `session_id` |
+| `knots_partner(session_texts, include_videos=True, challenge_me=False)` | "What are we doing today?" Threads, what's underneath (with confidence), grouped picks with reasons and receipts, watch-and-learn pairs, spoken line, follow-up question, and a `session_id` |
 | `rate_pick(session_id, url, good)` | The person said a pick was good or not. Only for a signed-in person and only for a pick shown to them in that session; this is the feedback retraining learns from |
 | `get_recommendations(session_texts, limit=6, challenge_me=False)` | Full pipeline as ranked cards |
 | `extract_interests(session_texts)` | Topics, concepts, unstated themes, keywords, and which extractor ran |
@@ -183,7 +183,7 @@ AWS chain. The role needs `bedrock:InvokeModel`. Never commit keys.
 
 ```bash
 python -m pytest -q            # offline tests
-python tests/test_local.py     # the tests, then a sample thinking_partner response
+python tests/test_local.py     # the tests, then a sample knots_partner response
 python server.py       # MCP server at http://localhost:8000/mcp
 ```
 
@@ -198,7 +198,7 @@ async def main():
     async with streamablehttp_client("http://localhost:8000/mcp") as (r, w, _):
         async with ClientSession(r, w) as s:
             await s.initialize()
-            res = await s.call_tool("thinking_partner", {
+            res = await s.call_tool("knots_partner", {
                 "session_texts": ["I keep reading about memecoin tokenomics. Is it a bubble?"]})
             print(res.content[0].text)
 
