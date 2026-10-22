@@ -1,4 +1,104 @@
 {
- "status": "not_trained",
- "reason": "107 labelled live picks, but only 0 carry stored fit features (107 do not). Re-run `python eval/run_eval.py run`, then label the new picks."
+ "status": "trained",
+ "train_picks": 215,
+ "train_sessions": 24,
+ "good_rate": 0.516,
+ "good_rate_by_type": {
+  "doc": 0.632,
+  "movie": 0.559,
+  "paper": 0.276,
+  "series": 0.452,
+  "video": 0.574
+ },
+ "loso": {
+  "old overlap score": {
+   "auc": 0.324,
+   "auc_ci90": [
+    0.257,
+    0.397
+   ],
+   "precision_at_3": 0.375
+  },
+  "hand-set prior": {
+   "auc": 0.66,
+   "auc_ci90": [
+    0.601,
+    0.717
+   ],
+   "precision_at_3": 0.736
+  },
+  "fitted (leave-session-out)": {
+   "auc": 0.693,
+   "auc_ci90": [
+    0.643,
+    0.745
+   ],
+   "precision_at_3": 0.778
+  }
+ },
+ "weights": {
+  "sim_session": 0.7704,
+  "sim_concept": -0.2625,
+  "overlap": 0.1176,
+  "quality": 0.0129,
+  "medium": 0.3911,
+  "authority": -0.2175
+ },
+ "calibration": {
+  "a": 1.015,
+  "b": -0.3062,
+  "ece": 0.0562,
+  "reliability": [
+   {
+    "bin": "0.0-0.2",
+    "n": 8,
+    "predicted": 0.173,
+    "observed": 0.375
+   },
+   {
+    "bin": "0.2-0.4",
+    "n": 50,
+    "predicted": 0.317,
+    "observed": 0.24
+   },
+   {
+    "bin": "0.4-0.6",
+    "n": 84,
+    "predicted": 0.507,
+    "observed": 0.56
+   },
+   {
+    "bin": "0.6-0.8",
+    "n": 68,
+    "predicted": 0.69,
+    "observed": 0.662
+   },
+   {
+    "bin": "0.8-1.0",
+    "n": 5,
+    "predicted": 0.853,
+    "observed": 0.8
+   }
+  ]
+ },
+ "holdout": {
+  "n": 55,
+  "auc": 0.796,
+  "auc_ci90": [
+   0.643,
+   0.921
+  ],
+  "precision_at_3": 0.611
+ },
+ "embedder": {
+  "recorded": true,
+  "provider": "cohere",
+  "requested": "auto",
+  "model_id": "cohere.embed-v4:0",
+  "dimensions": 256,
+  "runs_by_embedder": {
+   "cohere": 60
+  },
+  "fell_back_runs": 0
+ }
 }

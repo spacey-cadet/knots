@@ -1,0 +1,21 @@
+{
+ "weights": {
+  "sim_session": 0.7704,
+  "sim_concept": -0.2625,
+  "overlap": 0.1176,
+  "quality": 0.0129,
+  "medium": 0.3911,
+  "authority": -0.2175
+ },
+ "calibration": {
+  "a": 1.0149527078092582,
+  "b": -0.3061803841357395
+ },
+ "meta": {
+  "picks": 215,
+  "sessions": 24,
+  "C": 0.3,
+  "date": "2026-10-22",
+  "loso_auc": 0.693
+ }
+}
