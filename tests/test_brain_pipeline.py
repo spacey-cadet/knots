@@ -27,7 +27,10 @@ from knots.ranking import medium_weight, rank_and_render  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
-def offline_hashed(monkeypatch):
+def offline_hashed(monkeypatch, tmp_path):
+    # Tests assume the hand-set prior and no calibration, whatever rank_weights.json ships.
+    monkeypatch.setattr(fitmodel, "WEIGHTS_FILE", tmp_path / "no_rank_weights.json")
+    fitmodel.reload()
     monkeypatch.setenv("EMBEDDER", "hashed")
     monkeypatch.delenv("BEDROCK_MODEL_ID", raising=False)
     monkeypatch.setenv("KNOTS_OFFLINE", "1")
