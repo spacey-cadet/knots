@@ -28,7 +28,12 @@
   "novelty": "1 - popularity percentile within the source (votes, views or citations); 1 = rarely seen",
   "unexpectedness": "1 - percentile of closeness to the person's own words (keyword overlap, session similarity)",
   "serendipity": "mean of good * unexpectedness over the picks",
-  "creativity": "mean of good * sqrt(novelty * unexpectedness) over the picks",
+  "grounding": "mean over the top-k picks of good * supported * min(E, 3) / 3, E = independent evidence types (TMDB keyword, quoted theme, overview similarity; co-mention is not available yet). Distance earns nothing",
+  "theme_coverage": "share of the session's linkable supported themes served by at least one good, supported pick",
+  "overreach": "GATE: share of shown picks labelled not supported (proxy: bad with reason 'relevance'); lower is better",
+  "creative_grounded": "STRICT: share of picks that are good, supported, backed by >= 2 evidence types AND far from what the person said (unexpectedness >= 0.5). Reported with its count; reaching further cannot raise it",
+  "creative_grounded_soft": "SOFT: mean of good * supported * min(E,3)/3 * unexpectedness; any pick that is bad, overreaching or unevidenced scores 0 however far it is",
+  "evidence_mean": "mean number of evidence types per pick (0 to 3)",
   "interest_coverage": "share of the session's own interests that at least one shown pick answers",
   "unique_share": "distinct items / slots shown across all lists (1 = no item is ever repeated); point value, no interval",
   "gini": "inequality of how often each shown item appears (0 = all equally often)",
@@ -53,11 +58,39 @@
       0.916
      ]
     },
-    "format_spread": {
-     "mean": 0.607,
+    "grounding": {
+     "mean": 0.284,
      "ci90": [
-      0.546,
-      0.664
+      0.242,
+      0.323
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.094,
+     "ci90": [
+      0.049,
+      0.139
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.128,
+     "ci90": [
+      0.111,
+      0.145
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.787,
+     "ci90": [
+      0.639,
+      0.925
+     ]
+    },
+    "overreach": {
+     "mean": 0.361,
+     "ci90": [
+      0.288,
+      0.434
      ]
     },
     "novelty": {
@@ -81,11 +114,11 @@
       0.328
      ]
     },
-    "creativity": {
-     "mean": 0.267,
+    "format_spread": {
+     "mean": 0.607,
      "ci90": [
-      0.222,
-      0.315
+      0.546,
+      0.664
      ]
     },
     "interest_coverage": {
@@ -95,6 +128,14 @@
       0.608
      ]
     },
+    "evidence_mean": {
+     "mean": 1.25,
+     "ci90": [
+      1.118,
+      1.385
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 137,
      "distinct_items": 130,
@@ -121,11 +162,39 @@
       0.927
      ]
     },
-    "format_spread": {
-     "mean": 0.718,
+    "grounding": {
+     "mean": 0.235,
      "ci90": [
-      0.649,
-      0.787
+      0.196,
+      0.275
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.045,
+     "ci90": [
+      0.014,
+      0.08
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.094,
+     "ci90": [
+      0.077,
+      0.112
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.787,
+     "ci90": [
+      0.639,
+      0.925
+     ]
+    },
+    "overreach": {
+     "mean": 0.347,
+     "ci90": [
+      0.274,
+      0.42
      ]
     },
     "novelty": {
@@ -149,11 +218,11 @@
       0.306
      ]
     },
-    "creativity": {
-     "mean": 0.264,
+    "format_spread": {
+     "mean": 0.718,
      "ci90": [
-      0.218,
-      0.312
+      0.649,
+      0.787
      ]
     },
     "interest_coverage": {
@@ -163,6 +232,14 @@
       0.627
      ]
     },
+    "evidence_mean": {
+     "mean": 1.035,
+     "ci90": [
+      0.924,
+      1.153
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 137,
      "distinct_items": 133,
@@ -189,11 +266,39 @@
       0.917
      ]
     },
-    "format_spread": {
-     "mean": 0.643,
+    "grounding": {
+     "mean": 0.223,
      "ci90": [
-      0.59,
-      0.695
+      0.19,
+      0.259
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.052,
+     "ci90": [
+      0.021,
+      0.087
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.09,
+     "ci90": [
+      0.074,
+      0.108
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.815,
+     "ci90": [
+      0.667,
+      0.944
+     ]
+    },
+    "overreach": {
+     "mean": 0.41,
+     "ci90": [
+      0.333,
+      0.483
      ]
     },
     "novelty": {
@@ -217,11 +322,11 @@
       0.281
      ]
     },
-    "creativity": {
-     "mean": 0.243,
+    "format_spread": {
+     "mean": 0.643,
      "ci90": [
-      0.195,
-      0.297
+      0.59,
+      0.695
      ]
     },
     "interest_coverage": {
@@ -231,6 +336,14 @@
       0.619
      ]
     },
+    "evidence_mean": {
+     "mean": 0.993,
+     "ci90": [
+      0.889,
+      1.101
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 137,
      "distinct_items": 134,
@@ -257,11 +370,39 @@
       0.927
      ]
     },
-    "format_spread": {
-     "mean": 0.691,
+    "grounding": {
+     "mean": 0.281,
      "ci90": [
-      0.628,
-      0.751
+      0.238,
+      0.324
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.066,
+     "ci90": [
+      0.035,
+      0.101
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.118,
+     "ci90": [
+      0.102,
+      0.134
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.787,
+     "ci90": [
+      0.639,
+      0.925
+     ]
+    },
+    "overreach": {
+     "mean": 0.319,
+     "ci90": [
+      0.246,
+      0.389
      ]
     },
     "novelty": {
@@ -285,11 +426,11 @@
       0.323
      ]
     },
-    "creativity": {
-     "mean": 0.281,
+    "format_spread": {
+     "mean": 0.691,
      "ci90": [
-      0.235,
-      0.33
+      0.628,
+      0.751
      ]
     },
     "interest_coverage": {
@@ -299,6 +440,14 @@
       0.608
      ]
     },
+    "evidence_mean": {
+     "mean": 1.146,
+     "ci90": [
+      1.031,
+      1.264
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 137,
      "distinct_items": 134,
@@ -325,11 +474,39 @@
       0.917
      ]
     },
-    "format_spread": {
-     "mean": 0.661,
+    "grounding": {
+     "mean": 0.277,
      "ci90": [
-      0.598,
-      0.721
+      0.234,
+      0.317
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.101,
+     "ci90": [
+      0.059,
+      0.146
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.131,
+     "ci90": [
+      0.113,
+      0.148
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.704,
+     "ci90": [
+      0.53,
+      0.863
+     ]
+    },
+    "overreach": {
+     "mean": 0.354,
+     "ci90": [
+      0.278,
+      0.431
      ]
     },
     "novelty": {
@@ -353,11 +530,11 @@
       0.333
      ]
     },
-    "creativity": {
-     "mean": 0.271,
+    "format_spread": {
+     "mean": 0.661,
      "ci90": [
-      0.223,
-      0.32
+      0.598,
+      0.721
      ]
     },
     "interest_coverage": {
@@ -367,6 +544,14 @@
       0.602
      ]
     },
+    "evidence_mean": {
+     "mean": 1.243,
+     "ci90": [
+      1.118,
+      1.368
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 137,
      "distinct_items": 127,
@@ -393,11 +578,39 @@
       0.939
      ]
     },
-    "format_spread": {
-     "mean": 0.62,
+    "grounding": {
+     "mean": 0.244,
      "ci90": [
-      0.568,
-      0.669
+      0.212,
+      0.278
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.087,
+     "ci90": [
+      0.045,
+      0.132
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.113,
+     "ci90": [
+      0.097,
+      0.129
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.778,
+     "ci90": [
+      0.622,
+      0.917
+     ]
+    },
+    "overreach": {
+     "mean": 0.34,
+     "ci90": [
+      0.274,
+      0.41
      ]
     },
     "novelty": {
@@ -421,11 +634,11 @@
       0.331
      ]
     },
-    "creativity": {
-     "mean": 0.257,
+    "format_spread": {
+     "mean": 0.62,
      "ci90": [
-      0.212,
-      0.306
+      0.568,
+      0.669
      ]
     },
     "interest_coverage": {
@@ -435,6 +648,14 @@
       0.652
      ]
     },
+    "evidence_mean": {
+     "mean": 0.979,
+     "ci90": [
+      0.889,
+      1.076
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 137,
      "distinct_items": 132,
@@ -461,11 +682,39 @@
       0.925
      ]
     },
-    "format_spread": {
-     "mean": 0.633,
+    "grounding": {
+     "mean": 0.239,
      "ci90": [
-      0.582,
-      0.682
+      0.205,
+      0.273
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.077,
+     "ci90": [
+      0.043,
+      0.115
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.107,
+     "ci90": [
+      0.094,
+      0.123
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.833,
+     "ci90": [
+      0.702,
+      0.952
+     ]
+    },
+    "overreach": {
+     "mean": 0.391,
+     "ci90": [
+      0.321,
+      0.46
      ]
     },
     "novelty": {
@@ -489,11 +738,11 @@
       0.305
      ]
     },
-    "creativity": {
-     "mean": 0.258,
+    "format_spread": {
+     "mean": 0.633,
      "ci90": [
-      0.214,
-      0.305
+      0.582,
+      0.682
      ]
     },
     "interest_coverage": {
@@ -503,6 +752,14 @@
       0.682
      ]
     },
+    "evidence_mean": {
+     "mean": 1.041,
+     "ci90": [
+      0.944,
+      1.14
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 215,
      "distinct_items": 202,
@@ -529,11 +786,39 @@
       0.926
      ]
     },
-    "format_spread": {
-     "mean": 0.685,
+    "grounding": {
+     "mean": 0.237,
      "ci90": [
-      0.628,
-      0.739
+      0.202,
+      0.271
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.076,
+     "ci90": [
+      0.043,
+      0.114
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.106,
+     "ci90": [
+      0.092,
+      0.122
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.733,
+     "ci90": [
+      0.598,
+      0.856
+     ]
+    },
+    "overreach": {
+     "mean": 0.395,
+     "ci90": [
+      0.324,
+      0.465
      ]
     },
     "novelty": {
@@ -557,11 +842,11 @@
       0.302
      ]
     },
-    "creativity": {
-     "mean": 0.255,
+    "format_spread": {
+     "mean": 0.685,
      "ci90": [
-      0.211,
-      0.303
+      0.628,
+      0.739
      ]
     },
     "interest_coverage": {
@@ -571,6 +856,14 @@
       0.622
      ]
     },
+    "evidence_mean": {
+     "mean": 1.04,
+     "ci90": [
+      0.943,
+      1.14
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 137.0,
      "distinct_items": 132.88,
@@ -621,6 +914,13 @@
       0.608
      ]
     },
+    "evidence_mean": {
+     "mean": 1.25,
+     "ci90": [
+      1.118,
+      1.385
+     ]
+    },
     "coverage": {
      "slots": 137,
      "distinct_items": 130,
@@ -666,6 +966,13 @@
      "ci90": [
       0.533,
       0.627
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.035,
+     "ci90": [
+      0.924,
+      1.153
      ]
     },
     "coverage": {
@@ -715,6 +1022,13 @@
       0.619
      ]
     },
+    "evidence_mean": {
+     "mean": 0.993,
+     "ci90": [
+      0.889,
+      1.101
+     ]
+    },
     "coverage": {
      "slots": 137,
      "distinct_items": 134,
@@ -760,6 +1074,13 @@
      "ci90": [
       0.522,
       0.608
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.146,
+     "ci90": [
+      1.031,
+      1.264
      ]
     },
     "coverage": {
@@ -809,6 +1130,13 @@
       0.602
      ]
     },
+    "evidence_mean": {
+     "mean": 1.243,
+     "ci90": [
+      1.118,
+      1.368
+     ]
+    },
     "coverage": {
      "slots": 137,
      "distinct_items": 127,
@@ -854,6 +1182,13 @@
      "ci90": [
       0.578,
       0.652
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.979,
+     "ci90": [
+      0.889,
+      1.076
      ]
     },
     "coverage": {
@@ -903,6 +1238,13 @@
       0.682
      ]
     },
+    "evidence_mean": {
+     "mean": 1.041,
+     "ci90": [
+      0.944,
+      1.14
+     ]
+    },
     "coverage": {
      "slots": 215,
      "distinct_items": 202,
@@ -950,6 +1292,13 @@
       0.622
      ]
     },
+    "evidence_mean": {
+     "mean": 1.04,
+     "ci90": [
+      0.943,
+      1.14
+     ]
+    },
     "coverage": {
      "slots": 137.0,
      "distinct_items": 132.88,
@@ -979,11 +1328,39 @@
       0.905
      ]
     },
-    "format_spread": {
-     "mean": 0.72,
+    "grounding": {
+     "mean": 0.282,
      "ci90": [
-      0.649,
-      0.79
+      0.157,
+      0.407
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.167,
+     "ci90": [
+      0.056,
+      0.278
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.137,
+     "ci90": [
+      0.068,
+      0.205
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.528,
+     "ci90": [
+      0.389,
+      0.694
      ]
     },
     "novelty": {
@@ -1007,11 +1384,11 @@
       0.307
      ]
     },
-    "creativity": {
-     "mean": 0.228,
+    "format_spread": {
+     "mean": 0.72,
      "ci90": [
-      0.118,
-      0.337
+      0.649,
+      0.79
      ]
     },
     "interest_coverage": {
@@ -1021,6 +1398,14 @@
       0.683
      ]
     },
+    "evidence_mean": {
+     "mean": 1.389,
+     "ci90": [
+      1.056,
+      1.778
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 34,
      "distinct_items": 34,
@@ -1047,11 +1432,39 @@
       0.936
      ]
     },
-    "format_spread": {
-     "mean": 0.755,
+    "grounding": {
+     "mean": 0.255,
      "ci90": [
-      0.685,
-      0.79
+      0.157,
+      0.343
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.083,
+     "ci90": [
+      0.0,
+      0.167
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.096,
+     "ci90": [
+      0.054,
+      0.14
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.472,
+     "ci90": [
+      0.305,
+      0.667
      ]
     },
     "novelty": {
@@ -1075,11 +1488,11 @@
       0.236
      ]
     },
-    "creativity": {
-     "mean": 0.215,
+    "format_spread": {
+     "mean": 0.755,
      "ci90": [
-      0.136,
-      0.271
+      0.685,
+      0.79
      ]
     },
     "interest_coverage": {
@@ -1089,6 +1502,14 @@
       0.7
      ]
     },
+    "evidence_mean": {
+     "mean": 1.194,
+     "ci90": [
+      0.972,
+      1.5
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 34,
      "distinct_items": 34,
@@ -1115,11 +1536,39 @@
       0.939
      ]
     },
-    "format_spread": {
-     "mean": 0.72,
+    "grounding": {
+     "mean": 0.236,
      "ci90": [
-      0.649,
-      0.79
+      0.139,
+      0.329
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.083,
+     "ci90": [
+      0.0,
+      0.167
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.09,
+     "ci90": [
+      0.043,
+      0.14
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.5,
+     "ci90": [
+      0.347,
+      0.681
      ]
     },
     "novelty": {
@@ -1143,11 +1592,11 @@
       0.224
      ]
     },
-    "creativity": {
-     "mean": 0.206,
+    "format_spread": {
+     "mean": 0.72,
      "ci90": [
-      0.134,
-      0.265
+      0.649,
+      0.79
      ]
     },
     "interest_coverage": {
@@ -1157,6 +1606,14 @@
       0.672
      ]
     },
+    "evidence_mean": {
+     "mean": 1.194,
+     "ci90": [
+      0.889,
+      1.528
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 34,
      "distinct_items": 34,
@@ -1183,11 +1640,39 @@
       0.938
      ]
     },
-    "format_spread": {
-     "mean": 0.755,
+    "grounding": {
+     "mean": 0.255,
      "ci90": [
-      0.685,
-      0.79
+      0.157,
+      0.343
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.083,
+     "ci90": [
+      0.0,
+      0.167
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.096,
+     "ci90": [
+      0.054,
+      0.14
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.472,
+     "ci90": [
+      0.305,
+      0.667
      ]
     },
     "novelty": {
@@ -1211,11 +1696,11 @@
       0.236
      ]
     },
-    "creativity": {
-     "mean": 0.215,
+    "format_spread": {
+     "mean": 0.755,
      "ci90": [
-      0.136,
-      0.271
+      0.685,
+      0.79
      ]
     },
     "interest_coverage": {
@@ -1225,6 +1710,14 @@
       0.7
      ]
     },
+    "evidence_mean": {
+     "mean": 1.167,
+     "ci90": [
+      0.944,
+      1.472
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 34,
      "distinct_items": 34,
@@ -1251,11 +1744,39 @@
       0.9
      ]
     },
-    "format_spread": {
-     "mean": 0.706,
+    "grounding": {
+     "mean": 0.255,
      "ci90": [
-      0.553,
-      0.847
+      0.157,
+      0.343
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.139,
+     "ci90": [
+      0.056,
+      0.25
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.122,
+     "ci90": [
+      0.071,
+      0.165
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.583,
+     "ci90": [
+      0.486,
+      0.736
      ]
     },
     "novelty": {
@@ -1279,11 +1800,11 @@
       0.249
      ]
     },
-    "creativity": {
-     "mean": 0.195,
+    "format_spread": {
+     "mean": 0.706,
      "ci90": [
-      0.116,
-      0.268
+      0.553,
+      0.847
      ]
     },
     "interest_coverage": {
@@ -1293,6 +1814,14 @@
       0.683
      ]
     },
+    "evidence_mean": {
+     "mean": 1.417,
+     "ci90": [
+      1.11,
+      1.806
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 34,
      "distinct_items": 34,
@@ -1319,11 +1848,39 @@
       0.906
      ]
     },
-    "format_spread": {
-     "mean": 0.755,
+    "grounding": {
+     "mean": 0.208,
      "ci90": [
-      0.685,
-      0.79
+      0.13,
+      0.278
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.056,
+     "ci90": [
+      0.0,
+      0.167
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.077,
+     "ci90": [
+      0.044,
+      0.112
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.556,
+     "ci90": [
+      0.431,
+      0.708
      ]
     },
     "novelty": {
@@ -1347,11 +1904,11 @@
       0.203
      ]
     },
-    "creativity": {
-     "mean": 0.176,
+    "format_spread": {
+     "mean": 0.755,
      "ci90": [
-      0.114,
-      0.225
+      0.685,
+      0.79
      ]
     },
     "interest_coverage": {
@@ -1361,6 +1918,14 @@
       0.733
      ]
     },
+    "evidence_mean": {
+     "mean": 1.083,
+     "ci90": [
+      0.917,
+      1.279
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 34,
      "distinct_items": 34,
@@ -1387,11 +1952,39 @@
       0.913
      ]
     },
-    "format_spread": {
-     "mean": 0.782,
+    "grounding": {
+     "mean": 0.246,
      "ci90": [
-      0.727,
-      0.83
+      0.147,
+      0.334
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.11,
+     "ci90": [
+      0.033,
+      0.199
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.109,
+     "ci90": [
+      0.062,
+      0.153
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.525,
+     "ci90": [
+      0.388,
+      0.695
      ]
     },
     "novelty": {
@@ -1415,11 +2008,11 @@
       0.25
      ]
     },
-    "creativity": {
-     "mean": 0.216,
+    "format_spread": {
+     "mean": 0.782,
      "ci90": [
-      0.136,
-      0.284
+      0.727,
+      0.83
      ]
     },
     "interest_coverage": {
@@ -1429,6 +2022,14 @@
       0.75
      ]
     },
+    "evidence_mean": {
+     "mean": 1.189,
+     "ci90": [
+      0.957,
+      1.48
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 55,
      "distinct_items": 55,
@@ -1455,11 +2056,39 @@
       0.912
      ]
     },
-    "format_spread": {
-     "mean": 0.838,
+    "grounding": {
+     "mean": 0.247,
      "ci90": [
-      0.789,
-      0.886
+      0.147,
+      0.336
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.114,
+     "ci90": [
+      0.036,
+      0.203
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.11,
+     "ci90": [
+      0.063,
+      0.156
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.96,
+     "ci90": [
+      0.88,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.529,
+     "ci90": [
+      0.394,
+      0.695
      ]
     },
     "novelty": {
@@ -1483,11 +2112,11 @@
       0.249
      ]
     },
-    "creativity": {
-     "mean": 0.214,
+    "format_spread": {
+     "mean": 0.838,
      "ci90": [
-      0.136,
-      0.282
+      0.789,
+      0.886
      ]
     },
     "interest_coverage": {
@@ -1497,6 +2126,14 @@
       0.694
      ]
     },
+    "evidence_mean": {
+     "mean": 1.194,
+     "ci90": [
+      0.961,
+      1.486
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 34.0,
      "distinct_items": 34.0,
@@ -1506,6 +2143,27 @@
      "formats_seen": 4.94
     }
    }
+  },
+  "evidence": {
+   "picks": 137,
+   "fired": {
+    "keyword": 97,
+    "theme_quote": 29,
+    "overview_sim": 49,
+    "co_mention": 0
+   },
+   "picks_with_a_quoted_theme": 33,
+   "creative_grounded_picks": {
+    "qualified": 13,
+    "of": 137,
+    "sessions": 9
+   },
+   "grounding_by_sim_threshold": {
+    "0.25": 0.325,
+    "0.30": 0.284,
+    "0.35": 0.237
+   },
+   "default_sim_threshold": 0.3
   }
  },
  "bedrock": {
@@ -1527,11 +2185,39 @@
       0.911
      ]
     },
-    "format_spread": {
-     "mean": 0.664,
+    "grounding": {
+     "mean": 0.463,
      "ci90": [
-      0.577,
-      0.737
+      0.38,
+      0.546
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.188,
+     "ci90": [
+      0.097,
+      0.278
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.205,
+     "ci90": [
+      0.169,
+      0.242
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.787,
+     "ci90": [
+      0.639,
+      0.925
+     ]
+    },
+    "overreach": {
+     "mean": 0.188,
+     "ci90": [
+      0.118,
+      0.257
      ]
     },
     "novelty": {
@@ -1555,11 +2241,11 @@
       0.398
      ]
     },
-    "creativity": {
-     "mean": 0.335,
+    "format_spread": {
+     "mean": 0.664,
      "ci90": [
-      0.279,
-      0.389
+      0.577,
+      0.737
      ]
     },
     "interest_coverage": {
@@ -1569,6 +2255,14 @@
       0.847
      ]
     },
+    "evidence_mean": {
+     "mean": 1.736,
+     "ci90": [
+      1.5,
+      1.972
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 69,
      "distinct_items": 65,
@@ -1595,11 +2289,39 @@
       0.915
      ]
     },
-    "format_spread": {
-     "mean": 0.799,
+    "grounding": {
+     "mean": 0.361,
      "ci90": [
-      0.726,
-      0.872
+      0.282,
+      0.444
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.09,
+     "ci90": [
+      0.028,
+      0.16
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.137,
+     "ci90": [
+      0.103,
+      0.175
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.787,
+     "ci90": [
+      0.639,
+      0.925
+     ]
+    },
+    "overreach": {
+     "mean": 0.215,
+     "ci90": [
+      0.139,
+      0.292
      ]
     },
     "novelty": {
@@ -1623,11 +2345,11 @@
       0.339
      ]
     },
-    "creativity": {
-     "mean": 0.322,
+    "format_spread": {
+     "mean": 0.799,
      "ci90": [
-      0.264,
-      0.381
+      0.726,
+      0.872
      ]
     },
     "interest_coverage": {
@@ -1637,6 +2359,14 @@
       0.861
      ]
     },
+    "evidence_mean": {
+     "mean": 1.361,
+     "ci90": [
+      1.153,
+      1.569
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 69,
      "distinct_items": 68,
@@ -1663,11 +2393,39 @@
       0.918
      ]
     },
-    "format_spread": {
-     "mean": 0.792,
+    "grounding": {
+     "mean": 0.366,
      "ci90": [
-      0.697,
-      0.877
+      0.296,
+      0.435
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.104,
+     "ci90": [
+      0.042,
+      0.174
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.142,
+     "ci90": [
+      0.11,
+      0.177
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.815,
+     "ci90": [
+      0.667,
+      0.944
+     ]
+    },
+    "overreach": {
+     "mean": 0.215,
+     "ci90": [
+      0.146,
+      0.285
      ]
     },
     "novelty": {
@@ -1691,11 +2449,11 @@
       0.339
      ]
     },
-    "creativity": {
-     "mean": 0.306,
+    "format_spread": {
+     "mean": 0.792,
      "ci90": [
-      0.249,
-      0.364
+      0.697,
+      0.877
      ]
     },
     "interest_coverage": {
@@ -1705,6 +2463,14 @@
       0.847
      ]
     },
+    "evidence_mean": {
+     "mean": 1.347,
+     "ci90": [
+      1.139,
+      1.542
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 69,
      "distinct_items": 68,
@@ -1731,11 +2497,39 @@
       0.913
      ]
     },
-    "format_spread": {
-     "mean": 0.762,
+    "grounding": {
+     "mean": 0.449,
      "ci90": [
-      0.689,
-      0.832
+      0.361,
+      0.537
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.132,
+     "ci90": [
+      0.069,
+      0.201
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.182,
+     "ci90": [
+      0.147,
+      0.217
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.787,
+     "ci90": [
+      0.639,
+      0.925
+     ]
+    },
+    "overreach": {
+     "mean": 0.174,
+     "ci90": [
+      0.097,
+      0.25
      ]
     },
     "novelty": {
@@ -1759,11 +2553,11 @@
       0.369
      ]
     },
-    "creativity": {
-     "mean": 0.34,
+    "format_spread": {
+     "mean": 0.762,
      "ci90": [
-      0.283,
-      0.397
+      0.689,
+      0.832
      ]
     },
     "interest_coverage": {
@@ -1773,6 +2567,14 @@
       0.84
      ]
     },
+    "evidence_mean": {
+     "mean": 1.639,
+     "ci90": [
+      1.403,
+      1.875
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 69,
      "distinct_items": 68,
@@ -1799,11 +2601,39 @@
       0.907
      ]
     },
-    "format_spread": {
-     "mean": 0.737,
+    "grounding": {
+     "mean": 0.444,
      "ci90": [
-      0.646,
-      0.82
+      0.361,
+      0.523
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.201,
+     "ci90": [
+      0.118,
+      0.292
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.207,
+     "ci90": [
+      0.169,
+      0.246
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.704,
+     "ci90": [
+      0.53,
+      0.863
+     ]
+    },
+    "overreach": {
+     "mean": 0.201,
+     "ci90": [
+      0.125,
+      0.278
      ]
     },
     "novelty": {
@@ -1827,11 +2657,11 @@
       0.398
      ]
     },
-    "creativity": {
-     "mean": 0.333,
+    "format_spread": {
+     "mean": 0.737,
      "ci90": [
-      0.275,
-      0.388
+      0.646,
+      0.82
      ]
     },
     "interest_coverage": {
@@ -1841,6 +2671,14 @@
       0.847
      ]
     },
+    "evidence_mean": {
+     "mean": 1.75,
+     "ci90": [
+      1.514,
+      1.958
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 69,
      "distinct_items": 64,
@@ -1867,11 +2705,39 @@
       0.925
      ]
     },
-    "format_spread": {
-     "mean": 0.726,
+    "grounding": {
+     "mean": 0.389,
      "ci90": [
-      0.656,
-      0.799
+      0.319,
+      0.458
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.174,
+     "ci90": [
+      0.09,
+      0.264
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.175,
+     "ci90": [
+      0.143,
+      0.21
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.778,
+     "ci90": [
+      0.622,
+      0.917
+     ]
+    },
+    "overreach": {
+     "mean": 0.174,
+     "ci90": [
+      0.111,
+      0.243
      ]
     },
     "novelty": {
@@ -1895,11 +2761,11 @@
       0.4
      ]
     },
-    "creativity": {
-     "mean": 0.325,
+    "format_spread": {
+     "mean": 0.726,
      "ci90": [
-      0.267,
-      0.383
+      0.656,
+      0.799
      ]
     },
     "interest_coverage": {
@@ -1909,6 +2775,14 @@
       0.882
      ]
     },
+    "evidence_mean": {
+     "mean": 1.417,
+     "ci90": [
+      1.236,
+      1.611
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 69,
      "distinct_items": 66,
@@ -1935,11 +2809,39 @@
       0.917
      ]
     },
-    "format_spread": {
-     "mean": 0.729,
+    "grounding": {
+     "mean": 0.391,
      "ci90": [
-      0.674,
-      0.784
+      0.321,
+      0.461
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.155,
+     "ci90": [
+      0.086,
+      0.23
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.172,
+     "ci90": [
+      0.142,
+      0.206
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.833,
+     "ci90": [
+      0.702,
+      0.952
+     ]
+    },
+    "overreach": {
+     "mean": 0.221,
+     "ci90": [
+      0.152,
+      0.292
      ]
     },
     "novelty": {
@@ -1963,11 +2865,11 @@
       0.373
      ]
     },
-    "creativity": {
-     "mean": 0.329,
+    "format_spread": {
+     "mean": 0.729,
      "ci90": [
-      0.274,
-      0.381
+      0.674,
+      0.784
      ]
     },
     "interest_coverage": {
@@ -1977,6 +2879,14 @@
       0.913
      ]
     },
+    "evidence_mean": {
+     "mean": 1.51,
+     "ci90": [
+      1.322,
+      1.695
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 102,
      "distinct_items": 97,
@@ -2003,11 +2913,39 @@
       0.917
      ]
     },
-    "format_spread": {
-     "mean": 0.758,
+    "grounding": {
+     "mean": 0.394,
      "ci90": [
-      0.7,
-      0.812
+      0.324,
+      0.465
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.156,
+     "ci90": [
+      0.088,
+      0.231
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.172,
+     "ci90": [
+      0.142,
+      0.207
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.739,
+     "ci90": [
+      0.607,
+      0.858
+     ]
+    },
+    "overreach": {
+     "mean": 0.219,
+     "ci90": [
+      0.151,
+      0.289
      ]
     },
     "novelty": {
@@ -2031,11 +2969,11 @@
       0.374
      ]
     },
-    "creativity": {
-     "mean": 0.33,
+    "format_spread": {
+     "mean": 0.758,
      "ci90": [
-      0.276,
-      0.383
+      0.7,
+      0.812
      ]
     },
     "interest_coverage": {
@@ -2045,6 +2983,14 @@
       0.855
      ]
     },
+    "evidence_mean": {
+     "mean": 1.512,
+     "ci90": [
+      1.324,
+      1.701
+     ]
+    },
+    "theme_coverage_lists": 18,
     "coverage": {
      "slots": 69.0,
      "distinct_items": 66.66,
@@ -2095,6 +3041,13 @@
       0.847
      ]
     },
+    "evidence_mean": {
+     "mean": 1.736,
+     "ci90": [
+      1.5,
+      1.972
+     ]
+    },
     "coverage": {
      "slots": 69,
      "distinct_items": 65,
@@ -2140,6 +3093,13 @@
      "ci90": [
       0.688,
       0.861
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.361,
+     "ci90": [
+      1.153,
+      1.569
      ]
     },
     "coverage": {
@@ -2189,6 +3149,13 @@
       0.847
      ]
     },
+    "evidence_mean": {
+     "mean": 1.347,
+     "ci90": [
+      1.139,
+      1.542
+     ]
+    },
     "coverage": {
      "slots": 69,
      "distinct_items": 68,
@@ -2234,6 +3201,13 @@
      "ci90": [
       0.667,
       0.84
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.639,
+     "ci90": [
+      1.403,
+      1.875
      ]
     },
     "coverage": {
@@ -2283,6 +3257,13 @@
       0.847
      ]
     },
+    "evidence_mean": {
+     "mean": 1.75,
+     "ci90": [
+      1.514,
+      1.958
+     ]
+    },
     "coverage": {
      "slots": 69,
      "distinct_items": 64,
@@ -2328,6 +3309,13 @@
      "ci90": [
       0.729,
       0.882
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.417,
+     "ci90": [
+      1.236,
+      1.611
      ]
     },
     "coverage": {
@@ -2377,6 +3365,13 @@
       0.913
      ]
     },
+    "evidence_mean": {
+     "mean": 1.51,
+     "ci90": [
+      1.322,
+      1.695
+     ]
+    },
     "coverage": {
      "slots": 102,
      "distinct_items": 97,
@@ -2422,6 +3417,13 @@
      "ci90": [
       0.708,
       0.855
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.512,
+     "ci90": [
+      1.324,
+      1.701
      ]
     },
     "coverage": {
@@ -2453,11 +3455,39 @@
       0.886
      ]
     },
-    "format_spread": {
-     "mean": 0.79,
+    "grounding": {
+     "mean": 0.417,
      "ci90": [
-      0.65,
-      0.93
+      0.241,
+      0.574
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.333,
+     "ci90": [
+      0.111,
+      0.556
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.219,
+     "ci90": [
+      0.109,
+      0.329
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.306,
+     "ci90": [
+      0.083,
+      0.556
      ]
     },
     "novelty": {
@@ -2481,11 +3511,11 @@
       0.485
      ]
     },
-    "creativity": {
-     "mean": 0.36,
+    "format_spread": {
+     "mean": 0.79,
      "ci90": [
-      0.197,
-      0.528
+      0.65,
+      0.93
      ]
     },
     "interest_coverage": {
@@ -2495,6 +3525,14 @@
       1.0
      ]
     },
+    "evidence_mean": {
+     "mean": 1.667,
+     "ci90": [
+      1.222,
+      2.167
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -2521,11 +3559,39 @@
       0.911
      ]
     },
-    "format_spread": {
-     "mean": 0.79,
+    "grounding": {
+     "mean": 0.343,
      "ci90": [
-      0.65,
-      0.93
+      0.204,
+      0.481
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.167,
+     "ci90": [
+      0.0,
+      0.333
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.134,
+     "ci90": [
+      0.057,
+      0.222
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.306,
+     "ci90": [
+      0.083,
+      0.556
      ]
     },
     "novelty": {
@@ -2549,11 +3615,11 @@
       0.334
      ]
     },
-    "creativity": {
-     "mean": 0.285,
+    "format_spread": {
+     "mean": 0.79,
      "ci90": [
-      0.18,
-      0.379
+      0.65,
+      0.93
      ]
     },
     "interest_coverage": {
@@ -2563,6 +3629,14 @@
       1.0
      ]
     },
+    "evidence_mean": {
+     "mean": 1.444,
+     "ci90": [
+      1.111,
+      1.833
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -2589,11 +3663,39 @@
       0.916
      ]
     },
-    "format_spread": {
-     "mean": 0.79,
+    "grounding": {
+     "mean": 0.306,
      "ci90": [
-      0.65,
-      0.93
+      0.167,
+      0.454
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.167,
+     "ci90": [
+      0.0,
+      0.333
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.121,
+     "ci90": [
+      0.039,
+      0.212
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.306,
+     "ci90": [
+      0.083,
+      0.556
      ]
     },
     "novelty": {
@@ -2617,11 +3719,11 @@
       0.336
      ]
     },
-    "creativity": {
-     "mean": 0.303,
+    "format_spread": {
+     "mean": 0.79,
      "ci90": [
-      0.191,
-      0.39
+      0.65,
+      0.93
      ]
     },
     "interest_coverage": {
@@ -2631,6 +3733,14 @@
       1.0
      ]
     },
+    "evidence_mean": {
+     "mean": 1.333,
+     "ci90": [
+      0.944,
+      1.778
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -2657,11 +3767,39 @@
       0.911
      ]
     },
-    "format_spread": {
-     "mean": 0.79,
+    "grounding": {
+     "mean": 0.343,
      "ci90": [
-      0.65,
-      0.93
+      0.204,
+      0.481
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.167,
+     "ci90": [
+      0.0,
+      0.333
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.134,
+     "ci90": [
+      0.057,
+      0.222
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.306,
+     "ci90": [
+      0.083,
+      0.556
      ]
     },
     "novelty": {
@@ -2685,11 +3823,11 @@
       0.334
      ]
     },
-    "creativity": {
-     "mean": 0.285,
+    "format_spread": {
+     "mean": 0.79,
      "ci90": [
-      0.18,
-      0.379
+      0.65,
+      0.93
      ]
     },
     "interest_coverage": {
@@ -2699,6 +3837,14 @@
       1.0
      ]
     },
+    "evidence_mean": {
+     "mean": 1.444,
+     "ci90": [
+      1.111,
+      1.833
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -2725,11 +3871,39 @@
       0.888
      ]
     },
-    "format_spread": {
-     "mean": 0.693,
+    "grounding": {
+     "mean": 0.361,
      "ci90": [
-      0.43,
-      0.93
+      0.213,
+      0.5
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.278,
+     "ci90": [
+      0.111,
+      0.5
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.19,
+     "ci90": [
+      0.105,
+      0.266
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.417,
+     "ci90": [
+      0.194,
+      0.667
      ]
     },
     "novelty": {
@@ -2753,11 +3927,11 @@
       0.408
      ]
     },
-    "creativity": {
-     "mean": 0.295,
+    "format_spread": {
+     "mean": 0.693,
      "ci90": [
-      0.175,
-      0.404
+      0.43,
+      0.93
      ]
     },
     "interest_coverage": {
@@ -2767,6 +3941,14 @@
       1.0
      ]
     },
+    "evidence_mean": {
+     "mean": 1.722,
+     "ci90": [
+      1.278,
+      2.222
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -2793,11 +3975,39 @@
       0.9
      ]
     },
-    "format_spread": {
-     "mean": 0.86,
+    "grounding": {
+     "mean": 0.269,
      "ci90": [
-      0.72,
+      0.13,
+      0.426
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.111,
+     "ci90": [
+      0.0,
+      0.333
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.099,
+     "ci90": [
+      0.03,
+      0.19
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
       1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.417,
+     "ci90": [
+      0.194,
+      0.667
      ]
     },
     "novelty": {
@@ -2821,11 +4031,11 @@
       0.308
      ]
     },
-    "creativity": {
-     "mean": 0.22,
+    "format_spread": {
+     "mean": 0.86,
      "ci90": [
-      0.128,
-      0.318
+      0.72,
+      1.0
      ]
     },
     "interest_coverage": {
@@ -2835,6 +4045,14 @@
       1.0
      ]
     },
+    "evidence_mean": {
+     "mean": 1.444,
+     "ci90": [
+      1.111,
+      1.833
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -2861,11 +4079,39 @@
       0.901
      ]
     },
-    "format_spread": {
-     "mean": 0.843,
+    "grounding": {
+     "mean": 0.346,
      "ci90": [
-      0.725,
-      0.944
+      0.204,
+      0.485
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.219,
+     "ci90": [
+      0.067,
+      0.397
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.163,
+     "ci90": [
+      0.086,
+      0.244
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.337,
+     "ci90": [
+      0.125,
+      0.584
      ]
     },
     "novelty": {
@@ -2889,11 +4135,11 @@
       0.378
      ]
     },
-    "creativity": {
-     "mean": 0.31,
+    "format_spread": {
+     "mean": 0.843,
      "ci90": [
-      0.192,
-      0.408
+      0.725,
+      0.944
      ]
     },
     "interest_coverage": {
@@ -2903,6 +4149,14 @@
       1.0
      ]
     },
+    "evidence_mean": {
+     "mean": 1.51,
+     "ci90": [
+      1.118,
+      1.932
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 27,
      "distinct_items": 27,
@@ -2929,11 +4183,39 @@
       0.904
      ]
     },
-    "format_spread": {
-     "mean": 0.895,
+    "grounding": {
+     "mean": 0.346,
      "ci90": [
-      0.812,
-      0.974
+      0.206,
+      0.486
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.219,
+     "ci90": [
+      0.067,
+      0.397
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.164,
+     "ci90": [
+      0.087,
+      0.244
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.96,
+     "ci90": [
+      0.88,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.338,
+     "ci90": [
+      0.121,
+      0.584
      ]
     },
     "novelty": {
@@ -2957,11 +4239,11 @@
       0.38
      ]
     },
-    "creativity": {
-     "mean": 0.313,
+    "format_spread": {
+     "mean": 0.895,
      "ci90": [
-      0.194,
-      0.413
+      0.812,
+      0.974
      ]
     },
     "interest_coverage": {
@@ -2971,6 +4253,14 @@
       1.0
      ]
     },
+    "evidence_mean": {
+     "mean": 1.516,
+     "ci90": [
+      1.118,
+      1.94
+     ]
+    },
+    "theme_coverage_lists": 3,
     "coverage": {
      "slots": 17.0,
      "distinct_items": 17.0,
@@ -2980,6 +4270,27 @@
      "formats_seen": 4.66
     }
    }
+  },
+  "evidence": {
+   "picks": 69,
+   "fired": {
+    "keyword": 56,
+    "theme_quote": 29,
+    "overview_sim": 36,
+    "co_mention": 0
+   },
+   "picks_with_a_quoted_theme": 33,
+   "creative_grounded_picks": {
+    "qualified": 13,
+    "of": 69,
+    "sessions": 9
+   },
+   "grounding_by_sim_threshold": {
+    "0.25": 0.502,
+    "0.30": 0.463,
+    "0.35": 0.384
+   },
+   "default_sim_threshold": 0.3
   }
  },
  "heuristic": {
@@ -3001,11 +4312,39 @@
       0.93
      ]
     },
-    "format_spread": {
-     "mean": 0.553,
+    "grounding": {
+     "mean": 0.104,
      "ci90": [
-      0.452,
-      0.647
+      0.065,
+      0.141
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.052,
+     "ci90": [
+      0.032,
+      0.072
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.535,
+     "ci90": [
+      0.417,
+      0.646
      ]
     },
     "novelty": {
@@ -3029,11 +4368,11 @@
       0.29
      ]
     },
-    "creativity": {
-     "mean": 0.199,
+    "format_spread": {
+     "mean": 0.553,
      "ci90": [
-      0.132,
-      0.265
+      0.452,
+      0.647
      ]
     },
     "interest_coverage": {
@@ -3043,6 +4382,14 @@
       0.4
      ]
     },
+    "evidence_mean": {
+     "mean": 0.764,
+     "ci90": [
+      0.639,
+      0.882
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 68,
      "distinct_items": 67,
@@ -3069,11 +4416,39 @@
       0.946
      ]
     },
-    "format_spread": {
-     "mean": 0.641,
+    "grounding": {
+     "mean": 0.109,
      "ci90": [
-      0.522,
-      0.755
+      0.076,
+      0.141
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.052,
+     "ci90": [
+      0.036,
+      0.068
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.479,
+     "ci90": [
+      0.375,
+      0.583
      ]
     },
     "novelty": {
@@ -3097,11 +4472,11 @@
       0.298
      ]
     },
-    "creativity": {
-     "mean": 0.205,
+    "format_spread": {
+     "mean": 0.641,
      "ci90": [
-      0.143,
-      0.271
+      0.522,
+      0.755
      ]
     },
     "interest_coverage": {
@@ -3111,6 +4486,14 @@
       0.417
      ]
     },
+    "evidence_mean": {
+     "mean": 0.708,
+     "ci90": [
+      0.583,
+      0.833
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 68,
      "distinct_items": 67,
@@ -3137,11 +4520,39 @@
       0.928
      ]
     },
-    "format_spread": {
-     "mean": 0.5,
+    "grounding": {
+     "mean": 0.081,
      "ci90": [
-      0.41,
-      0.577
+      0.051,
+      0.111
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.039,
+     "ci90": [
+      0.024,
+      0.055
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.604,
+     "ci90": [
+      0.493,
+      0.708
      ]
     },
     "novelty": {
@@ -3165,11 +4576,11 @@
       0.247
      ]
     },
-    "creativity": {
-     "mean": 0.18,
+    "format_spread": {
+     "mean": 0.5,
      "ci90": [
-      0.117,
-      0.247
+      0.41,
+      0.577
      ]
     },
     "interest_coverage": {
@@ -3179,6 +4590,14 @@
       0.417
      ]
     },
+    "evidence_mean": {
+     "mean": 0.639,
+     "ci90": [
+      0.521,
+      0.764
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 68,
      "distinct_items": 67,
@@ -3205,11 +4624,39 @@
       0.951
      ]
     },
-    "format_spread": {
-     "mean": 0.623,
+    "grounding": {
+     "mean": 0.113,
      "ci90": [
-      0.509,
-      0.731
+      0.079,
+      0.148
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.054,
+     "ci90": [
+      0.038,
+      0.071
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.465,
+     "ci90": [
+      0.354,
+      0.576
      ]
     },
     "novelty": {
@@ -3233,11 +4680,11 @@
       0.307
      ]
     },
-    "creativity": {
-     "mean": 0.221,
+    "format_spread": {
+     "mean": 0.623,
      "ci90": [
-      0.156,
-      0.291
+      0.509,
+      0.731
      ]
     },
     "interest_coverage": {
@@ -3247,6 +4694,14 @@
       0.408
      ]
     },
+    "evidence_mean": {
+     "mean": 0.653,
+     "ci90": [
+      0.535,
+      0.778
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 68,
      "distinct_items": 68,
@@ -3273,11 +4728,39 @@
       0.934
      ]
     },
-    "format_spread": {
-     "mean": 0.588,
+    "grounding": {
+     "mean": 0.109,
      "ci90": [
-      0.481,
-      0.693
+      0.069,
+      0.148
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.055,
+     "ci90": [
+      0.034,
+      0.076
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.507,
+     "ci90": [
+      0.382,
+      0.625
      ]
     },
     "novelty": {
@@ -3301,11 +4784,11 @@
       0.301
      ]
     },
-    "creativity": {
-     "mean": 0.21,
+    "format_spread": {
+     "mean": 0.588,
      "ci90": [
-      0.142,
-      0.278
+      0.481,
+      0.693
      ]
     },
     "interest_coverage": {
@@ -3315,6 +4798,14 @@
       0.383
      ]
     },
+    "evidence_mean": {
+     "mean": 0.736,
+     "ci90": [
+      0.625,
+      0.847
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 68,
      "distinct_items": 66,
@@ -3341,11 +4832,39 @@
       0.96
      ]
     },
-    "format_spread": {
-     "mean": 0.518,
+    "grounding": {
+     "mean": 0.1,
      "ci90": [
-      0.428,
-      0.601
+      0.069,
+      0.13
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.05,
+     "ci90": [
+      0.035,
+      0.067
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.507,
+     "ci90": [
+      0.41,
+      0.604
      ]
     },
     "novelty": {
@@ -3369,11 +4888,11 @@
       0.29
      ]
     },
-    "creativity": {
-     "mean": 0.189,
+    "format_spread": {
+     "mean": 0.518,
      "ci90": [
-      0.13,
-      0.252
+      0.428,
+      0.601
      ]
     },
     "interest_coverage": {
@@ -3383,6 +4902,14 @@
       0.458
      ]
     },
+    "evidence_mean": {
+     "mean": 0.542,
+     "ci90": [
+      0.451,
+      0.632
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 68,
      "distinct_items": 67,
@@ -3409,11 +4936,39 @@
       0.941
      ]
     },
-    "format_spread": {
-     "mean": 0.541,
+    "grounding": {
+     "mean": 0.087,
      "ci90": [
-      0.448,
-      0.621
+      0.061,
+      0.115
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.043,
+     "ci90": [
+      0.029,
+      0.057
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.562,
+     "ci90": [
+      0.464,
+      0.655
      ]
     },
     "novelty": {
@@ -3437,11 +4992,11 @@
       0.261
      ]
     },
-    "creativity": {
-     "mean": 0.187,
+    "format_spread": {
+     "mean": 0.541,
      "ci90": [
-      0.128,
-      0.249
+      0.448,
+      0.621
      ]
     },
     "interest_coverage": {
@@ -3451,6 +5006,14 @@
       0.483
      ]
     },
+    "evidence_mean": {
+     "mean": 0.572,
+     "ci90": [
+      0.483,
+      0.665
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 113,
      "distinct_items": 111,
@@ -3477,11 +5040,39 @@
       0.941
      ]
     },
-    "format_spread": {
-     "mean": 0.606,
+    "grounding": {
+     "mean": 0.087,
      "ci90": [
-      0.502,
-      0.697
+      0.061,
+      0.114
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.043,
+     "ci90": [
+      0.029,
+      0.057
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.56,
+     "ci90": [
+      0.462,
+      0.651
      ]
     },
     "novelty": {
@@ -3505,11 +5096,11 @@
       0.259
      ]
     },
-    "creativity": {
-     "mean": 0.186,
+    "format_spread": {
+     "mean": 0.606,
      "ci90": [
-      0.127,
-      0.248
+      0.502,
+      0.697
      ]
     },
     "interest_coverage": {
@@ -3519,6 +5110,14 @@
       0.417
      ]
     },
+    "evidence_mean": {
+     "mean": 0.566,
+     "ci90": [
+      0.477,
+      0.657
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 68.0,
      "distinct_items": 67.54,
@@ -3569,6 +5168,13 @@
       0.4
      ]
     },
+    "evidence_mean": {
+     "mean": 0.764,
+     "ci90": [
+      0.639,
+      0.882
+     ]
+    },
     "coverage": {
      "slots": 68,
      "distinct_items": 67,
@@ -3614,6 +5220,13 @@
      "ci90": [
       0.35,
       0.417
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.708,
+     "ci90": [
+      0.583,
+      0.833
      ]
     },
     "coverage": {
@@ -3663,6 +5276,13 @@
       0.417
      ]
     },
+    "evidence_mean": {
+     "mean": 0.639,
+     "ci90": [
+      0.521,
+      0.764
+     ]
+    },
     "coverage": {
      "slots": 68,
      "distinct_items": 67,
@@ -3708,6 +5328,13 @@
      "ci90": [
       0.342,
       0.408
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.653,
+     "ci90": [
+      0.535,
+      0.778
      ]
     },
     "coverage": {
@@ -3757,6 +5384,13 @@
       0.383
      ]
     },
+    "evidence_mean": {
+     "mean": 0.736,
+     "ci90": [
+      0.625,
+      0.847
+     ]
+    },
     "coverage": {
      "slots": 68,
      "distinct_items": 66,
@@ -3802,6 +5436,13 @@
      "ci90": [
       0.4,
       0.458
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.542,
+     "ci90": [
+      0.451,
+      0.632
      ]
     },
     "coverage": {
@@ -3851,6 +5492,13 @@
       0.483
      ]
     },
+    "evidence_mean": {
+     "mean": 0.572,
+     "ci90": [
+      0.483,
+      0.665
+     ]
+    },
     "coverage": {
      "slots": 113,
      "distinct_items": 111,
@@ -3898,6 +5546,13 @@
       0.417
      ]
     },
+    "evidence_mean": {
+     "mean": 0.566,
+     "ci90": [
+      0.477,
+      0.657
+     ]
+    },
     "coverage": {
      "slots": 68.0,
      "distinct_items": 67.54,
@@ -3927,11 +5582,39 @@
       0.937
      ]
     },
-    "format_spread": {
-     "mean": 0.65,
+    "grounding": {
+     "mean": 0.148,
      "ci90": [
-      0.579,
-      0.79
+      0.019,
+      0.278
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.054,
+     "ci90": [
+      0.009,
+      0.099
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.75,
+     "ci90": [
+      0.583,
+      0.944
      ]
     },
     "novelty": {
@@ -3955,11 +5638,11 @@
       0.162
      ]
     },
-    "creativity": {
-     "mean": 0.096,
+    "format_spread": {
+     "mean": 0.65,
      "ci90": [
-      0.031,
-      0.165
+      0.579,
+      0.79
      ]
     },
     "interest_coverage": {
@@ -3969,6 +5652,14 @@
       0.4
      ]
     },
+    "evidence_mean": {
+     "mean": 1.111,
+     "ci90": [
+      0.889,
+      1.444
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -3995,11 +5686,39 @@
       0.979
      ]
     },
-    "format_spread": {
-     "mean": 0.72,
+    "grounding": {
+     "mean": 0.167,
      "ci90": [
-      0.579,
-      0.86
+      0.074,
+      0.259
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.059,
+     "ci90": [
+      0.026,
+      0.09
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.639,
+     "ci90": [
+      0.444,
+      0.833
      ]
     },
     "novelty": {
@@ -4023,11 +5742,11 @@
       0.207
      ]
     },
-    "creativity": {
-     "mean": 0.145,
+    "format_spread": {
+     "mean": 0.72,
      "ci90": [
-      0.071,
-      0.217
+      0.579,
+      0.86
      ]
     },
     "interest_coverage": {
@@ -4037,6 +5756,14 @@
       0.4
      ]
     },
+    "evidence_mean": {
+     "mean": 0.944,
+     "ci90": [
+      0.667,
+      1.222
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -4063,11 +5790,39 @@
       0.967
      ]
     },
-    "format_spread": {
-     "mean": 0.65,
+    "grounding": {
+     "mean": 0.167,
      "ci90": [
-      0.579,
-      0.79
+      0.056,
+      0.278
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.058,
+     "ci90": [
+      0.021,
+      0.102
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.694,
+     "ci90": [
+      0.528,
+      0.861
      ]
     },
     "novelty": {
@@ -4091,11 +5846,11 @@
       0.166
      ]
     },
-    "creativity": {
-     "mean": 0.109,
+    "format_spread": {
+     "mean": 0.65,
      "ci90": [
-      0.052,
-      0.168
+      0.579,
+      0.79
      ]
     },
     "interest_coverage": {
@@ -4105,6 +5860,14 @@
       0.4
      ]
     },
+    "evidence_mean": {
+     "mean": 1.056,
+     "ci90": [
+      0.778,
+      1.389
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -4131,11 +5894,39 @@
       0.988
      ]
     },
-    "format_spread": {
-     "mean": 0.72,
+    "grounding": {
+     "mean": 0.167,
      "ci90": [
-      0.579,
-      0.86
+      0.074,
+      0.259
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.059,
+     "ci90": [
+      0.026,
+      0.09
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.639,
+     "ci90": [
+      0.444,
+      0.833
      ]
     },
     "novelty": {
@@ -4159,11 +5950,11 @@
       0.207
      ]
     },
-    "creativity": {
-     "mean": 0.145,
+    "format_spread": {
+     "mean": 0.72,
      "ci90": [
-      0.071,
-      0.217
+      0.579,
+      0.86
      ]
     },
     "interest_coverage": {
@@ -4173,6 +5964,14 @@
       0.4
      ]
     },
+    "evidence_mean": {
+     "mean": 0.889,
+     "ci90": [
+      0.611,
+      1.167
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -4199,11 +5998,39 @@
       0.931
      ]
     },
-    "format_spread": {
-     "mean": 0.72,
+    "grounding": {
+     "mean": 0.148,
      "ci90": [
-      0.579,
-      0.86
+      0.019,
+      0.278
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.054,
+     "ci90": [
+      0.009,
+      0.099
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.75,
+     "ci90": [
+      0.583,
+      0.944
      ]
     },
     "novelty": {
@@ -4227,11 +6054,11 @@
       0.162
      ]
     },
-    "creativity": {
-     "mean": 0.096,
+    "format_spread": {
+     "mean": 0.72,
      "ci90": [
-      0.031,
-      0.165
+      0.579,
+      0.86
      ]
     },
     "interest_coverage": {
@@ -4241,6 +6068,14 @@
       0.367
      ]
     },
+    "evidence_mean": {
+     "mean": 1.111,
+     "ci90": [
+      0.889,
+      1.444
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -4267,11 +6102,39 @@
       0.952
      ]
     },
-    "format_spread": {
-     "mean": 0.65,
+    "grounding": {
+     "mean": 0.148,
      "ci90": [
-      0.579,
-      0.79
+      0.056,
+      0.241
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.055,
+     "ci90": [
+      0.026,
+      0.085
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.694,
+     "ci90": [
+      0.528,
+      0.861
      ]
     },
     "novelty": {
@@ -4295,11 +6158,11 @@
       0.188
      ]
     },
-    "creativity": {
-     "mean": 0.132,
+    "format_spread": {
+     "mean": 0.65,
      "ci90": [
-      0.062,
-      0.195
+      0.579,
+      0.79
      ]
     },
     "interest_coverage": {
@@ -4309,6 +6172,14 @@
       0.5
      ]
     },
+    "evidence_mean": {
+     "mean": 0.722,
+     "ci90": [
+      0.556,
+      0.889
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 17,
      "distinct_items": 17,
@@ -4335,11 +6206,39 @@
       0.949
      ]
     },
-    "format_spread": {
-     "mean": 0.721,
+    "grounding": {
+     "mean": 0.146,
      "ci90": [
-      0.643,
-      0.822
+      0.053,
+      0.241
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.054,
+     "ci90": [
+      0.023,
+      0.088
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.713,
+     "ci90": [
+      0.561,
+      0.861
      ]
     },
     "novelty": {
@@ -4363,11 +6262,11 @@
       0.173
      ]
     },
-    "creativity": {
-     "mean": 0.122,
+    "format_spread": {
+     "mean": 0.721,
      "ci90": [
-      0.054,
-      0.185
+      0.643,
+      0.822
      ]
     },
     "interest_coverage": {
@@ -4377,6 +6276,14 @@
       0.5
      ]
     },
+    "evidence_mean": {
+     "mean": 0.869,
+     "ci90": [
+      0.7,
+      1.067
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 28,
      "distinct_items": 28,
@@ -4403,10 +6310,38 @@
       0.948
      ]
     },
-    "format_spread": {
-     "mean": 0.776,
+    "grounding": {
+     "mean": 0.145,
      "ci90": [
-      0.692,
+      0.053,
+      0.239
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.054,
+     "ci90": [
+      0.022,
+      0.087
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.716,
+     "ci90": [
+      0.569,
       0.861
      ]
     },
@@ -4431,11 +6366,11 @@
       0.17
      ]
     },
-    "creativity": {
-     "mean": 0.12,
+    "format_spread": {
+     "mean": 0.776,
      "ci90": [
-      0.054,
-      0.182
+      0.692,
+      0.861
      ]
     },
     "interest_coverage": {
@@ -4445,6 +6380,14 @@
       0.415
      ]
     },
+    "evidence_mean": {
+     "mean": 0.886,
+     "ci90": [
+      0.712,
+      1.088
+     ]
+    },
+    "theme_coverage_lists": 0,
     "coverage": {
      "slots": 17.0,
      "distinct_items": 17.0,
@@ -4454,6 +6397,27 @@
      "formats_seen": 4.11
     }
    }
+  },
+  "evidence": {
+   "picks": 68,
+   "fired": {
+    "keyword": 41,
+    "theme_quote": 0,
+    "overview_sim": 13,
+    "co_mention": 0
+   },
+   "picks_with_a_quoted_theme": 0,
+   "creative_grounded_picks": {
+    "qualified": 0,
+    "of": 68,
+    "sessions": 0
+   },
+   "grounding_by_sim_threshold": {
+    "0.25": 0.148,
+    "0.30": 0.104,
+    "0.35": 0.09
+   },
+   "default_sim_threshold": 0.3
   }
  }
 }
