@@ -37,6 +37,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "eval"))
 sys.path.insert(0, str(ROOT))
+from dotenv import load_dotenv  # noqa: E402
+
+load_dotenv(ROOT / ".env")      # so EMBED_MODEL_ID / BEDROCK_MODEL_ID / AWS_REGION reach the embedder (diversity needs it)
 import eval_rank as ER  # noqa: E402
 import metrics as M  # noqa: E402
 from knots import beyond as B  # noqa: E402
@@ -345,7 +348,7 @@ def main(argv=None) -> int:
     vec, embedder = (None, None) if args.no_embed else embed_cards(all_cards)
     out: dict = {"embedder": M.embedder_info(), "ild_embedder": embedder, "k": K, "pool": pool.describe(),
                  "definitions": DEFINITIONS}
-    if embedder == "hashed":
+    if embedder == "hashed" and not args.no_embed:
         print("Note: picks were embedded with the offline hashed embedder (lexical only), so ild is a word-overlap "
               "measure here, not a semantic one.")
     scopes = [args.extractor] if args.extractor else [None, *sorted({e["extractor"] for e in results if e.get("ok")})]
