@@ -6,21 +6,21 @@
   "model_id": "cohere.embed-v4:0",
   "dimensions": 256,
   "runs_by_embedder": {
-   "cohere": 5
+   "cohere": 60
   },
   "fell_back_runs": 0
  },
  "ild_embedder": "cohere",
  "k": 3,
  "pool": {
-  "distinct_items": 19,
+  "distinct_items": 249,
   "popularity_reference": {
-   "paper": 2,
-   "tmdb": 8,
-   "video": 8
+   "paper": 29,
+   "tmdb": 133,
+   "video": 84
   },
-  "overlap_reference": 19,
-  "session_similarity_reference": 19
+  "overlap_reference": 249,
+  "session_similarity_reference": 249
  },
  "definitions": {
   "ild": "mean pairwise cosine distance between the picks' vectors (higher = more varied)",
@@ -42,1293 +42,2126 @@
  "all extractors": {
   "labelled": {
    "as read aloud": {
-    "lists": 5,
-    "sessions": 3,
+    "lists": 48,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.667,
+     "mean": 0.597,
      "ci90": [
-      0.5,
-      0.778
+      0.521,
+      0.674
      ]
     },
     "ild": {
-     "mean": 0.738,
+     "mean": 0.693,
      "ci90": [
-      0.686,
-      0.773
+      0.674,
+      0.713
      ]
     },
     "grounding": {
-     "mean": 0.278,
+     "mean": 0.284,
      "ci90": [
-      0.194,
-      0.333
+      0.242,
+      0.323
      ]
     },
     "creative_grounded": {
-     "mean": 0.233,
+     "mean": 0.094,
      "ci90": [
-      0.125,
-      0.306
+      0.049,
+      0.139
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.158,
+     "mean": 0.128,
      "ci90": [
-      0.094,
-      0.2
+      0.111,
+      0.145
      ]
     },
     "theme_coverage": {
-     "mean": 0.833,
+     "mean": 0.787,
      "ci90": [
-      0.667,
-      1.0
+      0.639,
+      0.925
      ]
     },
     "overreach": {
-     "mean": 0.267,
+     "mean": 0.361,
      "ci90": [
-      0.167,
-      0.417
+      0.288,
+      0.434
      ]
     },
     "novelty": {
-     "mean": 0.567,
+     "mean": 0.49,
      "ci90": [
-      0.463,
-      0.671
+      0.446,
+      0.532
      ]
     },
     "unexpectedness": {
-     "mean": 0.525,
+     "mean": 0.5,
      "ci90": [
-      0.485,
-      0.552
+      0.473,
+      0.526
      ]
     },
     "serendipity": {
-     "mean": 0.334,
+     "mean": 0.286,
      "ci90": [
-      0.227,
-      0.405
+      0.248,
+      0.328
      ]
     },
     "format_spread": {
-     "mean": 0.664,
+     "mean": 0.607,
      "ci90": [
-      0.579,
-      0.748
+      0.546,
+      0.664
      ]
     },
     "interest_coverage": {
-     "mean": 0.573,
+     "mean": 0.559,
      "ci90": [
-      0.467,
-      0.644
+      0.511,
+      0.608
      ]
     },
     "evidence_mean": {
-     "mean": 1.1,
+     "mean": 1.25,
      "ci90": [
-      1.042,
-      1.139
+      1.118,
+      1.385
      ]
     },
-    "theme_coverage_lists": 2,
+    "theme_coverage_lists": 18,
     "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.0714,
-     "formats_seen": 4
+     "slots": 137,
+     "distinct_items": 130,
+     "unique_share": 0.9489,
+     "gini": 0.049,
+     "top_item_share": 0.0219,
+     "formats_seen": 5
     }
    },
    "fit score": {
-    "lists": 5,
-    "sessions": 3,
+    "lists": 48,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.733,
+     "mean": 0.618,
      "ci90": [
-      0.667,
-      0.8
+      0.542,
+      0.698
      ]
     },
     "ild": {
-     "mean": 0.78,
+     "mean": 0.712,
      "ci90": [
-      0.762,
-      0.792
+      0.695,
+      0.728
      ]
     },
     "grounding": {
-     "mean": 0.211,
+     "mean": 0.235,
      "ci90": [
-      0.111,
-      0.311
+      0.196,
+      0.275
      ]
     },
     "creative_grounded": {
-     "mean": 0.1,
+     "mean": 0.045,
      "ci90": [
-      0.0,
-      0.2
+      0.014,
+      0.08
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.11,
+     "mean": 0.094,
      "ci90": [
-      0.033,
-      0.187
+      0.077,
+      0.112
      ]
     },
     "theme_coverage": {
-     "mean": 0.833,
+     "mean": 0.787,
      "ci90": [
-      0.667,
-      1.0
+      0.639,
+      0.925
      ]
     },
     "overreach": {
-     "mean": 0.2,
+     "mean": 0.347,
      "ci90": [
-      0.167,
-      0.25
+      0.274,
+      0.42
      ]
     },
     "novelty": {
-     "mean": 0.546,
+     "mean": 0.499,
      "ci90": [
-      0.37,
-      0.663
+      0.458,
+      0.542
      ]
     },
     "unexpectedness": {
-     "mean": 0.473,
+     "mean": 0.442,
      "ci90": [
-      0.407,
-      0.539
+      0.411,
+      0.475
      ]
     },
     "serendipity": {
-     "mean": 0.323,
+     "mean": 0.261,
      "ci90": [
-      0.241,
-      0.405
+      0.221,
+      0.306
      ]
     },
     "format_spread": {
-     "mean": 0.748,
+     "mean": 0.718,
      "ci90": [
-      0.685,
-      0.79
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.613,
-     "ci90": [
-      0.547,
-      0.68
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "theme_coverage_lists": 2,
-    "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.0714,
-     "formats_seen": 3
-    }
-   },
-   "tag overlap": {
-    "lists": 5,
-    "sessions": 3,
-    "p@3": {
-     "mean": 0.667,
-     "ci90": [
-      0.5,
-      0.778
-     ]
-    },
-    "ild": {
-     "mean": 0.758,
-     "ci90": [
-      0.713,
+      0.649,
       0.787
      ]
     },
-    "grounding": {
-     "mean": 0.211,
+    "interest_coverage": {
+     "mean": 0.581,
      "ci90": [
-      0.111,
-      0.311
+      0.533,
+      0.627
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.035,
+     "ci90": [
+      0.924,
+      1.153
+     ]
+    },
+    "theme_coverage_lists": 18,
+    "coverage": {
+     "slots": 137,
+     "distinct_items": 133,
+     "unique_share": 0.9708,
+     "gini": 0.0283,
+     "top_item_share": 0.0146,
+     "formats_seen": 5
+    }
+   },
+   "tag overlap": {
+    "lists": 48,
+    "sessions": 24,
+    "p@3": {
+     "mean": 0.562,
+     "ci90": [
+      0.493,
+      0.639
+     ]
+    },
+    "ild": {
+     "mean": 0.724,
+     "ci90": [
+      0.7,
+      0.747
+     ]
+    },
+    "grounding": {
+     "mean": 0.223,
+     "ci90": [
+      0.19,
+      0.259
      ]
     },
     "creative_grounded": {
-     "mean": 0.1,
+     "mean": 0.052,
      "ci90": [
-      0.0,
-      0.2
+      0.021,
+      0.087
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.11,
+     "mean": 0.09,
      "ci90": [
-      0.033,
-      0.187
+      0.074,
+      0.108
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.815,
+     "ci90": [
+      0.667,
+      0.944
+     ]
+    },
+    "overreach": {
+     "mean": 0.41,
+     "ci90": [
+      0.333,
+      0.483
+     ]
+    },
+    "novelty": {
+     "mean": 0.492,
+     "ci90": [
+      0.446,
+      0.535
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.444,
+     "ci90": [
+      0.416,
+      0.473
+     ]
+    },
+    "serendipity": {
+     "mean": 0.236,
+     "ci90": [
+      0.196,
+      0.281
+     ]
+    },
+    "format_spread": {
+     "mean": 0.643,
+     "ci90": [
+      0.59,
+      0.695
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.578,
+     "ci90": [
+      0.537,
+      0.619
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.993,
+     "ci90": [
+      0.889,
+      1.101
+     ]
+    },
+    "theme_coverage_lists": 18,
+    "coverage": {
+     "slots": 137,
+     "distinct_items": 134,
+     "unique_share": 0.9781,
+     "gini": 0.0214,
+     "top_item_share": 0.0146,
+     "formats_seen": 5
+    }
+   },
+   "session fit": {
+    "lists": 48,
+    "sessions": 24,
+    "p@3": {
+     "mean": 0.646,
+     "ci90": [
+      0.573,
+      0.726
+     ]
+    },
+    "ild": {
+     "mean": 0.712,
+     "ci90": [
+      0.694,
+      0.73
+     ]
+    },
+    "grounding": {
+     "mean": 0.281,
+     "ci90": [
+      0.238,
+      0.324
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.066,
+     "ci90": [
+      0.035,
+      0.101
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.118,
+     "ci90": [
+      0.102,
+      0.134
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.787,
+     "ci90": [
+      0.639,
+      0.925
+     ]
+    },
+    "overreach": {
+     "mean": 0.319,
+     "ci90": [
+      0.246,
+      0.389
+     ]
+    },
+    "novelty": {
+     "mean": 0.492,
+     "ci90": [
+      0.453,
+      0.532
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.457,
+     "ci90": [
+      0.43,
+      0.485
+     ]
+    },
+    "serendipity": {
+     "mean": 0.282,
+     "ci90": [
+      0.244,
+      0.323
+     ]
+    },
+    "format_spread": {
+     "mean": 0.691,
+     "ci90": [
+      0.628,
+      0.751
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.566,
+     "ci90": [
+      0.522,
+      0.608
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.146,
+     "ci90": [
+      1.031,
+      1.264
+     ]
+    },
+    "theme_coverage_lists": 18,
+    "coverage": {
+     "slots": 137,
+     "distinct_items": 134,
+     "unique_share": 0.9781,
+     "gini": 0.0214,
+     "top_item_share": 0.0146,
+     "formats_seen": 5
+    }
+   },
+   "rating": {
+    "lists": 48,
+    "sessions": 24,
+    "p@3": {
+     "mean": 0.583,
+     "ci90": [
+      0.497,
+      0.667
+     ]
+    },
+    "ild": {
+     "mean": 0.701,
+     "ci90": [
+      0.682,
+      0.719
+     ]
+    },
+    "grounding": {
+     "mean": 0.277,
+     "ci90": [
+      0.234,
+      0.317
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.101,
+     "ci90": [
+      0.059,
+      0.146
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.131,
+     "ci90": [
+      0.113,
+      0.148
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.704,
+     "ci90": [
+      0.53,
+      0.863
+     ]
+    },
+    "overreach": {
+     "mean": 0.354,
+     "ci90": [
+      0.278,
+      0.431
+     ]
+    },
+    "novelty": {
+     "mean": 0.504,
+     "ci90": [
+      0.463,
+      0.546
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.517,
+     "ci90": [
+      0.49,
+      0.545
+     ]
+    },
+    "serendipity": {
+     "mean": 0.29,
+     "ci90": [
+      0.246,
+      0.333
+     ]
+    },
+    "format_spread": {
+     "mean": 0.661,
+     "ci90": [
+      0.598,
+      0.721
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.555,
+     "ci90": [
+      0.508,
+      0.602
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.243,
+     "ci90": [
+      1.118,
+      1.368
+     ]
+    },
+    "theme_coverage_lists": 18,
+    "coverage": {
+     "slots": 137,
+     "distinct_items": 127,
+     "unique_share": 0.927,
+     "gini": 0.0683,
+     "top_item_share": 0.0219,
+     "formats_seen": 5
+    }
+   },
+   "popularity": {
+    "lists": 48,
+    "sessions": 24,
+    "p@3": {
+     "mean": 0.618,
+     "ci90": [
+      0.545,
+      0.688
+     ]
+    },
+    "ild": {
+     "mean": 0.726,
+     "ci90": [
+      0.708,
+      0.742
+     ]
+    },
+    "grounding": {
+     "mean": 0.244,
+     "ci90": [
+      0.212,
+      0.278
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.087,
+     "ci90": [
+      0.045,
+      0.132
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.113,
+     "ci90": [
+      0.097,
+      0.129
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.778,
+     "ci90": [
+      0.622,
+      0.917
+     ]
+    },
+    "overreach": {
+     "mean": 0.34,
+     "ci90": [
+      0.274,
+      0.41
+     ]
+    },
+    "novelty": {
+     "mean": 0.442,
+     "ci90": [
+      0.391,
+      0.493
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.515,
+     "ci90": [
+      0.491,
+      0.54
+     ]
+    },
+    "serendipity": {
+     "mean": 0.29,
+     "ci90": [
+      0.253,
+      0.331
+     ]
+    },
+    "format_spread": {
+     "mean": 0.62,
+     "ci90": [
+      0.568,
+      0.669
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.615,
+     "ci90": [
+      0.578,
+      0.652
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.979,
+     "ci90": [
+      0.889,
+      1.076
+     ]
+    },
+    "theme_coverage_lists": 18,
+    "coverage": {
+     "slots": 137,
+     "distinct_items": 132,
+     "unique_share": 0.9635,
+     "gini": 0.0356,
+     "top_item_share": 0.0219,
+     "formats_seen": 5
+    }
+   },
+   "as read aloud (all picks)": {
+    "lists": 48,
+    "sessions": 24,
+    "p@3": {
+     "mean": 0.568,
+     "ci90": [
+      0.499,
+      0.641
+     ]
+    },
+    "ild": {
+     "mean": 0.733,
+     "ci90": [
+      0.717,
+      0.749
+     ]
+    },
+    "grounding": {
+     "mean": 0.239,
+     "ci90": [
+      0.205,
+      0.273
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.077,
+     "ci90": [
+      0.043,
+      0.115
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.107,
+     "ci90": [
+      0.094,
+      0.123
      ]
     },
     "theme_coverage": {
      "mean": 0.833,
      "ci90": [
-      0.667,
-      1.0
+      0.702,
+      0.952
      ]
     },
     "overreach": {
-     "mean": 0.267,
+     "mean": 0.391,
      "ci90": [
-      0.167,
-      0.417
+      0.321,
+      0.46
      ]
     },
     "novelty": {
-     "mean": 0.567,
+     "mean": 0.506,
      "ci90": [
-      0.516,
-      0.601
+      0.468,
+      0.545
      ]
     },
     "unexpectedness": {
-     "mean": 0.46,
+     "mean": 0.501,
      "ci90": [
-      0.413,
-      0.507
+      0.477,
+      0.526
      ]
     },
     "serendipity": {
-     "mean": 0.288,
+     "mean": 0.264,
      "ci90": [
-      0.17,
-      0.37
+      0.228,
+      0.305
      ]
     },
     "format_spread": {
-     "mean": 0.748,
+     "mean": 0.633,
      "ci90": [
-      0.685,
-      0.79
+      0.582,
+      0.682
      ]
     },
     "interest_coverage": {
-     "mean": 0.573,
+     "mean": 0.647,
      "ci90": [
-      0.467,
-      0.644
+      0.611,
+      0.682
      ]
     },
     "evidence_mean": {
-     "mean": 0.9,
+     "mean": 1.041,
      "ci90": [
-      0.733,
-      1.067
+      0.944,
+      1.14
      ]
     },
-    "theme_coverage_lists": 2,
+    "theme_coverage_lists": 18,
     "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.0714,
-     "formats_seen": 4
+     "slots": 215,
+     "distinct_items": 202,
+     "unique_share": 0.9395,
+     "gini": 0.0571,
+     "top_item_share": 0.014,
+     "formats_seen": 5
     }
    },
-   "session fit": {
-    "lists": 5,
-    "sessions": 3,
+   "random (chance)": {
+    "lists": 48,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.733,
+     "mean": 0.562,
      "ci90": [
-      0.667,
-      0.8
+      0.491,
+      0.636
      ]
     },
     "ild": {
-     "mean": 0.786,
+     "mean": 0.734,
      "ci90": [
-      0.774,
-      0.795
+      0.717,
+      0.75
      ]
     },
     "grounding": {
-     "mean": 0.256,
+     "mean": 0.237,
      "ci90": [
-      0.167,
-      0.315
+      0.202,
+      0.271
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.076,
+     "ci90": [
+      0.043,
+      0.114
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.106,
+     "ci90": [
+      0.092,
+      0.122
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.733,
+     "ci90": [
+      0.598,
+      0.856
+     ]
+    },
+    "overreach": {
+     "mean": 0.395,
+     "ci90": [
+      0.324,
+      0.465
+     ]
+    },
+    "novelty": {
+     "mean": 0.506,
+     "ci90": [
+      0.469,
+      0.544
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.5,
+     "ci90": [
+      0.476,
+      0.525
+     ]
+    },
+    "serendipity": {
+     "mean": 0.261,
+     "ci90": [
+      0.225,
+      0.302
+     ]
+    },
+    "format_spread": {
+     "mean": 0.685,
+     "ci90": [
+      0.628,
+      0.739
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.584,
+     "ci90": [
+      0.547,
+      0.622
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.04,
+     "ci90": [
+      0.943,
+      1.14
+     ]
+    },
+    "theme_coverage_lists": 18,
+    "coverage": {
+     "slots": 137.0,
+     "distinct_items": 132.88,
+     "unique_share": 0.9699,
+     "gini": 0.0291,
+     "top_item_share": 0.0155,
+     "formats_seen": 5.0
+    }
+   }
+  },
+  "labelled_lists": 48,
+  "all_shown": {
+   "as read aloud": {
+    "lists": 48,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.693,
+     "ci90": [
+      0.674,
+      0.713
+     ]
+    },
+    "format_spread": {
+     "mean": 0.607,
+     "ci90": [
+      0.546,
+      0.664
+     ]
+    },
+    "novelty": {
+     "mean": 0.49,
+     "ci90": [
+      0.446,
+      0.532
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.5,
+     "ci90": [
+      0.473,
+      0.526
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.559,
+     "ci90": [
+      0.511,
+      0.608
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.25,
+     "ci90": [
+      1.118,
+      1.385
+     ]
+    },
+    "coverage": {
+     "slots": 137,
+     "distinct_items": 130,
+     "unique_share": 0.9489,
+     "gini": 0.049,
+     "top_item_share": 0.0219,
+     "formats_seen": 5
+    }
+   },
+   "fit score": {
+    "lists": 48,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.712,
+     "ci90": [
+      0.695,
+      0.728
+     ]
+    },
+    "format_spread": {
+     "mean": 0.718,
+     "ci90": [
+      0.649,
+      0.787
+     ]
+    },
+    "novelty": {
+     "mean": 0.499,
+     "ci90": [
+      0.458,
+      0.542
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.442,
+     "ci90": [
+      0.411,
+      0.475
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.581,
+     "ci90": [
+      0.533,
+      0.627
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.035,
+     "ci90": [
+      0.924,
+      1.153
+     ]
+    },
+    "coverage": {
+     "slots": 137,
+     "distinct_items": 133,
+     "unique_share": 0.9708,
+     "gini": 0.0283,
+     "top_item_share": 0.0146,
+     "formats_seen": 5
+    }
+   },
+   "tag overlap": {
+    "lists": 48,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.724,
+     "ci90": [
+      0.7,
+      0.747
+     ]
+    },
+    "format_spread": {
+     "mean": 0.643,
+     "ci90": [
+      0.59,
+      0.695
+     ]
+    },
+    "novelty": {
+     "mean": 0.492,
+     "ci90": [
+      0.446,
+      0.535
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.444,
+     "ci90": [
+      0.416,
+      0.473
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.578,
+     "ci90": [
+      0.537,
+      0.619
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.993,
+     "ci90": [
+      0.889,
+      1.101
+     ]
+    },
+    "coverage": {
+     "slots": 137,
+     "distinct_items": 134,
+     "unique_share": 0.9781,
+     "gini": 0.0214,
+     "top_item_share": 0.0146,
+     "formats_seen": 5
+    }
+   },
+   "session fit": {
+    "lists": 48,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.712,
+     "ci90": [
+      0.694,
+      0.73
+     ]
+    },
+    "format_spread": {
+     "mean": 0.691,
+     "ci90": [
+      0.628,
+      0.751
+     ]
+    },
+    "novelty": {
+     "mean": 0.492,
+     "ci90": [
+      0.453,
+      0.532
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.457,
+     "ci90": [
+      0.43,
+      0.485
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.566,
+     "ci90": [
+      0.522,
+      0.608
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.146,
+     "ci90": [
+      1.031,
+      1.264
+     ]
+    },
+    "coverage": {
+     "slots": 137,
+     "distinct_items": 134,
+     "unique_share": 0.9781,
+     "gini": 0.0214,
+     "top_item_share": 0.0146,
+     "formats_seen": 5
+    }
+   },
+   "rating": {
+    "lists": 48,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.701,
+     "ci90": [
+      0.682,
+      0.719
+     ]
+    },
+    "format_spread": {
+     "mean": 0.661,
+     "ci90": [
+      0.598,
+      0.721
+     ]
+    },
+    "novelty": {
+     "mean": 0.504,
+     "ci90": [
+      0.463,
+      0.546
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.517,
+     "ci90": [
+      0.49,
+      0.545
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.555,
+     "ci90": [
+      0.508,
+      0.602
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.243,
+     "ci90": [
+      1.118,
+      1.368
+     ]
+    },
+    "coverage": {
+     "slots": 137,
+     "distinct_items": 127,
+     "unique_share": 0.927,
+     "gini": 0.0683,
+     "top_item_share": 0.0219,
+     "formats_seen": 5
+    }
+   },
+   "popularity": {
+    "lists": 48,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.726,
+     "ci90": [
+      0.708,
+      0.742
+     ]
+    },
+    "format_spread": {
+     "mean": 0.62,
+     "ci90": [
+      0.568,
+      0.669
+     ]
+    },
+    "novelty": {
+     "mean": 0.442,
+     "ci90": [
+      0.391,
+      0.493
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.515,
+     "ci90": [
+      0.491,
+      0.54
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.615,
+     "ci90": [
+      0.578,
+      0.652
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.979,
+     "ci90": [
+      0.889,
+      1.076
+     ]
+    },
+    "coverage": {
+     "slots": 137,
+     "distinct_items": 132,
+     "unique_share": 0.9635,
+     "gini": 0.0356,
+     "top_item_share": 0.0219,
+     "formats_seen": 5
+    }
+   },
+   "as read aloud (all picks)": {
+    "lists": 48,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.733,
+     "ci90": [
+      0.717,
+      0.749
+     ]
+    },
+    "format_spread": {
+     "mean": 0.633,
+     "ci90": [
+      0.582,
+      0.682
+     ]
+    },
+    "novelty": {
+     "mean": 0.506,
+     "ci90": [
+      0.468,
+      0.545
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.501,
+     "ci90": [
+      0.477,
+      0.526
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.647,
+     "ci90": [
+      0.611,
+      0.682
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.041,
+     "ci90": [
+      0.944,
+      1.14
+     ]
+    },
+    "coverage": {
+     "slots": 215,
+     "distinct_items": 202,
+     "unique_share": 0.9395,
+     "gini": 0.0571,
+     "top_item_share": 0.014,
+     "formats_seen": 5
+    }
+   },
+   "random (chance)": {
+    "lists": 48,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.734,
+     "ci90": [
+      0.717,
+      0.75
+     ]
+    },
+    "format_spread": {
+     "mean": 0.685,
+     "ci90": [
+      0.628,
+      0.739
+     ]
+    },
+    "novelty": {
+     "mean": 0.506,
+     "ci90": [
+      0.469,
+      0.544
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.5,
+     "ci90": [
+      0.476,
+      0.525
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.584,
+     "ci90": [
+      0.547,
+      0.622
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.04,
+     "ci90": [
+      0.943,
+      1.14
+     ]
+    },
+    "coverage": {
+     "slots": 137.0,
+     "distinct_items": 132.88,
+     "unique_share": 0.9699,
+     "gini": 0.0291,
+     "top_item_share": 0.0155,
+     "formats_seen": 5.0
+    }
+   }
+  },
+  "all_shown_lists": 48,
+  "holdout": {
+   "as read aloud": {
+    "lists": 12,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.472,
+     "ci90": [
+      0.306,
+      0.611
+     ]
+    },
+    "ild": {
+     "mean": 0.723,
+     "ci90": [
+      0.68,
+      0.766
+     ]
+    },
+    "grounding": {
+     "mean": 0.282,
+     "ci90": [
+      0.157,
+      0.407
      ]
     },
     "creative_grounded": {
      "mean": 0.167,
      "ci90": [
-      0.083,
-      0.222
+      0.056,
+      0.278
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.133,
+     "mean": 0.137,
      "ci90": [
-      0.063,
-      0.187
+      0.068,
+      0.205
      ]
     },
     "theme_coverage": {
-     "mean": 0.833,
+     "mean": 1.0,
      "ci90": [
-      0.667,
+      1.0,
       1.0
      ]
     },
     "overreach": {
-     "mean": 0.2,
+     "mean": 0.528,
      "ci90": [
-      0.167,
-      0.25
+      0.389,
+      0.694
      ]
     },
     "novelty": {
-     "mean": 0.471,
+     "mean": 0.556,
      "ci90": [
-      0.323,
-      0.569
+      0.453,
+      0.651
      ]
     },
     "unexpectedness": {
-     "mean": 0.464,
+     "mean": 0.529,
      "ci90": [
-      0.424,
-      0.501
+      0.459,
+      0.592
      ]
     },
     "serendipity": {
-     "mean": 0.333,
+     "mean": 0.215,
      "ci90": [
-      0.261,
-      0.405
+      0.116,
+      0.307
      ]
     },
     "format_spread": {
-     "mean": 0.664,
+     "mean": 0.72,
      "ci90": [
-      0.579,
-      0.748
+      0.649,
+      0.79
      ]
     },
     "interest_coverage": {
-     "mean": 0.613,
+     "mean": 0.639,
      "ci90": [
-      0.547,
-      0.68
+      0.594,
+      0.683
      ]
     },
     "evidence_mean": {
-     "mean": 0.967,
+     "mean": 1.389,
      "ci90": [
-      0.833,
-      1.056
+      1.056,
+      1.778
      ]
     },
-    "theme_coverage_lists": 2,
+    "theme_coverage_lists": 3,
     "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
+     "slots": 34,
+     "distinct_items": 34,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.0714,
-     "formats_seen": 3
-    }
-   },
-   "rating": {
-    "lists": 5,
-    "sessions": 3,
-    "p@3": {
-     "mean": 0.667,
-     "ci90": [
-      0.5,
-      0.778
-     ]
-    },
-    "ild": {
-     "mean": 0.738,
-     "ci90": [
-      0.686,
-      0.773
-     ]
-    },
-    "grounding": {
-     "mean": 0.278,
-     "ci90": [
-      0.194,
-      0.333
-     ]
-    },
-    "creative_grounded": {
-     "mean": 0.233,
-     "ci90": [
-      0.125,
-      0.306
-     ]
-    },
-    "creative_grounded_soft": {
-     "mean": 0.158,
-     "ci90": [
-      0.094,
-      0.2
-     ]
-    },
-    "theme_coverage": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "overreach": {
-     "mean": 0.267,
-     "ci90": [
-      0.167,
-      0.417
-     ]
-    },
-    "novelty": {
-     "mean": 0.567,
-     "ci90": [
-      0.463,
-      0.671
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.525,
-     "ci90": [
-      0.485,
-      0.552
-     ]
-    },
-    "serendipity": {
-     "mean": 0.334,
-     "ci90": [
-      0.227,
-      0.405
-     ]
-    },
-    "format_spread": {
-     "mean": 0.664,
-     "ci90": [
-      0.579,
-      0.748
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.573,
-     "ci90": [
-      0.467,
-      0.644
-     ]
-    },
-    "evidence_mean": {
-     "mean": 1.1,
-     "ci90": [
-      1.042,
-      1.139
-     ]
-    },
-    "theme_coverage_lists": 2,
-    "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.0714,
+     "top_item_share": 0.0294,
      "formats_seen": 4
     }
    },
-   "popularity": {
-    "lists": 5,
-    "sessions": 3,
+   "fit score": {
+    "lists": 12,
+    "sessions": 6,
     "p@3": {
-     "mean": 0.8,
+     "mean": 0.528,
      "ci90": [
-      0.75,
-      0.833
+      0.333,
+      0.695
      ]
     },
     "ild": {
-     "mean": 0.766,
+     "mean": 0.749,
      "ci90": [
-      0.725,
-      0.794
+      0.722,
+      0.781
      ]
     },
     "grounding": {
-     "mean": 0.3,
+     "mean": 0.255,
      "ci90": [
-      0.222,
-      0.352
+      0.157,
+      0.343
      ]
     },
     "creative_grounded": {
-     "mean": 0.233,
+     "mean": 0.083,
      "ci90": [
-      0.125,
-      0.306
+      0.0,
+      0.167
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.159,
+     "mean": 0.096,
      "ci90": [
-      0.096,
-      0.201
+      0.054,
+      0.14
      ]
     },
     "theme_coverage": {
-     "mean": 0.833,
+     "mean": 1.0,
      "ci90": [
-      0.667,
+      1.0,
       1.0
      ]
     },
     "overreach": {
-     "mean": 0.2,
+     "mean": 0.472,
      "ci90": [
-      0.167,
-      0.25
+      0.305,
+      0.667
      ]
     },
     "novelty": {
-     "mean": 0.483,
+     "mean": 0.562,
      "ci90": [
-      0.271,
-      0.625
+      0.481,
+      0.639
      ]
     },
     "unexpectedness": {
-     "mean": 0.523,
+     "mean": 0.468,
      "ci90": [
-      0.482,
-      0.565
+      0.389,
+      0.542
      ]
     },
     "serendipity": {
-     "mean": 0.372,
+     "mean": 0.179,
      "ci90": [
-      0.319,
-      0.408
+      0.115,
+      0.236
      ]
     },
     "format_spread": {
-     "mean": 0.748,
+     "mean": 0.755,
      "ci90": [
       0.685,
       0.79
      ]
     },
     "interest_coverage": {
-     "mean": 0.573,
+     "mean": 0.656,
      "ci90": [
-      0.467,
-      0.644
+      0.611,
+      0.7
      ]
     },
     "evidence_mean": {
-     "mean": 0.9,
+     "mean": 1.194,
      "ci90": [
-      0.667,
-      1.056
+      0.972,
+      1.5
      ]
     },
-    "theme_coverage_lists": 2,
+    "theme_coverage_lists": 3,
     "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
+     "slots": 34,
+     "distinct_items": 34,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.0714,
-     "formats_seen": 4
+     "top_item_share": 0.0294,
+     "formats_seen": 5
     }
    },
-   "as read aloud (all picks)": {
-    "lists": 5,
-    "sessions": 3,
+   "tag overlap": {
+    "lists": 12,
+    "sessions": 6,
     "p@3": {
-     "mean": 0.673,
+     "mean": 0.5,
      "ci90": [
-      0.567,
-      0.744
+      0.319,
+      0.653
      ]
     },
     "ild": {
-     "mean": 0.79,
+     "mean": 0.726,
      "ci90": [
-      0.764,
-      0.808
+      0.683,
+      0.768
      ]
     },
     "grounding": {
      "mean": 0.236,
      "ci90": [
-      0.144,
-      0.296
+      0.139,
+      0.329
      ]
     },
     "creative_grounded": {
-     "mean": 0.18,
+     "mean": 0.083,
      "ci90": [
-      0.1,
-      0.233
+      0.0,
+      0.167
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.132,
+     "mean": 0.09,
      "ci90": [
-      0.063,
-      0.177
+      0.043,
+      0.14
      ]
     },
     "theme_coverage": {
-     "mean": 0.833,
+     "mean": 1.0,
      "ci90": [
-      0.667,
+      1.0,
       1.0
      ]
     },
     "overreach": {
-     "mean": 0.287,
+     "mean": 0.5,
      "ci90": [
-      0.194,
-      0.425
+      0.347,
+      0.681
      ]
     },
     "novelty": {
-     "mean": 0.545,
+     "mean": 0.574,
      "ci90": [
-      0.406,
-      0.642
+      0.508,
+      0.636
      ]
     },
     "unexpectedness": {
-     "mean": 0.519,
+     "mean": 0.465,
      "ci90": [
-      0.476,
-      0.562
+      0.391,
+      0.537
      ]
     },
     "serendipity": {
-     "mean": 0.321,
+     "mean": 0.166,
      "ci90": [
-      0.242,
-      0.374
+      0.103,
+      0.224
      ]
     },
     "format_spread": {
-     "mean": 0.713,
+     "mean": 0.72,
      "ci90": [
-      0.68,
-      0.735
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.613,
-     "ci90": [
-      0.547,
-      0.68
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.867,
-     "ci90": [
-      0.733,
-      0.956
-     ]
-    },
-    "theme_coverage_lists": 2,
-    "coverage": {
-     "slots": 19,
-     "distinct_items": 19,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.0526,
-     "formats_seen": 4
-    }
-   },
-   "random (chance)": {
-    "lists": 5,
-    "sessions": 3,
-    "p@3": {
-     "mean": 0.665,
-     "ci90": [
-      0.547,
-      0.744
-     ]
-    },
-    "ild": {
-     "mean": 0.789,
-     "ci90": [
-      0.764,
-      0.808
-     ]
-    },
-    "grounding": {
-     "mean": 0.234,
-     "ci90": [
-      0.14,
-      0.297
-     ]
-    },
-    "creative_grounded": {
-     "mean": 0.182,
-     "ci90": [
-      0.102,
-      0.235
-     ]
-    },
-    "creative_grounded_soft": {
-     "mean": 0.132,
-     "ci90": [
-      0.063,
-      0.179
-     ]
-    },
-    "theme_coverage": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "overreach": {
-     "mean": 0.293,
-     "ci90": [
-      0.194,
-      0.441
-     ]
-    },
-    "novelty": {
-     "mean": 0.549,
-     "ci90": [
-      0.418,
-      0.644
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.523,
-     "ci90": [
-      0.482,
-      0.565
-     ]
-    },
-    "serendipity": {
-     "mean": 0.321,
-     "ci90": [
-      0.237,
-      0.376
-     ]
-    },
-    "format_spread": {
-     "mean": 0.762,
-     "ci90": [
-      0.738,
-      0.786
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.587,
-     "ci90": [
-      0.501,
-      0.654
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.871,
-     "ci90": [
-      0.737,
-      0.96
-     ]
-    },
-    "theme_coverage_lists": 2,
-    "coverage": {
-     "slots": 14.0,
-     "distinct_items": 14.0,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.0714,
-     "formats_seen": 3.89
-    }
-   }
-  },
-  "labelled_lists": 5,
-  "all_shown": {
-   "as read aloud": {
-    "lists": 5,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.738,
-     "ci90": [
-      0.686,
-      0.773
-     ]
-    },
-    "format_spread": {
-     "mean": 0.664,
-     "ci90": [
-      0.579,
-      0.748
-     ]
-    },
-    "novelty": {
-     "mean": 0.567,
-     "ci90": [
-      0.463,
-      0.671
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.525,
-     "ci90": [
-      0.485,
-      0.552
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.573,
-     "ci90": [
-      0.467,
-      0.644
-     ]
-    },
-    "evidence_mean": {
-     "mean": 1.1,
-     "ci90": [
-      1.042,
-      1.139
-     ]
-    },
-    "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.0714,
-     "formats_seen": 4
-    }
-   },
-   "fit score": {
-    "lists": 5,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.78,
-     "ci90": [
-      0.762,
-      0.792
-     ]
-    },
-    "format_spread": {
-     "mean": 0.748,
-     "ci90": [
-      0.685,
+      0.649,
       0.79
      ]
     },
-    "novelty": {
-     "mean": 0.546,
+    "interest_coverage": {
+     "mean": 0.628,
      "ci90": [
-      0.37,
-      0.663
+      0.572,
+      0.672
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.194,
+     "ci90": [
+      0.889,
+      1.528
+     ]
+    },
+    "theme_coverage_lists": 3,
+    "coverage": {
+     "slots": 34,
+     "distinct_items": 34,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0294,
+     "formats_seen": 5
+    }
+   },
+   "session fit": {
+    "lists": 12,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.528,
+     "ci90": [
+      0.333,
+      0.695
+     ]
+    },
+    "ild": {
+     "mean": 0.757,
+     "ci90": [
+      0.729,
+      0.786
+     ]
+    },
+    "grounding": {
+     "mean": 0.255,
+     "ci90": [
+      0.157,
+      0.343
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.083,
+     "ci90": [
+      0.0,
+      0.167
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.096,
+     "ci90": [
+      0.054,
+      0.14
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.472,
+     "ci90": [
+      0.305,
+      0.667
+     ]
+    },
+    "novelty": {
+     "mean": 0.557,
+     "ci90": [
+      0.478,
+      0.634
      ]
     },
     "unexpectedness": {
      "mean": 0.473,
      "ci90": [
-      0.407,
-      0.539
+      0.393,
+      0.55
      ]
     },
-    "interest_coverage": {
-     "mean": 0.613,
+    "serendipity": {
+     "mean": 0.179,
      "ci90": [
-      0.547,
-      0.68
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.0714,
-     "formats_seen": 3
-    }
-   },
-   "tag overlap": {
-    "lists": 5,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.758,
-     "ci90": [
-      0.713,
-      0.787
+      0.115,
+      0.236
      ]
     },
     "format_spread": {
-     "mean": 0.748,
+     "mean": 0.755,
      "ci90": [
       0.685,
       0.79
      ]
     },
-    "novelty": {
-     "mean": 0.567,
-     "ci90": [
-      0.516,
-      0.601
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.46,
-     "ci90": [
-      0.413,
-      0.507
-     ]
-    },
     "interest_coverage": {
-     "mean": 0.573,
+     "mean": 0.656,
      "ci90": [
-      0.467,
-      0.644
+      0.611,
+      0.7
      ]
     },
     "evidence_mean": {
-     "mean": 0.9,
+     "mean": 1.167,
      "ci90": [
-      0.733,
-      1.067
+      0.944,
+      1.472
      ]
     },
+    "theme_coverage_lists": 3,
     "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
+     "slots": 34,
+     "distinct_items": 34,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.0714,
-     "formats_seen": 4
-    }
-   },
-   "session fit": {
-    "lists": 5,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.786,
-     "ci90": [
-      0.774,
-      0.795
-     ]
-    },
-    "format_spread": {
-     "mean": 0.664,
-     "ci90": [
-      0.579,
-      0.748
-     ]
-    },
-    "novelty": {
-     "mean": 0.471,
-     "ci90": [
-      0.323,
-      0.569
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.464,
-     "ci90": [
-      0.424,
-      0.501
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.613,
-     "ci90": [
-      0.547,
-      0.68
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.967,
-     "ci90": [
-      0.833,
-      1.056
-     ]
-    },
-    "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.0714,
-     "formats_seen": 3
+     "top_item_share": 0.0294,
+     "formats_seen": 5
     }
    },
    "rating": {
-    "lists": 5,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.738,
+    "lists": 12,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.417,
      "ci90": [
-      0.686,
-      0.773
+      0.264,
+      0.514
      ]
     },
-    "format_spread": {
-     "mean": 0.664,
+    "ild": {
+     "mean": 0.713,
      "ci90": [
-      0.579,
-      0.748
+      0.668,
+      0.762
+     ]
+    },
+    "grounding": {
+     "mean": 0.255,
+     "ci90": [
+      0.157,
+      0.343
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.139,
+     "ci90": [
+      0.056,
+      0.25
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.122,
+     "ci90": [
+      0.071,
+      0.165
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.583,
+     "ci90": [
+      0.486,
+      0.736
      ]
     },
     "novelty": {
-     "mean": 0.567,
+     "mean": 0.516,
      "ci90": [
-      0.463,
-      0.671
+      0.403,
+      0.615
      ]
     },
     "unexpectedness": {
-     "mean": 0.525,
+     "mean": 0.545,
      "ci90": [
-      0.485,
-      0.552
+      0.503,
+      0.593
+     ]
+    },
+    "serendipity": {
+     "mean": 0.194,
+     "ci90": [
+      0.124,
+      0.249
+     ]
+    },
+    "format_spread": {
+     "mean": 0.706,
+     "ci90": [
+      0.553,
+      0.847
      ]
     },
     "interest_coverage": {
-     "mean": 0.573,
+     "mean": 0.622,
      "ci90": [
-      0.467,
-      0.644
+      0.55,
+      0.683
      ]
     },
     "evidence_mean": {
-     "mean": 1.1,
+     "mean": 1.417,
      "ci90": [
-      1.042,
-      1.139
+      1.11,
+      1.806
      ]
     },
+    "theme_coverage_lists": 3,
     "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
+     "slots": 34,
+     "distinct_items": 34,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.0714,
+     "top_item_share": 0.0294,
      "formats_seen": 4
     }
    },
    "popularity": {
-    "lists": 5,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.766,
+    "lists": 12,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.444,
      "ci90": [
-      0.725,
-      0.794
+      0.292,
+      0.569
+     ]
+    },
+    "ild": {
+     "mean": 0.782,
+     "ci90": [
+      0.766,
+      0.801
+     ]
+    },
+    "grounding": {
+     "mean": 0.208,
+     "ci90": [
+      0.13,
+      0.278
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.056,
+     "ci90": [
+      0.0,
+      0.167
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.077,
+     "ci90": [
+      0.044,
+      0.112
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.556,
+     "ci90": [
+      0.431,
+      0.708
+     ]
+    },
+    "novelty": {
+     "mean": 0.507,
+     "ci90": [
+      0.424,
+      0.589
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.527,
+     "ci90": [
+      0.476,
+      0.575
+     ]
+    },
+    "serendipity": {
+     "mean": 0.152,
+     "ci90": [
+      0.098,
+      0.203
      ]
     },
     "format_spread": {
-     "mean": 0.748,
+     "mean": 0.755,
      "ci90": [
       0.685,
       0.79
      ]
     },
-    "novelty": {
-     "mean": 0.483,
-     "ci90": [
-      0.271,
-      0.625
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.523,
-     "ci90": [
-      0.482,
-      0.565
-     ]
-    },
     "interest_coverage": {
-     "mean": 0.573,
+     "mean": 0.689,
      "ci90": [
-      0.467,
-      0.644
+      0.633,
+      0.733
      ]
     },
     "evidence_mean": {
-     "mean": 0.9,
+     "mean": 1.083,
      "ci90": [
-      0.667,
-      1.056
+      0.917,
+      1.279
      ]
     },
+    "theme_coverage_lists": 3,
     "coverage": {
-     "slots": 14,
-     "distinct_items": 14,
+     "slots": 34,
+     "distinct_items": 34,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.0714,
+     "top_item_share": 0.0294,
      "formats_seen": 4
     }
    },
    "as read aloud (all picks)": {
-    "lists": 5,
-    "sessions": 3,
+    "lists": 12,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.475,
+     "ci90": [
+      0.305,
+      0.612
+     ]
+    },
     "ild": {
-     "mean": 0.79,
-     "ci90": [
-      0.764,
-      0.808
-     ]
-    },
-    "format_spread": {
-     "mean": 0.713,
-     "ci90": [
-      0.68,
-      0.735
-     ]
-    },
-    "novelty": {
-     "mean": 0.545,
-     "ci90": [
-      0.406,
-      0.642
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.519,
-     "ci90": [
-      0.476,
-      0.562
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.613,
-     "ci90": [
-      0.547,
-      0.68
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.867,
-     "ci90": [
-      0.733,
-      0.956
-     ]
-    },
-    "coverage": {
-     "slots": 19,
-     "distinct_items": 19,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.0526,
-     "formats_seen": 4
-    }
-   },
-   "random (chance)": {
-    "lists": 5,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.789,
-     "ci90": [
-      0.764,
-      0.808
-     ]
-    },
-    "format_spread": {
-     "mean": 0.762,
+     "mean": 0.761,
      "ci90": [
       0.738,
       0.786
      ]
     },
-    "novelty": {
-     "mean": 0.549,
+    "grounding": {
+     "mean": 0.246,
      "ci90": [
-      0.418,
-      0.644
+      0.147,
+      0.334
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.11,
+     "ci90": [
+      0.033,
+      0.199
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.109,
+     "ci90": [
+      0.062,
+      0.153
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.525,
+     "ci90": [
+      0.388,
+      0.695
+     ]
+    },
+    "novelty": {
+     "mean": 0.551,
+     "ci90": [
+      0.47,
+      0.626
      ]
     },
     "unexpectedness": {
-     "mean": 0.523,
+     "mean": 0.529,
      "ci90": [
       0.482,
-      0.565
+      0.575
+     ]
+    },
+    "serendipity": {
+     "mean": 0.193,
+     "ci90": [
+      0.121,
+      0.25
+     ]
+    },
+    "format_spread": {
+     "mean": 0.782,
+     "ci90": [
+      0.727,
+      0.83
      ]
     },
     "interest_coverage": {
-     "mean": 0.587,
+     "mean": 0.717,
      "ci90": [
-      0.501,
-      0.654
+      0.7,
+      0.75
      ]
     },
     "evidence_mean": {
-     "mean": 0.871,
+     "mean": 1.189,
      "ci90": [
-      0.737,
-      0.96
+      0.957,
+      1.48
      ]
     },
+    "theme_coverage_lists": 3,
     "coverage": {
-     "slots": 14.0,
-     "distinct_items": 14.0,
+     "slots": 55,
+     "distinct_items": 55,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.0714,
-     "formats_seen": 3.89
+     "top_item_share": 0.0182,
+     "formats_seen": 5
+    }
+   },
+   "random (chance)": {
+    "lists": 12,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.471,
+     "ci90": [
+      0.305,
+      0.606
+     ]
+    },
+    "ild": {
+     "mean": 0.76,
+     "ci90": [
+      0.736,
+      0.786
+     ]
+    },
+    "grounding": {
+     "mean": 0.247,
+     "ci90": [
+      0.147,
+      0.336
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.114,
+     "ci90": [
+      0.036,
+      0.203
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.11,
+     "ci90": [
+      0.063,
+      0.156
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.96,
+     "ci90": [
+      0.88,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.529,
+     "ci90": [
+      0.394,
+      0.695
+     ]
+    },
+    "novelty": {
+     "mean": 0.547,
+     "ci90": [
+      0.463,
+      0.624
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.532,
+     "ci90": [
+      0.486,
+      0.576
+     ]
+    },
+    "serendipity": {
+     "mean": 0.193,
+     "ci90": [
+      0.121,
+      0.249
+     ]
+    },
+    "format_spread": {
+     "mean": 0.838,
+     "ci90": [
+      0.789,
+      0.886
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.653,
+     "ci90": [
+      0.608,
+      0.694
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.194,
+     "ci90": [
+      0.961,
+      1.486
+     ]
+    },
+    "theme_coverage_lists": 3,
+    "coverage": {
+     "slots": 34.0,
+     "distinct_items": 34.0,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0294,
+     "formats_seen": 4.94
     }
    }
   },
-  "all_shown_lists": 5,
-  "holdout": null,
   "evidence": {
-   "picks": 14,
+   "picks": 137,
    "fired": {
-    "keyword": 8,
-    "theme_quote": 4,
-    "overview_sim": 3,
+    "keyword": 97,
+    "theme_quote": 29,
+    "overview_sim": 49,
     "co_mention": 0
    },
-   "picks_with_a_quoted_theme": 4,
+   "picks_with_a_quoted_theme": 33,
    "creative_grounded_picks": {
-    "qualified": 3,
-    "of": 14,
-    "sessions": 2
+    "qualified": 13,
+    "of": 137,
+    "sessions": 9
    },
    "grounding_by_sim_threshold": {
-    "0.25": 0.344,
-    "0.30": 0.278,
-    "0.35": 0.278
+    "0.25": 0.325,
+    "0.30": 0.284,
+    "0.35": 0.237
    },
    "default_sim_threshold": 0.3
   }
@@ -1336,1293 +2169,2126 @@
  "bedrock": {
   "labelled": {
    "as read aloud": {
-    "lists": 2,
-    "sessions": 2,
+    "lists": 24,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.833,
+     "mean": 0.757,
      "ci90": [
-      0.667,
-      1.0
+      0.688,
+      0.826
      ]
     },
     "ild": {
-     "mean": 0.722,
+     "mean": 0.681,
      "ci90": [
-      0.603,
-      0.84
+      0.645,
+      0.718
      ]
     },
     "grounding": {
-     "mean": 0.472,
+     "mean": 0.463,
      "ci90": [
-      0.444,
-      0.5
+      0.38,
+      0.546
      ]
     },
     "creative_grounded": {
-     "mean": 0.583,
+     "mean": 0.188,
      "ci90": [
-      0.5,
-      0.667
+      0.097,
+      0.278
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.306,
+     "mean": 0.205,
      "ci90": [
-      0.246,
-      0.366
+      0.169,
+      0.242
      ]
     },
     "theme_coverage": {
-     "mean": 0.833,
+     "mean": 0.787,
      "ci90": [
-      0.667,
-      1.0
+      0.639,
+      0.925
      ]
     },
     "overreach": {
-     "mean": 0.0,
+     "mean": 0.188,
      "ci90": [
-      0.0,
-      0.0
+      0.118,
+      0.257
      ]
     },
     "novelty": {
-     "mean": 0.625,
+     "mean": 0.516,
      "ci90": [
-      0.562,
-      0.688
+      0.457,
+      0.57
      ]
     },
     "unexpectedness": {
-     "mean": 0.558,
+     "mean": 0.479,
      "ci90": [
-      0.491,
-      0.625
+      0.429,
+      0.528
      ]
     },
     "serendipity": {
-     "mean": 0.497,
+     "mean": 0.349,
      "ci90": [
-      0.368,
-      0.625
+      0.301,
+      0.398
      ]
     },
     "format_spread": {
-     "mean": 0.79,
+     "mean": 0.664,
      "ci90": [
-      0.579,
-      1.0
+      0.577,
+      0.737
      ]
     },
     "interest_coverage": {
-     "mean": 0.833,
+     "mean": 0.76,
      "ci90": [
-      0.667,
-      1.0
+      0.674,
+      0.847
      ]
     },
     "evidence_mean": {
-     "mean": 1.75,
+     "mean": 1.736,
      "ci90": [
       1.5,
-      2.0
+      1.972
      ]
     },
-    "theme_coverage_lists": 2,
+    "theme_coverage_lists": 18,
     "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3
+     "slots": 69,
+     "distinct_items": 65,
+     "unique_share": 0.942,
+     "gini": 0.0557,
+     "top_item_share": 0.0435,
+     "formats_seen": 5
     }
    },
    "fit score": {
-    "lists": 2,
-    "sessions": 2,
+    "lists": 24,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.833,
+     "mean": 0.757,
      "ci90": [
-      0.667,
-      1.0
+      0.681,
+      0.833
      ]
     },
     "ild": {
-     "mean": 0.777,
+     "mean": 0.697,
      "ci90": [
-      0.713,
-      0.84
+      0.669,
+      0.724
      ]
     },
     "grounding": {
-     "mean": 0.306,
+     "mean": 0.361,
      "ci90": [
-      0.111,
-      0.5
+      0.282,
+      0.444
      ]
     },
     "creative_grounded": {
-     "mean": 0.25,
+     "mean": 0.09,
      "ci90": [
-      0.0,
-      0.5
+      0.028,
+      0.16
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.186,
+     "mean": 0.137,
      "ci90": [
-      0.006,
-      0.366
+      0.103,
+      0.175
      ]
     },
     "theme_coverage": {
-     "mean": 0.833,
+     "mean": 0.787,
      "ci90": [
-      0.667,
-      1.0
+      0.639,
+      0.925
      ]
     },
     "overreach": {
-     "mean": 0.0,
+     "mean": 0.215,
      "ci90": [
-      0.0,
-      0.0
+      0.139,
+      0.292
      ]
     },
     "novelty": {
-     "mean": 0.719,
+     "mean": 0.557,
      "ci90": [
-      0.688,
-      0.75
+      0.503,
+      0.606
      ]
     },
     "unexpectedness": {
-     "mean": 0.444,
+     "mean": 0.387,
      "ci90": [
-      0.263,
-      0.625
+      0.337,
+      0.439
      ]
     },
     "serendipity": {
-     "mean": 0.383,
+     "mean": 0.283,
      "ci90": [
-      0.14,
-      0.625
+      0.23,
+      0.339
      ]
     },
     "format_spread": {
-     "mean": 1.0,
+     "mean": 0.799,
      "ci90": [
-      1.0,
-      1.0
+      0.726,
+      0.872
      ]
     },
     "interest_coverage": {
-     "mean": 0.833,
+     "mean": 0.778,
      "ci90": [
-      0.667,
-      1.0
+      0.688,
+      0.861
      ]
     },
     "evidence_mean": {
-     "mean": 1.25,
+     "mean": 1.361,
      "ci90": [
-      1.0,
-      1.5
+      1.153,
+      1.569
      ]
     },
-    "theme_coverage_lists": 2,
+    "theme_coverage_lists": 18,
     "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3
+     "slots": 69,
+     "distinct_items": 68,
+     "unique_share": 0.9855,
+     "gini": 0.0143,
+     "top_item_share": 0.029,
+     "formats_seen": 5
     }
    },
    "tag overlap": {
-    "lists": 2,
-    "sessions": 2,
+    "lists": 24,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.833,
+     "mean": 0.757,
      "ci90": [
-      0.667,
-      1.0
+      0.694,
+      0.819
      ]
     },
     "ild": {
-     "mean": 0.777,
+     "mean": 0.708,
      "ci90": [
-      0.713,
-      0.84
+      0.68,
+      0.736
      ]
     },
     "grounding": {
-     "mean": 0.306,
+     "mean": 0.366,
      "ci90": [
-      0.111,
-      0.5
+      0.296,
+      0.435
      ]
     },
     "creative_grounded": {
-     "mean": 0.25,
+     "mean": 0.104,
      "ci90": [
-      0.0,
-      0.5
+      0.042,
+      0.174
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.186,
+     "mean": 0.142,
      "ci90": [
-      0.006,
-      0.366
+      0.11,
+      0.177
      ]
     },
     "theme_coverage": {
-     "mean": 0.833,
+     "mean": 0.815,
      "ci90": [
       0.667,
-      1.0
+      0.944
      ]
     },
     "overreach": {
-     "mean": 0.0,
+     "mean": 0.215,
      "ci90": [
-      0.0,
-      0.0
+      0.146,
+      0.285
      ]
     },
     "novelty": {
-     "mean": 0.719,
+     "mean": 0.529,
      "ci90": [
-      0.688,
-      0.75
+      0.471,
+      0.581
      ]
     },
     "unexpectedness": {
-     "mean": 0.444,
+     "mean": 0.393,
      "ci90": [
-      0.263,
-      0.625
+      0.343,
+      0.446
      ]
     },
     "serendipity": {
-     "mean": 0.383,
+     "mean": 0.288,
      "ci90": [
-      0.14,
-      0.625
+      0.238,
+      0.339
      ]
     },
     "format_spread": {
-     "mean": 1.0,
+     "mean": 0.792,
      "ci90": [
-      1.0,
-      1.0
+      0.697,
+      0.877
      ]
     },
     "interest_coverage": {
-     "mean": 0.833,
+     "mean": 0.764,
      "ci90": [
-      0.667,
-      1.0
+      0.674,
+      0.847
      ]
     },
     "evidence_mean": {
-     "mean": 1.25,
+     "mean": 1.347,
      "ci90": [
-      1.0,
-      1.5
+      1.139,
+      1.542
      ]
     },
-    "theme_coverage_lists": 2,
+    "theme_coverage_lists": 18,
     "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3
+     "slots": 69,
+     "distinct_items": 68,
+     "unique_share": 0.9855,
+     "gini": 0.0143,
+     "top_item_share": 0.029,
+     "formats_seen": 5
     }
    },
    "session fit": {
-    "lists": 2,
-    "sessions": 2,
+    "lists": 24,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.833,
+     "mean": 0.799,
      "ci90": [
-      0.667,
-      1.0
+      0.715,
+      0.875
      ]
     },
     "ild": {
-     "mean": 0.799,
+     "mean": 0.694,
      "ci90": [
-      0.758,
-      0.84
+      0.662,
+      0.725
      ]
     },
     "grounding": {
-     "mean": 0.417,
+     "mean": 0.449,
      "ci90": [
-      0.333,
-      0.5
+      0.361,
+      0.537
      ]
     },
     "creative_grounded": {
-     "mean": 0.417,
+     "mean": 0.132,
      "ci90": [
-      0.333,
-      0.5
+      0.069,
+      0.201
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.243,
+     "mean": 0.182,
      "ci90": [
-      0.12,
-      0.366
+      0.147,
+      0.217
      ]
     },
     "theme_coverage": {
-     "mean": 0.833,
+     "mean": 0.787,
      "ci90": [
-      0.667,
-      1.0
+      0.639,
+      0.925
      ]
     },
     "overreach": {
-     "mean": 0.0,
+     "mean": 0.174,
      "ci90": [
-      0.0,
-      0.0
+      0.097,
+      0.25
      ]
     },
     "novelty": {
-     "mean": 0.625,
+     "mean": 0.548,
      "ci90": [
-      0.562,
-      0.688
+      0.491,
+      0.602
      ]
     },
     "unexpectedness": {
-     "mean": 0.468,
+     "mean": 0.415,
      "ci90": [
-      0.311,
-      0.625
+      0.373,
+      0.46
      ]
     },
     "serendipity": {
-     "mean": 0.407,
+     "mean": 0.318,
      "ci90": [
-      0.189,
-      0.625
+      0.267,
+      0.369
      ]
     },
     "format_spread": {
-     "mean": 0.79,
+     "mean": 0.762,
      "ci90": [
-      0.579,
-      1.0
+      0.689,
+      0.832
      ]
     },
     "interest_coverage": {
-     "mean": 0.833,
+     "mean": 0.757,
      "ci90": [
       0.667,
-      1.0
+      0.84
      ]
     },
     "evidence_mean": {
-     "mean": 1.583,
+     "mean": 1.639,
      "ci90": [
-      1.5,
-      1.667
+      1.403,
+      1.875
      ]
     },
-    "theme_coverage_lists": 2,
+    "theme_coverage_lists": 18,
     "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 2
+     "slots": 69,
+     "distinct_items": 68,
+     "unique_share": 0.9855,
+     "gini": 0.0143,
+     "top_item_share": 0.029,
+     "formats_seen": 5
     }
    },
    "rating": {
-    "lists": 2,
-    "sessions": 2,
+    "lists": 24,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.833,
+     "mean": 0.715,
      "ci90": [
-      0.667,
-      1.0
+      0.625,
+      0.799
      ]
     },
     "ild": {
-     "mean": 0.722,
+     "mean": 0.685,
      "ci90": [
-      0.603,
-      0.84
+      0.654,
+      0.717
      ]
     },
     "grounding": {
-     "mean": 0.472,
+     "mean": 0.444,
      "ci90": [
-      0.444,
-      0.5
+      0.361,
+      0.523
      ]
     },
     "creative_grounded": {
-     "mean": 0.583,
+     "mean": 0.201,
      "ci90": [
-      0.5,
-      0.667
+      0.118,
+      0.292
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.306,
+     "mean": 0.207,
      "ci90": [
-      0.246,
-      0.366
+      0.169,
+      0.246
      ]
     },
     "theme_coverage": {
-     "mean": 0.833,
+     "mean": 0.704,
      "ci90": [
-      0.667,
-      1.0
+      0.53,
+      0.863
      ]
     },
     "overreach": {
-     "mean": 0.0,
+     "mean": 0.201,
      "ci90": [
-      0.0,
-      0.0
+      0.125,
+      0.278
      ]
     },
     "novelty": {
-     "mean": 0.625,
+     "mean": 0.534,
      "ci90": [
-      0.562,
-      0.688
+      0.477,
+      0.59
      ]
     },
     "unexpectedness": {
-     "mean": 0.558,
+     "mean": 0.503,
      "ci90": [
-      0.491,
-      0.625
+      0.452,
+      0.552
      ]
     },
     "serendipity": {
-     "mean": 0.497,
+     "mean": 0.347,
      "ci90": [
-      0.368,
-      0.625
+      0.292,
+      0.398
      ]
     },
     "format_spread": {
-     "mean": 0.79,
+     "mean": 0.737,
      "ci90": [
-      0.579,
-      1.0
+      0.646,
+      0.82
      ]
     },
     "interest_coverage": {
-     "mean": 0.833,
+     "mean": 0.76,
      "ci90": [
-      0.667,
-      1.0
+      0.674,
+      0.847
      ]
     },
     "evidence_mean": {
      "mean": 1.75,
      "ci90": [
-      1.5,
-      2.0
+      1.514,
+      1.958
      ]
     },
-    "theme_coverage_lists": 2,
+    "theme_coverage_lists": 18,
     "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3
+     "slots": 69,
+     "distinct_items": 64,
+     "unique_share": 0.9275,
+     "gini": 0.0686,
+     "top_item_share": 0.0435,
+     "formats_seen": 5
     }
    },
    "popularity": {
-    "lists": 2,
-    "sessions": 2,
+    "lists": 24,
+    "sessions": 24,
     "p@3": {
-     "mean": 1.0,
+     "mean": 0.785,
      "ci90": [
-      1.0,
-      1.0
+      0.708,
+      0.854
      ]
     },
     "ild": {
-     "mean": 0.785,
+     "mean": 0.708,
      "ci90": [
-      0.731,
-      0.84
+      0.675,
+      0.738
      ]
     },
     "grounding": {
-     "mean": 0.528,
+     "mean": 0.389,
      "ci90": [
-      0.5,
+      0.319,
+      0.458
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.174,
+     "ci90": [
+      0.09,
+      0.264
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.175,
+     "ci90": [
+      0.143,
+      0.21
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.778,
+     "ci90": [
+      0.622,
+      0.917
+     ]
+    },
+    "overreach": {
+     "mean": 0.174,
+     "ci90": [
+      0.111,
+      0.243
+     ]
+    },
+    "novelty": {
+     "mean": 0.476,
+     "ci90": [
+      0.408,
+      0.54
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.45,
+     "ci90": [
+      0.406,
+      0.496
+     ]
+    },
+    "serendipity": {
+     "mean": 0.347,
+     "ci90": [
+      0.296,
+      0.4
+     ]
+    },
+    "format_spread": {
+     "mean": 0.726,
+     "ci90": [
+      0.656,
+      0.799
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.806,
+     "ci90": [
+      0.729,
+      0.882
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.417,
+     "ci90": [
+      1.236,
+      1.611
+     ]
+    },
+    "theme_coverage_lists": 18,
+    "coverage": {
+     "slots": 69,
+     "distinct_items": 66,
+     "unique_share": 0.9565,
+     "gini": 0.0424,
+     "top_item_share": 0.0435,
+     "formats_seen": 5
+    }
+   },
+   "as read aloud (all picks)": {
+    "lists": 24,
+    "sessions": 24,
+    "p@3": {
+     "mean": 0.735,
+     "ci90": [
+      0.663,
+      0.803
+     ]
+    },
+    "ild": {
+     "mean": 0.712,
+     "ci90": [
+      0.684,
+      0.738
+     ]
+    },
+    "grounding": {
+     "mean": 0.391,
+     "ci90": [
+      0.321,
+      0.461
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.155,
+     "ci90": [
+      0.086,
+      0.23
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.172,
+     "ci90": [
+      0.142,
+      0.206
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.833,
+     "ci90": [
+      0.702,
+      0.952
+     ]
+    },
+    "overreach": {
+     "mean": 0.221,
+     "ci90": [
+      0.152,
+      0.292
+     ]
+    },
+    "novelty": {
+     "mean": 0.543,
+     "ci90": [
+      0.494,
+      0.589
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.455,
+     "ci90": [
+      0.412,
+      0.499
+     ]
+    },
+    "serendipity": {
+     "mean": 0.324,
+     "ci90": [
+      0.274,
+      0.373
+     ]
+    },
+    "format_spread": {
+     "mean": 0.729,
+     "ci90": [
+      0.674,
+      0.784
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.844,
+     "ci90": [
+      0.771,
+      0.913
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.51,
+     "ci90": [
+      1.322,
+      1.695
+     ]
+    },
+    "theme_coverage_lists": 18,
+    "coverage": {
+     "slots": 102,
+     "distinct_items": 97,
+     "unique_share": 0.951,
+     "gini": 0.0473,
+     "top_item_share": 0.0294,
+     "formats_seen": 5
+    }
+   },
+   "random (chance)": {
+    "lists": 24,
+    "sessions": 24,
+    "p@3": {
+     "mean": 0.74,
+     "ci90": [
+      0.668,
+      0.805
+     ]
+    },
+    "ild": {
+     "mean": 0.713,
+     "ci90": [
+      0.685,
+      0.739
+     ]
+    },
+    "grounding": {
+     "mean": 0.394,
+     "ci90": [
+      0.324,
+      0.465
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.156,
+     "ci90": [
+      0.088,
+      0.231
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.172,
+     "ci90": [
+      0.142,
+      0.207
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.739,
+     "ci90": [
+      0.607,
+      0.858
+     ]
+    },
+    "overreach": {
+     "mean": 0.219,
+     "ci90": [
+      0.151,
+      0.289
+     ]
+    },
+    "novelty": {
+     "mean": 0.542,
+     "ci90": [
+      0.492,
+      0.589
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.455,
+     "ci90": [
+      0.412,
+      0.499
+     ]
+    },
+    "serendipity": {
+     "mean": 0.325,
+     "ci90": [
+      0.276,
+      0.374
+     ]
+    },
+    "format_spread": {
+     "mean": 0.758,
+     "ci90": [
+      0.7,
+      0.812
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.781,
+     "ci90": [
+      0.708,
+      0.855
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.512,
+     "ci90": [
+      1.324,
+      1.701
+     ]
+    },
+    "theme_coverage_lists": 18,
+    "coverage": {
+     "slots": 69.0,
+     "distinct_items": 66.66,
+     "unique_share": 0.9661,
+     "gini": 0.0327,
+     "top_item_share": 0.0309,
+     "formats_seen": 5.0
+    }
+   }
+  },
+  "labelled_lists": 24,
+  "all_shown": {
+   "as read aloud": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.681,
+     "ci90": [
+      0.645,
+      0.718
+     ]
+    },
+    "format_spread": {
+     "mean": 0.664,
+     "ci90": [
+      0.577,
+      0.737
+     ]
+    },
+    "novelty": {
+     "mean": 0.516,
+     "ci90": [
+      0.457,
+      0.57
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.479,
+     "ci90": [
+      0.429,
+      0.528
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.76,
+     "ci90": [
+      0.674,
+      0.847
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.736,
+     "ci90": [
+      1.5,
+      1.972
+     ]
+    },
+    "coverage": {
+     "slots": 69,
+     "distinct_items": 65,
+     "unique_share": 0.942,
+     "gini": 0.0557,
+     "top_item_share": 0.0435,
+     "formats_seen": 5
+    }
+   },
+   "fit score": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.697,
+     "ci90": [
+      0.669,
+      0.724
+     ]
+    },
+    "format_spread": {
+     "mean": 0.799,
+     "ci90": [
+      0.726,
+      0.872
+     ]
+    },
+    "novelty": {
+     "mean": 0.557,
+     "ci90": [
+      0.503,
+      0.606
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.387,
+     "ci90": [
+      0.337,
+      0.439
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.778,
+     "ci90": [
+      0.688,
+      0.861
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.361,
+     "ci90": [
+      1.153,
+      1.569
+     ]
+    },
+    "coverage": {
+     "slots": 69,
+     "distinct_items": 68,
+     "unique_share": 0.9855,
+     "gini": 0.0143,
+     "top_item_share": 0.029,
+     "formats_seen": 5
+    }
+   },
+   "tag overlap": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.708,
+     "ci90": [
+      0.68,
+      0.736
+     ]
+    },
+    "format_spread": {
+     "mean": 0.792,
+     "ci90": [
+      0.697,
+      0.877
+     ]
+    },
+    "novelty": {
+     "mean": 0.529,
+     "ci90": [
+      0.471,
+      0.581
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.393,
+     "ci90": [
+      0.343,
+      0.446
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.764,
+     "ci90": [
+      0.674,
+      0.847
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.347,
+     "ci90": [
+      1.139,
+      1.542
+     ]
+    },
+    "coverage": {
+     "slots": 69,
+     "distinct_items": 68,
+     "unique_share": 0.9855,
+     "gini": 0.0143,
+     "top_item_share": 0.029,
+     "formats_seen": 5
+    }
+   },
+   "session fit": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.694,
+     "ci90": [
+      0.662,
+      0.725
+     ]
+    },
+    "format_spread": {
+     "mean": 0.762,
+     "ci90": [
+      0.689,
+      0.832
+     ]
+    },
+    "novelty": {
+     "mean": 0.548,
+     "ci90": [
+      0.491,
+      0.602
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.415,
+     "ci90": [
+      0.373,
+      0.46
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.757,
+     "ci90": [
+      0.667,
+      0.84
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.639,
+     "ci90": [
+      1.403,
+      1.875
+     ]
+    },
+    "coverage": {
+     "slots": 69,
+     "distinct_items": 68,
+     "unique_share": 0.9855,
+     "gini": 0.0143,
+     "top_item_share": 0.029,
+     "formats_seen": 5
+    }
+   },
+   "rating": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.685,
+     "ci90": [
+      0.654,
+      0.717
+     ]
+    },
+    "format_spread": {
+     "mean": 0.737,
+     "ci90": [
+      0.646,
+      0.82
+     ]
+    },
+    "novelty": {
+     "mean": 0.534,
+     "ci90": [
+      0.477,
+      0.59
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.503,
+     "ci90": [
+      0.452,
+      0.552
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.76,
+     "ci90": [
+      0.674,
+      0.847
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.75,
+     "ci90": [
+      1.514,
+      1.958
+     ]
+    },
+    "coverage": {
+     "slots": 69,
+     "distinct_items": 64,
+     "unique_share": 0.9275,
+     "gini": 0.0686,
+     "top_item_share": 0.0435,
+     "formats_seen": 5
+    }
+   },
+   "popularity": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.708,
+     "ci90": [
+      0.675,
+      0.738
+     ]
+    },
+    "format_spread": {
+     "mean": 0.726,
+     "ci90": [
+      0.656,
+      0.799
+     ]
+    },
+    "novelty": {
+     "mean": 0.476,
+     "ci90": [
+      0.408,
+      0.54
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.45,
+     "ci90": [
+      0.406,
+      0.496
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.806,
+     "ci90": [
+      0.729,
+      0.882
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.417,
+     "ci90": [
+      1.236,
+      1.611
+     ]
+    },
+    "coverage": {
+     "slots": 69,
+     "distinct_items": 66,
+     "unique_share": 0.9565,
+     "gini": 0.0424,
+     "top_item_share": 0.0435,
+     "formats_seen": 5
+    }
+   },
+   "as read aloud (all picks)": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.712,
+     "ci90": [
+      0.684,
+      0.738
+     ]
+    },
+    "format_spread": {
+     "mean": 0.729,
+     "ci90": [
+      0.674,
+      0.784
+     ]
+    },
+    "novelty": {
+     "mean": 0.543,
+     "ci90": [
+      0.494,
+      0.589
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.455,
+     "ci90": [
+      0.412,
+      0.499
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.844,
+     "ci90": [
+      0.771,
+      0.913
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.51,
+     "ci90": [
+      1.322,
+      1.695
+     ]
+    },
+    "coverage": {
+     "slots": 102,
+     "distinct_items": 97,
+     "unique_share": 0.951,
+     "gini": 0.0473,
+     "top_item_share": 0.0294,
+     "formats_seen": 5
+    }
+   },
+   "random (chance)": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.713,
+     "ci90": [
+      0.685,
+      0.739
+     ]
+    },
+    "format_spread": {
+     "mean": 0.758,
+     "ci90": [
+      0.7,
+      0.812
+     ]
+    },
+    "novelty": {
+     "mean": 0.542,
+     "ci90": [
+      0.492,
+      0.589
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.455,
+     "ci90": [
+      0.412,
+      0.499
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.781,
+     "ci90": [
+      0.708,
+      0.855
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.512,
+     "ci90": [
+      1.324,
+      1.701
+     ]
+    },
+    "coverage": {
+     "slots": 69.0,
+     "distinct_items": 66.66,
+     "unique_share": 0.9661,
+     "gini": 0.0327,
+     "top_item_share": 0.0309,
+     "formats_seen": 5.0
+    }
+   }
+  },
+  "all_shown_lists": 24,
+  "holdout": {
+   "as read aloud": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.694,
+     "ci90": [
+      0.444,
+      0.917
+     ]
+    },
+    "ild": {
+     "mean": 0.737,
+     "ci90": [
+      0.706,
+      0.77
+     ]
+    },
+    "grounding": {
+     "mean": 0.417,
+     "ci90": [
+      0.241,
+      0.574
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.333,
+     "ci90": [
+      0.111,
       0.556
      ]
     },
-    "creative_grounded": {
-     "mean": 0.583,
-     "ci90": [
-      0.5,
-      0.667
-     ]
-    },
     "creative_grounded_soft": {
-     "mean": 0.309,
+     "mean": 0.219,
      "ci90": [
-      0.251,
-      0.366
+      0.109,
+      0.329
      ]
     },
     "theme_coverage": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "overreach": {
-     "mean": 0.0,
-     "ci90": [
-      0.0,
-      0.0
-     ]
-    },
-    "novelty": {
-     "mean": 0.604,
-     "ci90": [
-      0.521,
-      0.688
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.505,
-     "ci90": [
-      0.386,
-      0.625
-     ]
-    },
-    "serendipity": {
-     "mean": 0.505,
-     "ci90": [
-      0.386,
-      0.625
-     ]
-    },
-    "format_spread": {
      "mean": 1.0,
      "ci90": [
       1.0,
       1.0
      ]
     },
-    "interest_coverage": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "evidence_mean": {
-     "mean": 1.583,
-     "ci90": [
-      1.5,
-      1.667
-     ]
-    },
-    "theme_coverage_lists": 2,
-    "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3
-    }
-   },
-   "as read aloud (all picks)": {
-    "lists": 2,
-    "sessions": 2,
-    "p@3": {
-     "mean": 0.9,
-     "ci90": [
-      0.8,
-      1.0
-     ]
-    },
-    "ild": {
-     "mean": 0.785,
-     "ci90": [
-      0.73,
-      0.84
-     ]
-    },
-    "grounding": {
-     "mean": 0.417,
-     "ci90": [
-      0.333,
-      0.5
-     ]
-    },
-    "creative_grounded": {
-     "mean": 0.45,
-     "ci90": [
-      0.4,
-      0.5
-     ]
-    },
-    "creative_grounded_soft": {
-     "mean": 0.259,
-     "ci90": [
-      0.151,
-      0.366
-     ]
-    },
-    "theme_coverage": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
     "overreach": {
-     "mean": 0.0,
+     "mean": 0.306,
      "ci90": [
-      0.0,
-      0.0
+      0.083,
+      0.556
      ]
     },
     "novelty": {
-     "mean": 0.641,
+     "mean": 0.575,
      "ci90": [
-      0.594,
-      0.688
+      0.445,
+      0.718
      ]
     },
     "unexpectedness": {
-     "mean": 0.502,
+     "mean": 0.551,
      "ci90": [
-      0.379,
-      0.625
+      0.422,
+      0.644
      ]
     },
     "serendipity": {
-     "mean": 0.465,
+     "mean": 0.335,
      "ci90": [
-      0.305,
-      0.625
-     ]
-    },
-    "format_spread": {
-     "mean": 0.914,
-     "ci90": [
-      0.828,
-      1.0
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "evidence_mean": {
-     "mean": 1.45,
-     "ci90": [
-      1.4,
-      1.5
-     ]
-    },
-    "theme_coverage_lists": 2,
-    "coverage": {
-     "slots": 7,
-     "distinct_items": 7,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1429,
-     "formats_seen": 4
-    }
-   },
-   "random (chance)": {
-    "lists": 2,
-    "sessions": 2,
-    "p@3": {
-     "mean": 0.91,
-     "ci90": [
-      0.82,
-      1.0
-     ]
-    },
-    "ild": {
-     "mean": 0.789,
-     "ci90": [
-      0.738,
-      0.84
-     ]
-    },
-    "grounding": {
-     "mean": 0.409,
-     "ci90": [
-      0.318,
-      0.5
-     ]
-    },
-    "creative_grounded": {
-     "mean": 0.432,
-     "ci90": [
-      0.363,
-      0.5
-     ]
-    },
-    "creative_grounded_soft": {
-     "mean": 0.252,
-     "ci90": [
-      0.138,
-      0.366
-     ]
-    },
-    "theme_coverage": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "overreach": {
-     "mean": 0.0,
-     "ci90": [
-      0.0,
-      0.0
-     ]
-    },
-    "novelty": {
-     "mean": 0.64,
-     "ci90": [
-      0.593,
-      0.688
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.494,
-     "ci90": [
-      0.364,
-      0.625
-     ]
-    },
-    "serendipity": {
-     "mean": 0.461,
-     "ci90": [
-      0.297,
-      0.625
-     ]
-    },
-    "format_spread": {
-     "mean": 0.958,
-     "ci90": [
-      0.916,
-      1.0
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "evidence_mean": {
-     "mean": 1.407,
-     "ci90": [
-      1.313,
-      1.5
-     ]
-    },
-    "theme_coverage_lists": 2,
-    "coverage": {
-     "slots": 5.0,
-     "distinct_items": 5.0,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3.23
-    }
-   }
-  },
-  "labelled_lists": 2,
-  "all_shown": {
-   "as read aloud": {
-    "lists": 2,
-    "sessions": 2,
-    "ild": {
-     "mean": 0.722,
-     "ci90": [
-      0.603,
-      0.84
+      0.186,
+      0.485
      ]
     },
     "format_spread": {
      "mean": 0.79,
      "ci90": [
-      0.579,
-      1.0
-     ]
-    },
-    "novelty": {
-     "mean": 0.625,
-     "ci90": [
-      0.562,
-      0.688
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.558,
-     "ci90": [
-      0.491,
-      0.625
+      0.65,
+      0.93
      ]
     },
     "interest_coverage": {
-     "mean": 0.833,
+     "mean": 0.944,
      "ci90": [
-      0.667,
+      0.833,
       1.0
      ]
     },
     "evidence_mean": {
-     "mean": 1.75,
+     "mean": 1.667,
      "ci90": [
-      1.5,
-      2.0
+      1.222,
+      2.167
      ]
     },
+    "theme_coverage_lists": 3,
     "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
+     "slots": 17,
+     "distinct_items": 17,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3
+     "top_item_share": 0.0588,
+     "formats_seen": 4
     }
    },
    "fit score": {
-    "lists": 2,
-    "sessions": 2,
-    "ild": {
-     "mean": 0.777,
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.694,
      "ci90": [
-      0.713,
-      0.84
+      0.444,
+      0.917
      ]
     },
-    "format_spread": {
+    "ild": {
+     "mean": 0.721,
+     "ci90": [
+      0.688,
+      0.76
+     ]
+    },
+    "grounding": {
+     "mean": 0.343,
+     "ci90": [
+      0.204,
+      0.481
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.167,
+     "ci90": [
+      0.0,
+      0.333
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.134,
+     "ci90": [
+      0.057,
+      0.222
+     ]
+    },
+    "theme_coverage": {
      "mean": 1.0,
      "ci90": [
       1.0,
       1.0
      ]
     },
-    "novelty": {
-     "mean": 0.719,
+    "overreach": {
+     "mean": 0.306,
      "ci90": [
-      0.688,
-      0.75
+      0.083,
+      0.556
+     ]
+    },
+    "novelty": {
+     "mean": 0.589,
+     "ci90": [
+      0.476,
+      0.705
      ]
     },
     "unexpectedness": {
-     "mean": 0.444,
+     "mean": 0.438,
      "ci90": [
-      0.263,
-      0.625
+      0.296,
+      0.565
+     ]
+    },
+    "serendipity": {
+     "mean": 0.222,
+     "ci90": [
+      0.121,
+      0.334
+     ]
+    },
+    "format_spread": {
+     "mean": 0.79,
+     "ci90": [
+      0.65,
+      0.93
      ]
     },
     "interest_coverage": {
-     "mean": 0.833,
+     "mean": 0.944,
      "ci90": [
-      0.667,
+      0.833,
       1.0
      ]
     },
     "evidence_mean": {
-     "mean": 1.25,
+     "mean": 1.444,
      "ci90": [
-      1.0,
-      1.5
+      1.111,
+      1.833
      ]
     },
+    "theme_coverage_lists": 3,
     "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
+     "slots": 17,
+     "distinct_items": 17,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3
+     "top_item_share": 0.0588,
+     "formats_seen": 5
     }
    },
    "tag overlap": {
-    "lists": 2,
-    "sessions": 2,
-    "ild": {
-     "mean": 0.777,
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.694,
      "ci90": [
-      0.713,
-      0.84
+      0.444,
+      0.917
      ]
     },
-    "format_spread": {
+    "ild": {
+     "mean": 0.719,
+     "ci90": [
+      0.686,
+      0.758
+     ]
+    },
+    "grounding": {
+     "mean": 0.306,
+     "ci90": [
+      0.167,
+      0.454
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.167,
+     "ci90": [
+      0.0,
+      0.333
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.121,
+     "ci90": [
+      0.039,
+      0.212
+     ]
+    },
+    "theme_coverage": {
      "mean": 1.0,
      "ci90": [
       1.0,
       1.0
      ]
     },
-    "novelty": {
-     "mean": 0.719,
+    "overreach": {
+     "mean": 0.306,
      "ci90": [
-      0.688,
-      0.75
+      0.083,
+      0.556
+     ]
+    },
+    "novelty": {
+     "mean": 0.617,
+     "ci90": [
+      0.521,
+      0.717
      ]
     },
     "unexpectedness": {
-     "mean": 0.444,
+     "mean": 0.44,
      "ci90": [
-      0.263,
-      0.625
+      0.301,
+      0.564
+     ]
+    },
+    "serendipity": {
+     "mean": 0.225,
+     "ci90": [
+      0.123,
+      0.336
+     ]
+    },
+    "format_spread": {
+     "mean": 0.79,
+     "ci90": [
+      0.65,
+      0.93
      ]
     },
     "interest_coverage": {
-     "mean": 0.833,
+     "mean": 0.889,
      "ci90": [
-      0.667,
+      0.778,
       1.0
      ]
     },
     "evidence_mean": {
-     "mean": 1.25,
+     "mean": 1.333,
      "ci90": [
-      1.0,
-      1.5
+      0.944,
+      1.778
      ]
     },
+    "theme_coverage_lists": 3,
     "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
+     "slots": 17,
+     "distinct_items": 17,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3
+     "top_item_share": 0.0588,
+     "formats_seen": 5
     }
    },
    "session fit": {
-    "lists": 2,
-    "sessions": 2,
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.694,
+     "ci90": [
+      0.444,
+      0.917
+     ]
+    },
     "ild": {
-     "mean": 0.799,
+     "mean": 0.721,
      "ci90": [
-      0.758,
-      0.84
+      0.688,
+      0.76
      ]
     },
-    "format_spread": {
-     "mean": 0.79,
+    "grounding": {
+     "mean": 0.343,
      "ci90": [
-      0.579,
-      1.0
+      0.204,
+      0.481
      ]
     },
-    "novelty": {
-     "mean": 0.625,
+    "creative_grounded": {
+     "mean": 0.167,
      "ci90": [
-      0.562,
-      0.688
+      0.0,
+      0.333
      ]
     },
-    "unexpectedness": {
-     "mean": 0.468,
+    "creative_grounded_soft": {
+     "mean": 0.134,
      "ci90": [
-      0.311,
-      0.625
+      0.057,
+      0.222
      ]
     },
-    "interest_coverage": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "evidence_mean": {
-     "mean": 1.583,
-     "ci90": [
-      1.5,
-      1.667
-     ]
-    },
-    "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 2
-    }
-   },
-   "rating": {
-    "lists": 2,
-    "sessions": 2,
-    "ild": {
-     "mean": 0.722,
-     "ci90": [
-      0.603,
-      0.84
-     ]
-    },
-    "format_spread": {
-     "mean": 0.79,
-     "ci90": [
-      0.579,
-      1.0
-     ]
-    },
-    "novelty": {
-     "mean": 0.625,
-     "ci90": [
-      0.562,
-      0.688
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.558,
-     "ci90": [
-      0.491,
-      0.625
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.833,
-     "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "evidence_mean": {
-     "mean": 1.75,
-     "ci90": [
-      1.5,
-      2.0
-     ]
-    },
-    "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3
-    }
-   },
-   "popularity": {
-    "lists": 2,
-    "sessions": 2,
-    "ild": {
-     "mean": 0.785,
-     "ci90": [
-      0.731,
-      0.84
-     ]
-    },
-    "format_spread": {
+    "theme_coverage": {
      "mean": 1.0,
      "ci90": [
       1.0,
       1.0
      ]
     },
-    "novelty": {
-     "mean": 0.604,
+    "overreach": {
+     "mean": 0.306,
      "ci90": [
-      0.521,
-      0.688
+      0.083,
+      0.556
+     ]
+    },
+    "novelty": {
+     "mean": 0.589,
+     "ci90": [
+      0.476,
+      0.705
      ]
     },
     "unexpectedness": {
-     "mean": 0.505,
+     "mean": 0.438,
      "ci90": [
-      0.386,
-      0.625
+      0.296,
+      0.565
      ]
     },
-    "interest_coverage": {
-     "mean": 0.833,
+    "serendipity": {
+     "mean": 0.222,
      "ci90": [
-      0.667,
-      1.0
-     ]
-    },
-    "evidence_mean": {
-     "mean": 1.583,
-     "ci90": [
-      1.5,
-      1.667
-     ]
-    },
-    "coverage": {
-     "slots": 5,
-     "distinct_items": 5,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3
-    }
-   },
-   "as read aloud (all picks)": {
-    "lists": 2,
-    "sessions": 2,
-    "ild": {
-     "mean": 0.785,
-     "ci90": [
-      0.73,
-      0.84
+      0.121,
+      0.334
      ]
     },
     "format_spread": {
-     "mean": 0.914,
+     "mean": 0.79,
      "ci90": [
-      0.828,
-      1.0
-     ]
-    },
-    "novelty": {
-     "mean": 0.641,
-     "ci90": [
-      0.594,
-      0.688
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.502,
-     "ci90": [
-      0.379,
-      0.625
+      0.65,
+      0.93
      ]
     },
     "interest_coverage": {
-     "mean": 0.833,
+     "mean": 0.944,
      "ci90": [
-      0.667,
+      0.833,
       1.0
      ]
     },
     "evidence_mean": {
-     "mean": 1.45,
+     "mean": 1.444,
      "ci90": [
-      1.4,
-      1.5
+      1.111,
+      1.833
      ]
     },
+    "theme_coverage_lists": 3,
     "coverage": {
-     "slots": 7,
-     "distinct_items": 7,
+     "slots": 17,
+     "distinct_items": 17,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.1429,
+     "top_item_share": 0.0588,
+     "formats_seen": 5
+    }
+   },
+   "rating": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.583,
+     "ci90": [
+      0.333,
+      0.806
+     ]
+    },
+    "ild": {
+     "mean": 0.717,
+     "ci90": [
+      0.663,
+      0.767
+     ]
+    },
+    "grounding": {
+     "mean": 0.361,
+     "ci90": [
+      0.213,
+      0.5
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.278,
+     "ci90": [
+      0.111,
+      0.5
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.19,
+     "ci90": [
+      0.105,
+      0.266
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.417,
+     "ci90": [
+      0.194,
+      0.667
+     ]
+    },
+    "novelty": {
+     "mean": 0.498,
+     "ci90": [
+      0.362,
+      0.628
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.58,
+     "ci90": [
+      0.518,
+      0.632
+     ]
+    },
+    "serendipity": {
+     "mean": 0.293,
+     "ci90": [
+      0.169,
+      0.408
+     ]
+    },
+    "format_spread": {
+     "mean": 0.693,
+     "ci90": [
+      0.43,
+      0.93
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.944,
+     "ci90": [
+      0.833,
+      1.0
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.722,
+     "ci90": [
+      1.278,
+      2.222
+     ]
+    },
+    "theme_coverage_lists": 3,
+    "coverage": {
+     "slots": 17,
+     "distinct_items": 17,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0588,
      "formats_seen": 4
     }
    },
-   "random (chance)": {
-    "lists": 2,
-    "sessions": 2,
-    "ild": {
-     "mean": 0.789,
+   "popularity": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.583,
      "ci90": [
-      0.738,
-      0.84
+      0.333,
+      0.806
      ]
     },
-    "format_spread": {
-     "mean": 0.958,
+    "ild": {
+     "mean": 0.754,
      "ci90": [
-      0.916,
+      0.724,
+      0.784
+     ]
+    },
+    "grounding": {
+     "mean": 0.269,
+     "ci90": [
+      0.13,
+      0.426
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.111,
+     "ci90": [
+      0.0,
+      0.333
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.099,
+     "ci90": [
+      0.03,
+      0.19
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
       1.0
      ]
     },
-    "novelty": {
-     "mean": 0.64,
+    "overreach": {
+     "mean": 0.417,
      "ci90": [
-      0.593,
-      0.688
+      0.194,
+      0.667
+     ]
+    },
+    "novelty": {
+     "mean": 0.529,
+     "ci90": [
+      0.445,
+      0.613
      ]
     },
     "unexpectedness": {
-     "mean": 0.494,
+     "mean": 0.466,
      "ci90": [
-      0.364,
-      0.625
+      0.35,
+      0.574
+     ]
+    },
+    "serendipity": {
+     "mean": 0.18,
+     "ci90": [
+      0.077,
+      0.308
+     ]
+    },
+    "format_spread": {
+     "mean": 0.86,
+     "ci90": [
+      0.72,
+      1.0
      ]
     },
     "interest_coverage": {
-     "mean": 0.833,
+     "mean": 0.944,
      "ci90": [
-      0.667,
+      0.833,
       1.0
      ]
     },
     "evidence_mean": {
-     "mean": 1.407,
+     "mean": 1.444,
      "ci90": [
-      1.313,
-      1.5
+      1.111,
+      1.833
      ]
     },
+    "theme_coverage_lists": 3,
     "coverage": {
-     "slots": 5.0,
-     "distinct_items": 5.0,
+     "slots": 17,
+     "distinct_items": 17,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.2,
-     "formats_seen": 3.23
+     "top_item_share": 0.0588,
+     "formats_seen": 4
+    }
+   },
+   "as read aloud (all picks)": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.662,
+     "ci90": [
+      0.416,
+      0.875
+     ]
+    },
+    "ild": {
+     "mean": 0.742,
+     "ci90": [
+      0.707,
+      0.776
+     ]
+    },
+    "grounding": {
+     "mean": 0.346,
+     "ci90": [
+      0.204,
+      0.485
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.219,
+     "ci90": [
+      0.067,
+      0.397
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.163,
+     "ci90": [
+      0.086,
+      0.244
+     ]
+    },
+    "theme_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.337,
+     "ci90": [
+      0.125,
+      0.584
+     ]
+    },
+    "novelty": {
+     "mean": 0.559,
+     "ci90": [
+      0.453,
+      0.667
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.511,
+     "ci90": [
+      0.421,
+      0.593
+     ]
+    },
+    "serendipity": {
+     "mean": 0.273,
+     "ci90": [
+      0.168,
+      0.378
+     ]
+    },
+    "format_spread": {
+     "mean": 0.843,
+     "ci90": [
+      0.725,
+      0.944
+     ]
+    },
+    "interest_coverage": {
+     "mean": 1.0,
+     "ci90": [
+      1.0,
+      1.0
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.51,
+     "ci90": [
+      1.118,
+      1.932
+     ]
+    },
+    "theme_coverage_lists": 3,
+    "coverage": {
+     "slots": 27,
+     "distinct_items": 27,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.037,
+     "formats_seen": 5
+    }
+   },
+   "random (chance)": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.662,
+     "ci90": [
+      0.416,
+      0.879
+     ]
+    },
+    "ild": {
+     "mean": 0.741,
+     "ci90": [
+      0.703,
+      0.777
+     ]
+    },
+    "grounding": {
+     "mean": 0.346,
+     "ci90": [
+      0.206,
+      0.486
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.219,
+     "ci90": [
+      0.067,
+      0.397
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.164,
+     "ci90": [
+      0.087,
+      0.244
+     ]
+    },
+    "theme_coverage": {
+     "mean": 0.96,
+     "ci90": [
+      0.88,
+      1.0
+     ]
+    },
+    "overreach": {
+     "mean": 0.338,
+     "ci90": [
+      0.121,
+      0.584
+     ]
+    },
+    "novelty": {
+     "mean": 0.559,
+     "ci90": [
+      0.452,
+      0.669
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.514,
+     "ci90": [
+      0.426,
+      0.594
+     ]
+    },
+    "serendipity": {
+     "mean": 0.276,
+     "ci90": [
+      0.171,
+      0.38
+     ]
+    },
+    "format_spread": {
+     "mean": 0.895,
+     "ci90": [
+      0.812,
+      0.974
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.914,
+     "ci90": [
+      0.829,
+      1.0
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.516,
+     "ci90": [
+      1.118,
+      1.94
+     ]
+    },
+    "theme_coverage_lists": 3,
+    "coverage": {
+     "slots": 17.0,
+     "distinct_items": 17.0,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0588,
+     "formats_seen": 4.66
     }
    }
   },
-  "all_shown_lists": 2,
-  "holdout": null,
   "evidence": {
-   "picks": 5,
+   "picks": 69,
    "fired": {
-    "keyword": 4,
-    "theme_quote": 4,
-    "overview_sim": 1,
+    "keyword": 56,
+    "theme_quote": 29,
+    "overview_sim": 36,
     "co_mention": 0
    },
-   "picks_with_a_quoted_theme": 4,
+   "picks_with_a_quoted_theme": 33,
    "creative_grounded_picks": {
-    "qualified": 3,
-    "of": 5,
-    "sessions": 2
+    "qualified": 13,
+    "of": 69,
+    "sessions": 9
    },
    "grounding_by_sim_threshold": {
-    "0.25": 0.583,
-    "0.30": 0.472,
-    "0.35": 0.472
+    "0.25": 0.502,
+    "0.30": 0.463,
+    "0.35": 0.384
    },
    "default_sim_threshold": 0.3
   }
@@ -2630,27 +4296,27 @@
  "heuristic": {
   "labelled": {
    "as read aloud": {
-    "lists": 3,
-    "sessions": 3,
+    "lists": 24,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.556,
+     "mean": 0.438,
      "ci90": [
-      0.444,
-      0.667
+      0.319,
+      0.556
      ]
     },
     "ild": {
-     "mean": 0.749,
+     "mean": 0.705,
      "ci90": [
-      0.692,
-      0.805
+      0.682,
+      0.728
      ]
     },
     "grounding": {
-     "mean": 0.148,
+     "mean": 0.104,
      "ci90": [
-      0.111,
-      0.185
+      0.065,
+      0.141
      ]
     },
     "creative_grounded": {
@@ -2661,10 +4327,10 @@
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.059,
+     "mean": 0.052,
      "ci90": [
-      0.044,
-      0.074
+      0.032,
+      0.072
      ]
     },
     "theme_coverage": {
@@ -2675,86 +4341,86 @@
      ]
     },
     "overreach": {
-     "mean": 0.444,
+     "mean": 0.535,
      "ci90": [
-      0.333,
-      0.556
+      0.417,
+      0.646
      ]
     },
     "novelty": {
-     "mean": 0.528,
+     "mean": 0.463,
      "ci90": [
-      0.396,
-      0.66
+      0.414,
+      0.514
      ]
     },
     "unexpectedness": {
-     "mean": 0.503,
+     "mean": 0.52,
      "ci90": [
-      0.472,
-      0.534
+      0.499,
+      0.541
      ]
     },
     "serendipity": {
-     "mean": 0.225,
+     "mean": 0.224,
      "ci90": [
-      0.155,
-      0.295
+      0.158,
+      0.29
      ]
     },
     "format_spread": {
-     "mean": 0.579,
+     "mean": 0.553,
      "ci90": [
-      0.579,
-      0.579
+      0.452,
+      0.647
      ]
     },
     "interest_coverage": {
-     "mean": 0.4,
+     "mean": 0.358,
      "ci90": [
-      0.4,
+      0.325,
       0.4
      ]
     },
     "evidence_mean": {
-     "mean": 0.667,
+     "mean": 0.764,
      "ci90": [
-      0.444,
-      0.889
+      0.639,
+      0.882
      ]
     },
     "theme_coverage_lists": 0,
     "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 4
+     "slots": 68,
+     "distinct_items": 67,
+     "unique_share": 0.9853,
+     "gini": 0.0145,
+     "top_item_share": 0.0294,
+     "formats_seen": 5
     }
    },
    "fit score": {
-    "lists": 3,
-    "sessions": 3,
+    "lists": 24,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.667,
+     "mean": 0.479,
      "ci90": [
-      0.667,
-      0.667
+      0.368,
+      0.59
      ]
     },
     "ild": {
-     "mean": 0.782,
+     "mean": 0.725,
      "ci90": [
-      0.758,
-      0.805
+      0.708,
+      0.744
      ]
     },
     "grounding": {
-     "mean": 0.148,
+     "mean": 0.109,
      "ci90": [
-      0.111,
-      0.185
+      0.076,
+      0.141
      ]
     },
     "creative_grounded": {
@@ -2765,10 +4431,10 @@
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.059,
+     "mean": 0.052,
      "ci90": [
-      0.044,
-      0.074
+      0.036,
+      0.068
      ]
     },
     "theme_coverage": {
@@ -2779,86 +4445,86 @@
      ]
     },
     "overreach": {
-     "mean": 0.333,
+     "mean": 0.479,
      "ci90": [
-      0.333,
-      0.333
+      0.375,
+      0.583
      ]
     },
     "novelty": {
-     "mean": 0.431,
+     "mean": 0.442,
      "ci90": [
-      0.243,
-      0.618
+      0.384,
+      0.501
      ]
     },
     "unexpectedness": {
-     "mean": 0.493,
+     "mean": 0.498,
      "ci90": [
-      0.452,
-      0.534
+      0.478,
+      0.518
      ]
     },
     "serendipity": {
-     "mean": 0.284,
+     "mean": 0.238,
      "ci90": [
-      0.259,
-      0.308
+      0.18,
+      0.298
      ]
     },
     "format_spread": {
-     "mean": 0.579,
+     "mean": 0.641,
      "ci90": [
-      0.579,
-      0.579
+      0.522,
+      0.755
      ]
     },
     "interest_coverage": {
-     "mean": 0.467,
+     "mean": 0.383,
      "ci90": [
-      0.4,
-      0.533
+      0.35,
+      0.417
      ]
     },
     "evidence_mean": {
-     "mean": 0.556,
+     "mean": 0.708,
      "ci90": [
-      0.444,
-      0.667
+      0.583,
+      0.833
      ]
     },
     "theme_coverage_lists": 0,
     "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 3
+     "slots": 68,
+     "distinct_items": 67,
+     "unique_share": 0.9853,
+     "gini": 0.0145,
+     "top_item_share": 0.0294,
+     "formats_seen": 5
     }
    },
    "tag overlap": {
-    "lists": 3,
-    "sessions": 3,
+    "lists": 24,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.556,
+     "mean": 0.368,
      "ci90": [
-      0.444,
-      0.667
+      0.257,
+      0.486
      ]
     },
     "ild": {
-     "mean": 0.745,
+     "mean": 0.739,
      "ci90": [
-      0.688,
-      0.801
+      0.708,
+      0.769
      ]
     },
     "grounding": {
-     "mean": 0.148,
+     "mean": 0.081,
      "ci90": [
-      0.111,
-      0.185
+      0.051,
+      0.111
      ]
     },
     "creative_grounded": {
@@ -2869,10 +4535,10 @@
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.059,
+     "mean": 0.039,
      "ci90": [
-      0.044,
-      0.074
+      0.024,
+      0.055
      ]
     },
     "theme_coverage": {
@@ -2883,397 +4549,85 @@
      ]
     },
     "overreach": {
-     "mean": 0.444,
+     "mean": 0.604,
      "ci90": [
-      0.333,
-      0.556
+      0.493,
+      0.708
      ]
     },
     "novelty": {
-     "mean": 0.465,
+     "mean": 0.455,
      "ci90": [
       0.396,
-      0.535
+      0.512
      ]
     },
     "unexpectedness": {
-     "mean": 0.471,
+     "mean": 0.496,
      "ci90": [
-      0.428,
-      0.513
+      0.477,
+      0.515
      ]
     },
     "serendipity": {
-     "mean": 0.225,
+     "mean": 0.184,
      "ci90": [
-      0.155,
-      0.295
+      0.126,
+      0.247
      ]
     },
     "format_spread": {
-     "mean": 0.579,
+     "mean": 0.5,
      "ci90": [
-      0.579,
-      0.579
+      0.41,
+      0.577
      ]
     },
     "interest_coverage": {
-     "mean": 0.4,
+     "mean": 0.392,
      "ci90": [
-      0.4,
-      0.4
+      0.358,
+      0.417
      ]
     },
     "evidence_mean": {
-     "mean": 0.667,
+     "mean": 0.639,
      "ci90": [
-      0.444,
-      0.889
+      0.521,
+      0.764
      ]
     },
     "theme_coverage_lists": 0,
     "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 4
+     "slots": 68,
+     "distinct_items": 67,
+     "unique_share": 0.9853,
+     "gini": 0.0145,
+     "top_item_share": 0.0294,
+     "formats_seen": 5
     }
    },
    "session fit": {
-    "lists": 3,
-    "sessions": 3,
+    "lists": 24,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.667,
+     "mean": 0.493,
      "ci90": [
-      0.667,
-      0.667
-     ]
-    },
-    "ild": {
-     "mean": 0.778,
-     "ci90": [
-      0.753,
-      0.802
-     ]
-    },
-    "grounding": {
-     "mean": 0.148,
-     "ci90": [
-      0.111,
-      0.185
-     ]
-    },
-    "creative_grounded": {
-     "mean": 0.0,
-     "ci90": [
-      0.0,
-      0.0
-     ]
-    },
-    "creative_grounded_soft": {
-     "mean": 0.059,
-     "ci90": [
-      0.044,
-      0.074
-     ]
-    },
-    "theme_coverage": {
-     "mean": NaN,
-     "ci90": [
-      NaN,
-      NaN
-     ]
-    },
-    "overreach": {
-     "mean": 0.333,
-     "ci90": [
-      0.333,
-      0.333
-     ]
-    },
-    "novelty": {
-     "mean": 0.368,
-     "ci90": [
-      0.243,
-      0.493
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.461,
-     "ci90": [
-      0.418,
-      0.503
-     ]
-    },
-    "serendipity": {
-     "mean": 0.284,
-     "ci90": [
-      0.259,
-      0.308
-     ]
-    },
-    "format_spread": {
-     "mean": 0.579,
-     "ci90": [
-      0.579,
-      0.579
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.467,
-     "ci90": [
-      0.4,
-      0.533
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.556,
-     "ci90": [
-      0.444,
-      0.667
-     ]
-    },
-    "theme_coverage_lists": 0,
-    "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 3
-    }
-   },
-   "rating": {
-    "lists": 3,
-    "sessions": 3,
-    "p@3": {
-     "mean": 0.556,
-     "ci90": [
-      0.444,
-      0.667
-     ]
-    },
-    "ild": {
-     "mean": 0.749,
-     "ci90": [
-      0.692,
-      0.805
-     ]
-    },
-    "grounding": {
-     "mean": 0.148,
-     "ci90": [
-      0.111,
-      0.185
-     ]
-    },
-    "creative_grounded": {
-     "mean": 0.0,
-     "ci90": [
-      0.0,
-      0.0
-     ]
-    },
-    "creative_grounded_soft": {
-     "mean": 0.059,
-     "ci90": [
-      0.044,
-      0.074
-     ]
-    },
-    "theme_coverage": {
-     "mean": NaN,
-     "ci90": [
-      NaN,
-      NaN
-     ]
-    },
-    "overreach": {
-     "mean": 0.444,
-     "ci90": [
-      0.333,
-      0.556
-     ]
-    },
-    "novelty": {
-     "mean": 0.528,
-     "ci90": [
-      0.396,
-      0.66
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.503,
-     "ci90": [
-      0.472,
-      0.534
-     ]
-    },
-    "serendipity": {
-     "mean": 0.225,
-     "ci90": [
-      0.155,
-      0.295
-     ]
-    },
-    "format_spread": {
-     "mean": 0.579,
-     "ci90": [
-      0.579,
-      0.579
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.4,
-     "ci90": [
-      0.4,
-      0.4
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.667,
-     "ci90": [
-      0.444,
-      0.889
-     ]
-    },
-    "theme_coverage_lists": 0,
-    "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 4
-    }
-   },
-   "popularity": {
-    "lists": 3,
-    "sessions": 3,
-    "p@3": {
-     "mean": 0.667,
-     "ci90": [
-      0.667,
-      0.667
-     ]
-    },
-    "ild": {
-     "mean": 0.754,
-     "ci90": [
-      0.702,
-      0.805
-     ]
-    },
-    "grounding": {
-     "mean": 0.148,
-     "ci90": [
-      0.111,
-      0.185
-     ]
-    },
-    "creative_grounded": {
-     "mean": 0.0,
-     "ci90": [
-      0.0,
-      0.0
-     ]
-    },
-    "creative_grounded_soft": {
-     "mean": 0.059,
-     "ci90": [
-      0.044,
-      0.074
-     ]
-    },
-    "theme_coverage": {
-     "mean": NaN,
-     "ci90": [
-      NaN,
-      NaN
-     ]
-    },
-    "overreach": {
-     "mean": 0.333,
-     "ci90": [
-      0.333,
-      0.333
-     ]
-    },
-    "novelty": {
-     "mean": 0.403,
-     "ci90": [
-      0.188,
-      0.618
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.535,
-     "ci90": [
-      0.523,
-      0.547
-     ]
-    },
-    "serendipity": {
-     "mean": 0.284,
-     "ci90": [
-      0.259,
-      0.308
-     ]
-    },
-    "format_spread": {
-     "mean": 0.579,
-     "ci90": [
-      0.579,
-      0.579
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.4,
-     "ci90": [
-      0.4,
-      0.4
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.444,
-     "ci90": [
-      0.333,
-      0.556
-     ]
-    },
-    "theme_coverage_lists": 0,
-    "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 3
-    }
-   },
-   "as read aloud (all picks)": {
-    "lists": 3,
-    "sessions": 3,
-    "p@3": {
-     "mean": 0.522,
-     "ci90": [
-      0.433,
+      0.382,
       0.611
      ]
     },
     "ild": {
-     "mean": 0.794,
+     "mean": 0.729,
      "ci90": [
-      0.769,
-      0.819
+      0.711,
+      0.746
      ]
     },
     "grounding": {
-     "mean": 0.115,
+     "mean": 0.113,
      "ci90": [
-      0.081,
+      0.079,
       0.148
      ]
     },
@@ -3285,10 +4639,10 @@
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.047,
+     "mean": 0.054,
      "ci90": [
-      0.034,
-      0.06
+      0.038,
+      0.071
      ]
     },
     "theme_coverage": {
@@ -3299,86 +4653,86 @@
      ]
     },
     "overreach": {
-     "mean": 0.478,
+     "mean": 0.465,
      "ci90": [
-      0.389,
-      0.567
+      0.354,
+      0.576
      ]
     },
     "novelty": {
-     "mean": 0.481,
+     "mean": 0.436,
      "ci90": [
-      0.343,
-      0.618
+      0.374,
+      0.497
      ]
     },
     "unexpectedness": {
-     "mean": 0.53,
+     "mean": 0.498,
      "ci90": [
-      0.52,
-      0.541
+      0.479,
+      0.518
      ]
     },
     "serendipity": {
-     "mean": 0.225,
+     "mean": 0.245,
      "ci90": [
-      0.175,
-      0.275
+      0.187,
+      0.307
      ]
     },
     "format_spread": {
-     "mean": 0.578,
+     "mean": 0.623,
      "ci90": [
-      0.526,
-      0.63
+      0.509,
+      0.731
      ]
     },
     "interest_coverage": {
-     "mean": 0.467,
+     "mean": 0.375,
      "ci90": [
-      0.4,
-      0.533
+      0.342,
+      0.408
      ]
     },
     "evidence_mean": {
-     "mean": 0.478,
+     "mean": 0.653,
      "ci90": [
-      0.389,
-      0.567
+      0.535,
+      0.778
      ]
     },
     "theme_coverage_lists": 0,
     "coverage": {
-     "slots": 12,
-     "distinct_items": 12,
+     "slots": 68,
+     "distinct_items": 68,
      "unique_share": 1.0,
      "gini": 0.0,
-     "top_item_share": 0.0833,
-     "formats_seen": 4
+     "top_item_share": 0.0147,
+     "formats_seen": 5
     }
    },
-   "random (chance)": {
-    "lists": 3,
-    "sessions": 3,
+   "rating": {
+    "lists": 24,
+    "sessions": 24,
     "p@3": {
-     "mean": 0.518,
+     "mean": 0.451,
      "ci90": [
-      0.423,
-      0.612
+      0.326,
+      0.576
      ]
     },
     "ild": {
-     "mean": 0.793,
+     "mean": 0.716,
      "ci90": [
-      0.768,
-      0.818
+      0.695,
+      0.736
      ]
     },
     "grounding": {
-     "mean": 0.116,
+     "mean": 0.109,
      "ci90": [
-      0.082,
-      0.149
+      0.069,
+      0.148
      ]
     },
     "creative_grounded": {
@@ -3389,10 +4743,10 @@
      ]
     },
     "creative_grounded_soft": {
-     "mean": 0.048,
+     "mean": 0.055,
      "ci90": [
       0.034,
-      0.061
+      0.076
      ]
     },
     "theme_coverage": {
@@ -3403,520 +4757,1665 @@
      ]
     },
     "overreach": {
-     "mean": 0.482,
+     "mean": 0.507,
      "ci90": [
-      0.388,
-      0.577
+      0.382,
+      0.625
      ]
     },
     "novelty": {
-     "mean": 0.484,
+     "mean": 0.475,
      "ci90": [
-      0.354,
-      0.614
+      0.426,
+      0.525
      ]
     },
     "unexpectedness": {
-     "mean": 0.528,
+     "mean": 0.532,
      "ci90": [
-      0.518,
-      0.538
+      0.514,
+      0.55
      ]
     },
     "serendipity": {
-     "mean": 0.223,
+     "mean": 0.233,
      "ci90": [
-      0.17,
-      0.276
+      0.163,
+      0.301
      ]
     },
     "format_spread": {
-     "mean": 0.637,
+     "mean": 0.588,
      "ci90": [
-      0.579,
-      0.694
+      0.481,
+      0.693
      ]
     },
     "interest_coverage": {
-     "mean": 0.425,
+     "mean": 0.35,
      "ci90": [
-      0.4,
-      0.449
+      0.317,
+      0.383
      ]
     },
     "evidence_mean": {
-     "mean": 0.493,
+     "mean": 0.736,
      "ci90": [
-      0.39,
-      0.597
+      0.625,
+      0.847
      ]
     },
     "theme_coverage_lists": 0,
     "coverage": {
-     "slots": 9.0,
-     "distinct_items": 9.0,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 3.63
-    }
-   }
-  },
-  "labelled_lists": 3,
-  "all_shown": {
-   "as read aloud": {
-    "lists": 3,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.749,
-     "ci90": [
-      0.692,
-      0.805
-     ]
-    },
-    "format_spread": {
-     "mean": 0.579,
-     "ci90": [
-      0.579,
-      0.579
-     ]
-    },
-    "novelty": {
-     "mean": 0.528,
-     "ci90": [
-      0.396,
-      0.66
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.503,
-     "ci90": [
-      0.472,
-      0.534
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.4,
-     "ci90": [
-      0.4,
-      0.4
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.667,
-     "ci90": [
-      0.444,
-      0.889
-     ]
-    },
-    "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 4
-    }
-   },
-   "fit score": {
-    "lists": 3,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.782,
-     "ci90": [
-      0.758,
-      0.805
-     ]
-    },
-    "format_spread": {
-     "mean": 0.579,
-     "ci90": [
-      0.579,
-      0.579
-     ]
-    },
-    "novelty": {
-     "mean": 0.431,
-     "ci90": [
-      0.243,
-      0.618
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.493,
-     "ci90": [
-      0.452,
-      0.534
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.467,
-     "ci90": [
-      0.4,
-      0.533
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.556,
-     "ci90": [
-      0.444,
-      0.667
-     ]
-    },
-    "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 3
-    }
-   },
-   "tag overlap": {
-    "lists": 3,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.745,
-     "ci90": [
-      0.688,
-      0.801
-     ]
-    },
-    "format_spread": {
-     "mean": 0.579,
-     "ci90": [
-      0.579,
-      0.579
-     ]
-    },
-    "novelty": {
-     "mean": 0.465,
-     "ci90": [
-      0.396,
-      0.535
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.471,
-     "ci90": [
-      0.428,
-      0.513
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.4,
-     "ci90": [
-      0.4,
-      0.4
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.667,
-     "ci90": [
-      0.444,
-      0.889
-     ]
-    },
-    "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 4
-    }
-   },
-   "session fit": {
-    "lists": 3,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.778,
-     "ci90": [
-      0.753,
-      0.802
-     ]
-    },
-    "format_spread": {
-     "mean": 0.579,
-     "ci90": [
-      0.579,
-      0.579
-     ]
-    },
-    "novelty": {
-     "mean": 0.368,
-     "ci90": [
-      0.243,
-      0.493
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.461,
-     "ci90": [
-      0.418,
-      0.503
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.467,
-     "ci90": [
-      0.4,
-      0.533
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.556,
-     "ci90": [
-      0.444,
-      0.667
-     ]
-    },
-    "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 3
-    }
-   },
-   "rating": {
-    "lists": 3,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.749,
-     "ci90": [
-      0.692,
-      0.805
-     ]
-    },
-    "format_spread": {
-     "mean": 0.579,
-     "ci90": [
-      0.579,
-      0.579
-     ]
-    },
-    "novelty": {
-     "mean": 0.528,
-     "ci90": [
-      0.396,
-      0.66
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.503,
-     "ci90": [
-      0.472,
-      0.534
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.4,
-     "ci90": [
-      0.4,
-      0.4
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.667,
-     "ci90": [
-      0.444,
-      0.889
-     ]
-    },
-    "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 4
+     "slots": 68,
+     "distinct_items": 66,
+     "unique_share": 0.9706,
+     "gini": 0.0285,
+     "top_item_share": 0.0294,
+     "formats_seen": 5
     }
    },
    "popularity": {
-    "lists": 3,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.754,
+    "lists": 24,
+    "sessions": 24,
+    "p@3": {
+     "mean": 0.451,
      "ci90": [
-      0.702,
-      0.805
-     ]
-    },
-    "format_spread": {
-     "mean": 0.579,
-     "ci90": [
-      0.579,
-      0.579
-     ]
-    },
-    "novelty": {
-     "mean": 0.403,
-     "ci90": [
-      0.188,
-      0.618
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.535,
-     "ci90": [
-      0.523,
-      0.547
-     ]
-    },
-    "interest_coverage": {
-     "mean": 0.4,
-     "ci90": [
-      0.4,
-      0.4
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.444,
-     "ci90": [
-      0.333,
+      0.34,
       0.556
      ]
     },
-    "coverage": {
-     "slots": 9,
-     "distinct_items": 9,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 3
-    }
-   },
-   "as read aloud (all picks)": {
-    "lists": 3,
-    "sessions": 3,
     "ild": {
-     "mean": 0.794,
+     "mean": 0.743,
      "ci90": [
-      0.769,
-      0.819
+      0.727,
+      0.758
      ]
     },
-    "format_spread": {
-     "mean": 0.578,
+    "grounding": {
+     "mean": 0.1,
      "ci90": [
-      0.526,
-      0.63
+      0.069,
+      0.13
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.05,
+     "ci90": [
+      0.035,
+      0.067
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.507,
+     "ci90": [
+      0.41,
+      0.604
      ]
     },
     "novelty": {
-     "mean": 0.481,
+     "mean": 0.408,
      "ci90": [
-      0.343,
-      0.618
+      0.348,
+      0.472
      ]
     },
     "unexpectedness": {
-     "mean": 0.53,
+     "mean": 0.58,
      "ci90": [
-      0.52,
-      0.541
+      0.563,
+      0.597
      ]
     },
-    "interest_coverage": {
-     "mean": 0.467,
+    "serendipity": {
+     "mean": 0.233,
      "ci90": [
-      0.4,
-      0.533
-     ]
-    },
-    "evidence_mean": {
-     "mean": 0.478,
-     "ci90": [
-      0.389,
-      0.567
-     ]
-    },
-    "coverage": {
-     "slots": 12,
-     "distinct_items": 12,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.0833,
-     "formats_seen": 4
-    }
-   },
-   "random (chance)": {
-    "lists": 3,
-    "sessions": 3,
-    "ild": {
-     "mean": 0.793,
-     "ci90": [
-      0.768,
-      0.818
+      0.176,
+      0.29
      ]
     },
     "format_spread": {
-     "mean": 0.637,
+     "mean": 0.518,
      "ci90": [
-      0.579,
-      0.694
-     ]
-    },
-    "novelty": {
-     "mean": 0.484,
-     "ci90": [
-      0.354,
-      0.614
-     ]
-    },
-    "unexpectedness": {
-     "mean": 0.528,
-     "ci90": [
-      0.518,
-      0.538
+      0.428,
+      0.601
      ]
     },
     "interest_coverage": {
      "mean": 0.425,
      "ci90": [
       0.4,
-      0.449
+      0.458
      ]
     },
     "evidence_mean": {
-     "mean": 0.493,
+     "mean": 0.542,
      "ci90": [
-      0.39,
-      0.597
+      0.451,
+      0.632
      ]
     },
+    "theme_coverage_lists": 0,
     "coverage": {
-     "slots": 9.0,
-     "distinct_items": 9.0,
-     "unique_share": 1.0,
-     "gini": 0.0,
-     "top_item_share": 0.1111,
-     "formats_seen": 3.63
+     "slots": 68,
+     "distinct_items": 67,
+     "unique_share": 0.9853,
+     "gini": 0.0145,
+     "top_item_share": 0.0294,
+     "formats_seen": 4
+    }
+   },
+   "as read aloud (all picks)": {
+    "lists": 24,
+    "sessions": 24,
+    "p@3": {
+     "mean": 0.4,
+     "ci90": [
+      0.3,
+      0.502
+     ]
+    },
+    "ild": {
+     "mean": 0.754,
+     "ci90": [
+      0.739,
+      0.769
+     ]
+    },
+    "grounding": {
+     "mean": 0.087,
+     "ci90": [
+      0.061,
+      0.115
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.043,
+     "ci90": [
+      0.029,
+      0.057
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.562,
+     "ci90": [
+      0.464,
+      0.655
+     ]
+    },
+    "novelty": {
+     "mean": 0.469,
+     "ci90": [
+      0.42,
+      0.519
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.547,
+     "ci90": [
+      0.535,
+      0.559
+     ]
+    },
+    "serendipity": {
+     "mean": 0.205,
+     "ci90": [
+      0.151,
+      0.261
+     ]
+    },
+    "format_spread": {
+     "mean": 0.541,
+     "ci90": [
+      0.448,
+      0.621
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.45,
+     "ci90": [
+      0.425,
+      0.483
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.572,
+     "ci90": [
+      0.483,
+      0.665
+     ]
+    },
+    "theme_coverage_lists": 0,
+    "coverage": {
+     "slots": 113,
+     "distinct_items": 111,
+     "unique_share": 0.9823,
+     "gini": 0.0174,
+     "top_item_share": 0.0177,
+     "formats_seen": 5
+    }
+   },
+   "random (chance)": {
+    "lists": 24,
+    "sessions": 24,
+    "p@3": {
+     "mean": 0.398,
+     "ci90": [
+      0.298,
+      0.5
+     ]
+    },
+    "ild": {
+     "mean": 0.755,
+     "ci90": [
+      0.739,
+      0.769
+     ]
+    },
+    "grounding": {
+     "mean": 0.087,
+     "ci90": [
+      0.061,
+      0.114
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.043,
+     "ci90": [
+      0.029,
+      0.057
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.56,
+     "ci90": [
+      0.462,
+      0.651
+     ]
+    },
+    "novelty": {
+     "mean": 0.469,
+     "ci90": [
+      0.42,
+      0.52
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.549,
+     "ci90": [
+      0.536,
+      0.561
+     ]
+    },
+    "serendipity": {
+     "mean": 0.204,
+     "ci90": [
+      0.15,
+      0.259
+     ]
+    },
+    "format_spread": {
+     "mean": 0.606,
+     "ci90": [
+      0.502,
+      0.697
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.397,
+     "ci90": [
+      0.38,
+      0.417
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.566,
+     "ci90": [
+      0.477,
+      0.657
+     ]
+    },
+    "theme_coverage_lists": 0,
+    "coverage": {
+     "slots": 68.0,
+     "distinct_items": 67.54,
+     "unique_share": 0.9932,
+     "gini": 0.0066,
+     "top_item_share": 0.0207,
+     "formats_seen": 4.97
     }
    }
   },
-  "all_shown_lists": 3,
-  "holdout": null,
+  "labelled_lists": 24,
+  "all_shown": {
+   "as read aloud": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.705,
+     "ci90": [
+      0.682,
+      0.728
+     ]
+    },
+    "format_spread": {
+     "mean": 0.553,
+     "ci90": [
+      0.452,
+      0.647
+     ]
+    },
+    "novelty": {
+     "mean": 0.463,
+     "ci90": [
+      0.414,
+      0.514
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.52,
+     "ci90": [
+      0.499,
+      0.541
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.358,
+     "ci90": [
+      0.325,
+      0.4
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.764,
+     "ci90": [
+      0.639,
+      0.882
+     ]
+    },
+    "coverage": {
+     "slots": 68,
+     "distinct_items": 67,
+     "unique_share": 0.9853,
+     "gini": 0.0145,
+     "top_item_share": 0.0294,
+     "formats_seen": 5
+    }
+   },
+   "fit score": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.725,
+     "ci90": [
+      0.708,
+      0.744
+     ]
+    },
+    "format_spread": {
+     "mean": 0.641,
+     "ci90": [
+      0.522,
+      0.755
+     ]
+    },
+    "novelty": {
+     "mean": 0.442,
+     "ci90": [
+      0.384,
+      0.501
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.498,
+     "ci90": [
+      0.478,
+      0.518
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.383,
+     "ci90": [
+      0.35,
+      0.417
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.708,
+     "ci90": [
+      0.583,
+      0.833
+     ]
+    },
+    "coverage": {
+     "slots": 68,
+     "distinct_items": 67,
+     "unique_share": 0.9853,
+     "gini": 0.0145,
+     "top_item_share": 0.0294,
+     "formats_seen": 5
+    }
+   },
+   "tag overlap": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.739,
+     "ci90": [
+      0.708,
+      0.769
+     ]
+    },
+    "format_spread": {
+     "mean": 0.5,
+     "ci90": [
+      0.41,
+      0.577
+     ]
+    },
+    "novelty": {
+     "mean": 0.455,
+     "ci90": [
+      0.396,
+      0.512
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.496,
+     "ci90": [
+      0.477,
+      0.515
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.392,
+     "ci90": [
+      0.358,
+      0.417
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.639,
+     "ci90": [
+      0.521,
+      0.764
+     ]
+    },
+    "coverage": {
+     "slots": 68,
+     "distinct_items": 67,
+     "unique_share": 0.9853,
+     "gini": 0.0145,
+     "top_item_share": 0.0294,
+     "formats_seen": 5
+    }
+   },
+   "session fit": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.729,
+     "ci90": [
+      0.711,
+      0.746
+     ]
+    },
+    "format_spread": {
+     "mean": 0.623,
+     "ci90": [
+      0.509,
+      0.731
+     ]
+    },
+    "novelty": {
+     "mean": 0.436,
+     "ci90": [
+      0.374,
+      0.497
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.498,
+     "ci90": [
+      0.479,
+      0.518
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.375,
+     "ci90": [
+      0.342,
+      0.408
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.653,
+     "ci90": [
+      0.535,
+      0.778
+     ]
+    },
+    "coverage": {
+     "slots": 68,
+     "distinct_items": 68,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0147,
+     "formats_seen": 5
+    }
+   },
+   "rating": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.716,
+     "ci90": [
+      0.695,
+      0.736
+     ]
+    },
+    "format_spread": {
+     "mean": 0.588,
+     "ci90": [
+      0.481,
+      0.693
+     ]
+    },
+    "novelty": {
+     "mean": 0.475,
+     "ci90": [
+      0.426,
+      0.525
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.532,
+     "ci90": [
+      0.514,
+      0.55
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.35,
+     "ci90": [
+      0.317,
+      0.383
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.736,
+     "ci90": [
+      0.625,
+      0.847
+     ]
+    },
+    "coverage": {
+     "slots": 68,
+     "distinct_items": 66,
+     "unique_share": 0.9706,
+     "gini": 0.0285,
+     "top_item_share": 0.0294,
+     "formats_seen": 5
+    }
+   },
+   "popularity": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.743,
+     "ci90": [
+      0.727,
+      0.758
+     ]
+    },
+    "format_spread": {
+     "mean": 0.518,
+     "ci90": [
+      0.428,
+      0.601
+     ]
+    },
+    "novelty": {
+     "mean": 0.408,
+     "ci90": [
+      0.348,
+      0.472
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.58,
+     "ci90": [
+      0.563,
+      0.597
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.425,
+     "ci90": [
+      0.4,
+      0.458
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.542,
+     "ci90": [
+      0.451,
+      0.632
+     ]
+    },
+    "coverage": {
+     "slots": 68,
+     "distinct_items": 67,
+     "unique_share": 0.9853,
+     "gini": 0.0145,
+     "top_item_share": 0.0294,
+     "formats_seen": 4
+    }
+   },
+   "as read aloud (all picks)": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.754,
+     "ci90": [
+      0.739,
+      0.769
+     ]
+    },
+    "format_spread": {
+     "mean": 0.541,
+     "ci90": [
+      0.448,
+      0.621
+     ]
+    },
+    "novelty": {
+     "mean": 0.469,
+     "ci90": [
+      0.42,
+      0.519
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.547,
+     "ci90": [
+      0.535,
+      0.559
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.45,
+     "ci90": [
+      0.425,
+      0.483
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.572,
+     "ci90": [
+      0.483,
+      0.665
+     ]
+    },
+    "coverage": {
+     "slots": 113,
+     "distinct_items": 111,
+     "unique_share": 0.9823,
+     "gini": 0.0174,
+     "top_item_share": 0.0177,
+     "formats_seen": 5
+    }
+   },
+   "random (chance)": {
+    "lists": 24,
+    "sessions": 24,
+    "ild": {
+     "mean": 0.755,
+     "ci90": [
+      0.739,
+      0.769
+     ]
+    },
+    "format_spread": {
+     "mean": 0.606,
+     "ci90": [
+      0.502,
+      0.697
+     ]
+    },
+    "novelty": {
+     "mean": 0.469,
+     "ci90": [
+      0.42,
+      0.52
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.549,
+     "ci90": [
+      0.536,
+      0.561
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.397,
+     "ci90": [
+      0.38,
+      0.417
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.566,
+     "ci90": [
+      0.477,
+      0.657
+     ]
+    },
+    "coverage": {
+     "slots": 68.0,
+     "distinct_items": 67.54,
+     "unique_share": 0.9932,
+     "gini": 0.0066,
+     "top_item_share": 0.0207,
+     "formats_seen": 4.97
+    }
+   }
+  },
+  "all_shown_lists": 24,
+  "holdout": {
+   "as read aloud": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.25,
+     "ci90": [
+      0.056,
+      0.417
+     ]
+    },
+    "ild": {
+     "mean": 0.708,
+     "ci90": [
+      0.649,
+      0.764
+     ]
+    },
+    "grounding": {
+     "mean": 0.148,
+     "ci90": [
+      0.019,
+      0.278
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.054,
+     "ci90": [
+      0.009,
+      0.099
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.75,
+     "ci90": [
+      0.583,
+      0.944
+     ]
+    },
+    "novelty": {
+     "mean": 0.537,
+     "ci90": [
+      0.408,
+      0.654
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.507,
+     "ci90": [
+      0.452,
+      0.561
+     ]
+    },
+    "serendipity": {
+     "mean": 0.094,
+     "ci90": [
+      0.026,
+      0.162
+     ]
+    },
+    "format_spread": {
+     "mean": 0.65,
+     "ci90": [
+      0.579,
+      0.79
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.333,
+     "ci90": [
+      0.267,
+      0.4
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.111,
+     "ci90": [
+      0.889,
+      1.444
+     ]
+    },
+    "theme_coverage_lists": 0,
+    "coverage": {
+     "slots": 17,
+     "distinct_items": 17,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0588,
+     "formats_seen": 3
+    }
+   },
+   "fit score": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.361,
+     "ci90": [
+      0.167,
+      0.556
+     ]
+    },
+    "ild": {
+     "mean": 0.776,
+     "ci90": [
+      0.75,
+      0.805
+     ]
+    },
+    "grounding": {
+     "mean": 0.167,
+     "ci90": [
+      0.074,
+      0.259
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.059,
+     "ci90": [
+      0.026,
+      0.09
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.639,
+     "ci90": [
+      0.444,
+      0.833
+     ]
+    },
+    "novelty": {
+     "mean": 0.535,
+     "ci90": [
+      0.429,
+      0.636
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.499,
+     "ci90": [
+      0.441,
+      0.557
+     ]
+    },
+    "serendipity": {
+     "mean": 0.136,
+     "ci90": [
+      0.066,
+      0.207
+     ]
+    },
+    "format_spread": {
+     "mean": 0.72,
+     "ci90": [
+      0.579,
+      0.86
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.367,
+     "ci90": [
+      0.3,
+      0.4
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.944,
+     "ci90": [
+      0.667,
+      1.222
+     ]
+    },
+    "theme_coverage_lists": 0,
+    "coverage": {
+     "slots": 17,
+     "distinct_items": 17,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0588,
+     "formats_seen": 3
+    }
+   },
+   "tag overlap": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.306,
+     "ci90": [
+      0.139,
+      0.472
+     ]
+    },
+    "ild": {
+     "mean": 0.732,
+     "ci90": [
+      0.661,
+      0.797
+     ]
+    },
+    "grounding": {
+     "mean": 0.167,
+     "ci90": [
+      0.056,
+      0.278
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.058,
+     "ci90": [
+      0.021,
+      0.102
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.694,
+     "ci90": [
+      0.528,
+      0.861
+     ]
+    },
+    "novelty": {
+     "mean": 0.532,
+     "ci90": [
+      0.396,
+      0.653
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.489,
+     "ci90": [
+      0.43,
+      0.552
+     ]
+    },
+    "serendipity": {
+     "mean": 0.107,
+     "ci90": [
+      0.051,
+      0.166
+     ]
+    },
+    "format_spread": {
+     "mean": 0.65,
+     "ci90": [
+      0.579,
+      0.79
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.367,
+     "ci90": [
+      0.3,
+      0.4
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.056,
+     "ci90": [
+      0.778,
+      1.389
+     ]
+    },
+    "theme_coverage_lists": 0,
+    "coverage": {
+     "slots": 17,
+     "distinct_items": 17,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0588,
+     "formats_seen": 4
+    }
+   },
+   "session fit": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.361,
+     "ci90": [
+      0.167,
+      0.556
+     ]
+    },
+    "ild": {
+     "mean": 0.793,
+     "ci90": [
+      0.769,
+      0.816
+     ]
+    },
+    "grounding": {
+     "mean": 0.167,
+     "ci90": [
+      0.074,
+      0.259
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.059,
+     "ci90": [
+      0.026,
+      0.09
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.639,
+     "ci90": [
+      0.444,
+      0.833
+     ]
+    },
+    "novelty": {
+     "mean": 0.526,
+     "ci90": [
+      0.426,
+      0.616
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.508,
+     "ci90": [
+      0.447,
+      0.567
+     ]
+    },
+    "serendipity": {
+     "mean": 0.136,
+     "ci90": [
+      0.066,
+      0.207
+     ]
+    },
+    "format_spread": {
+     "mean": 0.72,
+     "ci90": [
+      0.579,
+      0.86
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.367,
+     "ci90": [
+      0.3,
+      0.4
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.889,
+     "ci90": [
+      0.611,
+      1.167
+     ]
+    },
+    "theme_coverage_lists": 0,
+    "coverage": {
+     "slots": 17,
+     "distinct_items": 17,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0588,
+     "formats_seen": 4
+    }
+   },
+   "rating": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.25,
+     "ci90": [
+      0.056,
+      0.417
+     ]
+    },
+    "ild": {
+     "mean": 0.709,
+     "ci90": [
+      0.65,
+      0.764
+     ]
+    },
+    "grounding": {
+     "mean": 0.148,
+     "ci90": [
+      0.019,
+      0.278
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.054,
+     "ci90": [
+      0.009,
+      0.099
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.75,
+     "ci90": [
+      0.583,
+      0.944
+     ]
+    },
+    "novelty": {
+     "mean": 0.534,
+     "ci90": [
+      0.404,
+      0.648
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.511,
+     "ci90": [
+      0.456,
+      0.564
+     ]
+    },
+    "serendipity": {
+     "mean": 0.094,
+     "ci90": [
+      0.026,
+      0.162
+     ]
+    },
+    "format_spread": {
+     "mean": 0.72,
+     "ci90": [
+      0.579,
+      0.86
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.3,
+     "ci90": [
+      0.233,
+      0.367
+     ]
+    },
+    "evidence_mean": {
+     "mean": 1.111,
+     "ci90": [
+      0.889,
+      1.444
+     ]
+    },
+    "theme_coverage_lists": 0,
+    "coverage": {
+     "slots": 17,
+     "distinct_items": 17,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0588,
+     "formats_seen": 4
+    }
+   },
+   "popularity": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.306,
+     "ci90": [
+      0.139,
+      0.472
+     ]
+    },
+    "ild": {
+     "mean": 0.811,
+     "ci90": [
+      0.787,
+      0.833
+     ]
+    },
+    "grounding": {
+     "mean": 0.148,
+     "ci90": [
+      0.056,
+      0.241
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.055,
+     "ci90": [
+      0.026,
+      0.085
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.694,
+     "ci90": [
+      0.528,
+      0.861
+     ]
+    },
+    "novelty": {
+     "mean": 0.486,
+     "ci90": [
+      0.376,
+      0.596
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.588,
+     "ci90": [
+      0.566,
+      0.608
+     ]
+    },
+    "serendipity": {
+     "mean": 0.123,
+     "ci90": [
+      0.054,
+      0.188
+     ]
+    },
+    "format_spread": {
+     "mean": 0.65,
+     "ci90": [
+      0.579,
+      0.79
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.433,
+     "ci90": [
+      0.4,
+      0.5
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.722,
+     "ci90": [
+      0.556,
+      0.889
+     ]
+    },
+    "theme_coverage_lists": 0,
+    "coverage": {
+     "slots": 17,
+     "distinct_items": 17,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0588,
+     "formats_seen": 3
+    }
+   },
+   "as read aloud (all picks)": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.287,
+     "ci90": [
+      0.139,
+      0.439
+     ]
+    },
+    "ild": {
+     "mean": 0.78,
+     "ci90": [
+      0.754,
+      0.805
+     ]
+    },
+    "grounding": {
+     "mean": 0.146,
+     "ci90": [
+      0.053,
+      0.241
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.054,
+     "ci90": [
+      0.023,
+      0.088
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.713,
+     "ci90": [
+      0.561,
+      0.861
+     ]
+    },
+    "novelty": {
+     "mean": 0.543,
+     "ci90": [
+      0.437,
+      0.644
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.548,
+     "ci90": [
+      0.518,
+      0.579
+     ]
+    },
+    "serendipity": {
+     "mean": 0.112,
+     "ci90": [
+      0.052,
+      0.173
+     ]
+    },
+    "format_spread": {
+     "mean": 0.721,
+     "ci90": [
+      0.643,
+      0.822
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.433,
+     "ci90": [
+      0.4,
+      0.5
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.869,
+     "ci90": [
+      0.7,
+      1.067
+     ]
+    },
+    "theme_coverage_lists": 0,
+    "coverage": {
+     "slots": 28,
+     "distinct_items": 28,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0357,
+     "formats_seen": 5
+    }
+   },
+   "random (chance)": {
+    "lists": 6,
+    "sessions": 6,
+    "p@3": {
+     "mean": 0.284,
+     "ci90": [
+      0.139,
+      0.431
+     ]
+    },
+    "ild": {
+     "mean": 0.776,
+     "ci90": [
+      0.747,
+      0.803
+     ]
+    },
+    "grounding": {
+     "mean": 0.145,
+     "ci90": [
+      0.053,
+      0.239
+     ]
+    },
+    "creative_grounded": {
+     "mean": 0.0,
+     "ci90": [
+      0.0,
+      0.0
+     ]
+    },
+    "creative_grounded_soft": {
+     "mean": 0.054,
+     "ci90": [
+      0.022,
+      0.087
+     ]
+    },
+    "theme_coverage": {
+     "mean": NaN,
+     "ci90": [
+      NaN,
+      NaN
+     ]
+    },
+    "overreach": {
+     "mean": 0.716,
+     "ci90": [
+      0.569,
+      0.861
+     ]
+    },
+    "novelty": {
+     "mean": 0.542,
+     "ci90": [
+      0.436,
+      0.642
+     ]
+    },
+    "unexpectedness": {
+     "mean": 0.546,
+     "ci90": [
+      0.515,
+      0.578
+     ]
+    },
+    "serendipity": {
+     "mean": 0.111,
+     "ci90": [
+      0.052,
+      0.17
+     ]
+    },
+    "format_spread": {
+     "mean": 0.776,
+     "ci90": [
+      0.692,
+      0.861
+     ]
+    },
+    "interest_coverage": {
+     "mean": 0.38,
+     "ci90": [
+      0.347,
+      0.415
+     ]
+    },
+    "evidence_mean": {
+     "mean": 0.886,
+     "ci90": [
+      0.712,
+      1.088
+     ]
+    },
+    "theme_coverage_lists": 0,
+    "coverage": {
+     "slots": 17.0,
+     "distinct_items": 17.0,
+     "unique_share": 1.0,
+     "gini": 0.0,
+     "top_item_share": 0.0588,
+     "formats_seen": 4.11
+    }
+   }
+  },
   "evidence": {
-   "picks": 9,
+   "picks": 68,
    "fired": {
-    "keyword": 4,
+    "keyword": 41,
     "theme_quote": 0,
-    "overview_sim": 2,
+    "overview_sim": 13,
     "co_mention": 0
    },
    "picks_with_a_quoted_theme": 0,
    "creative_grounded_picks": {
     "qualified": 0,
-    "of": 9,
+    "of": 68,
     "sessions": 0
    },
    "grounding_by_sim_threshold": {
-    "0.25": 0.185,
-    "0.30": 0.148,
-    "0.35": 0.148
+    "0.25": 0.148,
+    "0.30": 0.104,
+    "0.35": 0.09
    },
    "default_sim_threshold": 0.3
   }
