@@ -57,7 +57,7 @@ with `y`/`n`, and hide the last column (`extractor`) while you do.
 
 ```bash
 python eval/eval_rank.py     # precision@k, hit rate, MRR, MAP, NDCG@k of the order picks are read in
-python eval/eval_beyond.py   # diversity, novelty, unexpectedness, coverage, serendipity, creativity (docs/METRICS.md)
+python eval/eval_beyond.py   # diversity, Grounding, overreach gate, theme coverage; novelty/unexpectedness/serendipity/coverage as diagnostics (docs/METRICS.md)
 ```
 
 `eval_rank.py` takes each list of shown picks whose picks are all labelled, orders it several ways (as read

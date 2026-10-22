@@ -14,6 +14,7 @@ from __future__ import annotations
 from . import fitmodel, receipts, signals
 from .catalogs import ContentItem
 from .extraction import Interest
+from . import grounding
 from .quality import BLOCKBUSTER_MIN_RELEVANCE, is_blockbuster, is_gem
 
 # What the person does with each type. Used to group output for a screen/voice.
@@ -108,6 +109,9 @@ def render_card(item: ContentItem, interest: Interest, extras: dict | None = Non
     }
     if extras:
         card.update(extras)
+    # which independent kinds of evidence back this link (see knots/grounding.py); stored so it can be measured offline
+    card["evidence_types"] = grounding.evidence_types(item.content_type, item.matched_keywords, card.get("sim"),
+                                                      grounding.quoted_theme(interest))
     return card
 
 

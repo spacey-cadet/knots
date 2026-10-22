@@ -28,6 +28,7 @@ class Policy:
     alert_min_new: int = int(os.environ.get("KNOTS_RETRAIN_ALERT_MIN_NEW", "50")) # same, when an online alert says the model may be stale
     margin: float = 0.02                                                          # headline metric must improve by this
     tolerance: float = 0.01                                                       # the other metric may not drop more
+    overreach_tolerance: float = 0.02                                             # the overreach rate may not rise more
 
 
 def eligible(labels: list[dict], policy: Policy) -> list[dict]:
@@ -71,7 +72,11 @@ def should_retrain(labels: list[dict], state: dict, policy: Policy | None = None
 
 def gate(champion: dict, challenger: dict, policy: Policy | None = None, headline: str = "p@3",
          second: str = "ndcg@5") -> dict:
-    """Metrics are {name: float} measured on the SAME frozen expert holdout."""
+    """Metrics are {name: float} measured on the SAME frozen expert holdout.
+
+    If both carry an `overreach` rate (the share of shown picks labelled not supported, knots/grounding.py), the
+    challenger is also refused when it rose by more than `policy.overreach_tolerance`: a model that is better on
+    paper because it reaches further for links is not promoted."""
     policy = policy or Policy()
     gain = challenger[headline] - champion[headline]
     drop = champion[second] - challenger[second]
@@ -80,6 +85,12 @@ def gate(champion: dict, challenger: dict, policy: Policy | None = None, headlin
            f"{second} {champion[second]:.3f} -> {challenger[second]:.3f}")
     if not ok:
         why += (f"; needs {headline} +{policy.margin} and {second} no worse than -{policy.tolerance}")
+    if "overreach" in champion and "overreach" in challenger:
+        rise = challenger["overreach"] - champion["overreach"]
+        why += f"; overreach {champion['overreach']:.3f} -> {challenger['overreach']:.3f}"
+        if rise > policy.overreach_tolerance:
+            ok = False
+            why += f" (rose by more than {policy.overreach_tolerance}: refused)"
     return {"promote": ok, "reason": why}
 
 

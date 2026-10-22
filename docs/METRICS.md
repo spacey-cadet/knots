@@ -22,7 +22,9 @@ ranker that wins on P@3 by showing only famous, obvious picks should be visible 
 | Unexpectedness | 1 - mean percentile of keyword overlap and session similarity: how far the pick sits from what the person literally said | no |
 | `interest_coverage` | share of the session's own interests that at least one shown pick answers | no |
 | Serendipity | mean over picks of `good * unexpectedness`; also `serendipitous_share`, the share of good picks with unexpectedness >= 0.5 | yes |
-| Creativity | mean over picks of `good * sqrt(novelty * unexpectedness)`; also `creative_hit`, 1 if a list has a good pick with novelty and unexpectedness both >= 0.5 | yes |
+| **Grounding@k** (headline) | mean over the top-k picks of `good * supported * min(E, 3) / 3`, E = independent evidence types: `keyword` (a TMDB keyword matched; films, series, docs), `theme_quote` (the interest has a judge-kept theme resting on a verbatim quote), `overview_sim` (overview similarity to the session >= 0.30, untuned; `KNOTS_GROUNDING_SIM_MIN`), `co_mention` (reserved, never fires). Distance earns nothing | yes |
+| **Overreach rate** (gate) | share of shown picks labelled not supported. Proxy until picks carry a `supported` column: labelled bad with reason `relevance`. Lower is better; `retrain.gate` refuses a challenger whose overreach rose by more than 0.02 | yes |
+| **Theme coverage** (headline) | share of a session's linkable supported themes served by at least one good, supported pick | yes |
 | Coverage | across all lists: distinct items, `unique_share` (distinct / slots), `gini` of how often items repeat, `top_item_share` | no |
 
 ### How to read them honestly
@@ -32,17 +34,21 @@ ranker that wins on P@3 by showing only famous, obvious picks should be visible 
   inside one source, because votes, views and citations are not on one scale.
 - **Unknown stays unknown.** A paper with no citation count has no novelty; a list of one pick has no diversity; a
   source with fewer than 5 reference picks has no percentile. These are left out of the mean, never counted as 0.
-- **Creativity is a proxy.** Recommender evaluation has no accepted definition. This follows the usual
-  novelty-surprise-value reading using the data a pick carries. It overlaps with serendipity by construction;
-  creativity additionally needs the item itself to be rare. It cannot see whether a pick was a clever bridge between
-  ideas, only that it was good, rare and far from the person's words.
+- **Distance is never a goal.** An earlier "creativity" metric (good * sqrt(novelty * unexpectedness)) paid for
+  being far from the person's words, which rewards far-fetched picks, so it was removed. Novelty, unexpectedness and
+  serendipity stay as diagnostics that describe what was shown. Overreach is the gate that stops reaching further
+  being mistaken for improvement.
+- **Grounding is limited by what is stored.** Under the proxy every good pick counts as supported, so only the
+  overreach rate uses the proxy. Theme quotes link to picks for only some of them in older results (73 of 270 picks);
+  the report says how many it could link, and re-running `run_eval.py run` stores the evidence types and quotes.
+  The 0.30 similarity threshold is untuned; the report shows Grounding at 0.25, 0.30 and 0.35.
 - **Diversity needs a real embedder.** With the offline hashed embedder it is a word-overlap measure and sits near
   0.9 whatever is shown. The report and model card say which embedder was used and warn when it was hashed.
 - **Coverage has no catalog denominator.** TMDB, YouTube and arXiv cannot be enumerated here, so coverage is how
   repeated the shown items are, not what fraction of a catalog was reached. It is a point value with no interval:
   resampling sessions with replacement repeats sessions, which manufactures the repetition coverage measures.
   Repetition also grows with the number of slots, so compare rows from the same lists, not across scopes.
-- **Same limits as the accuracy numbers.** Only shown picks are labelled, serendipity and creativity use only
+- **Same limits as the accuracy numbers.** Only shown picks are labelled, Grounding, overreach and serendipity use only
   fully labelled lists, and there are few sessions and one labeller.
 
 ## 2. Online metrics
