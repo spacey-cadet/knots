@@ -111,7 +111,7 @@ the minimum number of answers and the eased new-label requirement are env-tunabl
 
 ## Not wired
 
-`impression` and `feedback` events are now written by the server (`knots/feedback.py`: `thinking_partner`, the
+`impression` and `feedback` events are now written by the server (`knots/feedback.py`: `knots_partner`, the
 `rate_pick` tool and the Alexa skill), under a salted hash of a verified identity, and `forget_me` removes them.
 `python eval/monitor.py` reads the log. Not written yet: `engage` (asked for more, opened, saved) and
 `reformulate` events, so engagement and reformulation rates read 0 until something records them. Nothing starts a

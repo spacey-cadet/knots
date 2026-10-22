@@ -6,7 +6,7 @@ This file is transport only: it declares the MCP tools and hands every call to `
 where the whole recommendation algorithm lives. There is no recommendation logic here.
 
 Tools (Streamable HTTP, MCP spec 2025-11-25+):
-  - thinking_partner      "what are we doing today?": threads, what's underneath them, and things
+  - knots_partner      "what are we doing today?": threads, what's underneath them, and things
                           to watch / read / explore, each with a reason. Returns a `session_id`.
   - rate_pick             the person said whether a pick was good: the feedback that drives retraining
   - get_recommendations   the full pipeline as ranked cards
@@ -115,7 +115,7 @@ async def get_recommendations(session_texts: list[str] | None = None, limit: int
                                   challenge=challenge_me or None)
 
 
-async def thinking_partner(session_texts: list[str] | None = None, include_videos: bool = True,
+async def knots_partner(session_texts: list[str] | None = None, include_videos: bool = True,
                            conversations: list[ConversationIn] | None = None,
                            user_id: str | None = None,
                            challenge_me: bool = False) -> dict:
@@ -152,7 +152,7 @@ async def thinking_partner(session_texts: list[str] | None = None, include_video
 async def rate_pick(session_id: str, url: str, good: bool) -> dict:
     """
     Call when the person says whether a pick you gave them was good ("that was a good pick", "not for
-    me", "I liked it", "that wasn't what I meant"). Pass the `session_id` from the thinking_partner result and
+    me", "I liked it", "that wasn't what I meant"). Pass the `session_id` from the knots_partner result and
     the `url` of the pick they mean (use the first pick if they say "that one" about the first thing you read out).
     `good` is true for a good pick and false for one that missed. Only works for a signed-in person and only for
     a pick that was actually shown to them in that session.
@@ -188,7 +188,7 @@ async def forget_me(user_id: str | None = None) -> dict:
     return out
 
 
-TOOLS = (thinking_partner, rate_pick, get_recommendations, extract_interests, search_content,
+TOOLS = (knots_partner, rate_pick, get_recommendations, extract_interests, search_content,
          what_do_you_remember, forget_me)
 
 

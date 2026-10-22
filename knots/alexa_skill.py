@@ -53,7 +53,7 @@ MAX_CHAIN_BYTES = 100 * 1024
 PENDING_TTL_S = 120
 MAX_PENDING = 200
 
-WELCOME = ("This is Knots, your thinking partner. Tell me what you have been curious about, "
+WELCOME = ("This is Knots, your partner for what to watch and read. Tell me what you have been curious about, "
            "or ask me what you should explore.")
 HELP = ("I suggest films, series, videos and papers that fit what you have been thinking about. "
         "Try: ask me about memecoins. Or say, what should I explore. "
@@ -267,7 +267,7 @@ async def handle_alexa(body: dict) -> dict:
             return say(HELP, REPROMPT)
         intent = req.get("intent") or {}
         name = intent.get("name", "")
-        if name == "ThinkingPartnerIntent":
+        if name == "KnotsPartnerIntent":
             user, topic = _user(body), _slot(intent, "topic")
             key = f"{user or 'anon'}|{topic.lower()}"
             got = await _plan_by_deadline(key, [topic] if topic else [], user,

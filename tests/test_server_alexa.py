@@ -210,7 +210,7 @@ def test_launch_help_stop_and_session_end_need_no_pipeline(engine_calls):
 
 
 def test_a_topic_request_runs_the_pipeline_speaks_ssml_and_sets_up_feedback(engine_calls):
-    out = asyncio.run(AS.handle_alexa(alexa_body(intent("ThinkingPartnerIntent", topic="memecoins"))))
+    out = asyncio.run(AS.handle_alexa(alexa_body(intent("KnotsPartnerIntent", topic="memecoins"))))
     assert engine_calls[0][0] == ["memecoins"] and engine_calls[0][1].startswith("u_")     # opaque id, not the Alexa id
     assert "amzn1" not in str(engine_calls)
     r = out["response"]
@@ -226,13 +226,13 @@ def test_a_plan_with_no_interests_still_gets_an_honest_spoken_answer(monkeypatch
         return {"extractor": "heuristic", "threads": [], "picks": {"watch": [], "read": [], "explore": []},
                 "spoken": "I do not have anything to go on yet.", "ask": "What have you been curious about lately?"}
     monkeypatch.setattr(AS.engine, "plan", plan)
-    out = asyncio.run(AS.handle_alexa(alexa_body(intent("ThinkingPartnerIntent"))))
+    out = asyncio.run(AS.handle_alexa(alexa_body(intent("KnotsPartnerIntent"))))
     assert "anything to go on" in out["response"]["outputSpeech"]["ssml"] and out["sessionAttributes"]["last_url"] == ""
     assert [e["status"] for e in O.EventLog(FB.log_path()).read()] == ["empty"]
 
 
 def test_good_and_bad_pick_become_verified_feedback_that_retraining_can_use(engine_calls):
-    shown = asyncio.run(AS.handle_alexa(alexa_body(intent("ThinkingPartnerIntent", topic="x"))))
+    shown = asyncio.run(AS.handle_alexa(alexa_body(intent("KnotsPartnerIntent", topic="x"))))
     attrs = shown["sessionAttributes"]
     done = asyncio.run(AS.handle_alexa(alexa_body(intent("GoodPickIntent"), attrs=attrs)))
     assert "remember that" in done["response"]["outputSpeech"]["text"] and done["sessionAttributes"]["last_url"] == ""
@@ -261,9 +261,9 @@ def test_a_slow_pipeline_asks_the_person_to_retry_then_serves_the_finished_answe
     monkeypatch.setenv("KNOTS_ALEXA_TIMEOUT_S", "0.05")
 
     async def scenario():
-        first = await AS.handle_alexa(alexa_body(intent("ThinkingPartnerIntent", topic="slow topic")))
+        first = await AS.handle_alexa(alexa_body(intent("KnotsPartnerIntent", topic="slow topic")))
         await asyncio.sleep(0.4)
-        second = await AS.handle_alexa(alexa_body(intent("ThinkingPartnerIntent", topic="Slow Topic")))
+        second = await AS.handle_alexa(alexa_body(intent("KnotsPartnerIntent", topic="Slow Topic")))
         return first, second
     first, second = asyncio.run(scenario())
     assert "longer than usual" in first["response"]["outputSpeech"]["text"]
@@ -274,7 +274,7 @@ def test_a_pipeline_failure_is_a_polite_answer_not_a_crash(monkeypatch):
     async def boom(*a, **k):
         raise RuntimeError("bedrock exploded")
     monkeypatch.setattr(AS.engine, "plan", boom)
-    out = asyncio.run(AS.handle_alexa(alexa_body(intent("ThinkingPartnerIntent", topic="x"))))
+    out = asyncio.run(AS.handle_alexa(alexa_body(intent("KnotsPartnerIntent", topic="x"))))
     assert "something went wrong" in out["response"]["outputSpeech"]["text"] and "exploded" not in json.dumps(out)
 
 
@@ -288,7 +288,7 @@ class FakeRequest:
 
 def test_the_http_route_verifies_before_it_does_any_work(pki, engine_calls):
     limiter = RateLimiter(per_key=0, overall=0)
-    body = alexa_body(intent("ThinkingPartnerIntent", topic="memecoins"))
+    body = alexa_body(intent("KnotsPartnerIntent", topic="memecoins"))
     h, raw = signed(pki, body)
 
     async def fetch(_):
@@ -304,7 +304,7 @@ def test_the_http_route_verifies_before_it_does_any_work(pki, engine_calls):
 
 
 def test_the_http_route_is_off_without_a_skill_id_and_rate_limits_after_verifying(pki, engine_calls, monkeypatch):
-    body = alexa_body(intent("ThinkingPartnerIntent", topic="x"))
+    body = alexa_body(intent("KnotsPartnerIntent", topic="x"))
     h, raw = signed(pki, body)
 
     async def fetch(_):
@@ -403,7 +403,7 @@ def srv(monkeypatch):
 def test_the_server_registers_every_tool_a_health_route_and_the_alexa_route(srv):
     app = srv.create_mcp()
     names = {t.name for t in asyncio.run(app.list_tools())}
-    assert names == {"thinking_partner", "rate_pick", "get_recommendations", "extract_interests", "search_content",
+    assert names == {"knots_partner", "rate_pick", "get_recommendations", "extract_interests", "search_content",
                      "what_do_you_remember", "forget_me"}
     paths = {r.path for r in app.streamable_http_app().routes}
     assert {"/health", "/alexa", "/mcp"} <= paths
@@ -417,8 +417,8 @@ def test_binding_host_comes_from_the_environment_so_a_container_is_reachable(srv
     assert (s.host, s.port) == ("0.0.0.0", 9100)
 
 
-def test_thinking_partner_logs_an_impression_returns_a_session_id_and_ignores_a_claimed_user(srv, engine_calls):
-    out = asyncio.run(srv.thinking_partner(["memes"], user_id="victim"))
+def test_knots_partner_logs_an_impression_returns_a_session_id_and_ignores_a_claimed_user(srv, engine_calls):
+    out = asyncio.run(srv.knots_partner(["memes"], user_id="victim"))
     assert out["session_id"] and engine_calls[0][1] is None                           # the claimed id was not used
     ev = O.EventLog(FB.log_path()).read()
     assert ev[0]["type"] == "impression" and ev[0]["session_id"] == out["session_id"] and ev[0]["user"] == ""
@@ -426,7 +426,7 @@ def test_thinking_partner_logs_an_impression_returns_a_session_id_and_ignores_a_
 
 def test_rate_pick_works_for_the_verified_caller_only(srv, engine_calls, monkeypatch):
     monkeypatch.setattr(ID, "current_user", lambda: "u_me")
-    out = asyncio.run(srv.thinking_partner(["memes"]))
+    out = asyncio.run(srv.knots_partner(["memes"]))
     sid, url = out["session_id"], out["response"]["picks"][0]["url"]
     assert engine_calls[-1][1] == "u_me"
     assert asyncio.run(srv.rate_pick(sid, url, True))["recorded"]
@@ -440,16 +440,16 @@ def test_memory_tools_refuse_unsigned_callers_and_forget_also_clears_the_event_l
     assert asyncio.run(srv.what_do_you_remember("anyone"))["remembered_conversations"] == 0
     assert asyncio.run(srv.forget_me("anyone"))["deleted"] == 0
     monkeypatch.setattr(ID, "current_user", lambda: "u_me")
-    asyncio.run(srv.thinking_partner(["memes"]))
+    asyncio.run(srv.knots_partner(["memes"]))
     forgotten = asyncio.run(srv.forget_me())
     assert forgotten["events_deleted"] == 1 and O.EventLog(FB.log_path()).read() == []
 
 
 def test_over_the_rate_limit_a_tool_call_fails_politely(srv, engine_calls, monkeypatch):
     monkeypatch.setattr(srv, "limiter", RateLimiter(per_key=1, window_s=60, overall=0))
-    asyncio.run(srv.thinking_partner(["a"]))
+    asyncio.run(srv.knots_partner(["a"]))
     with pytest.raises(ValueError, match="Too many requests"):
-        asyncio.run(srv.thinking_partner(["b"]))
+        asyncio.run(srv.knots_partner(["b"]))
 
 
 def test_over_http_health_is_open_the_mcp_endpoint_needs_a_token_and_hosts_are_checked(srv, monkeypatch):
@@ -491,7 +491,7 @@ def test_the_skill_package_matches_what_the_handler_understands():
     manifest = json.loads((pkg / "skill.json").read_text())["manifest"]
     assert len(model["invocationName"].split()) >= 2 and model["invocationName"] == model["invocationName"].lower()
     intents = {i["name"]: i for i in model["intents"]}
-    assert {"ThinkingPartnerIntent", "GoodPickIntent", "BadPickIntent", "AMAZON.HelpIntent", "AMAZON.StopIntent",
+    assert {"KnotsPartnerIntent", "GoodPickIntent", "BadPickIntent", "AMAZON.HelpIntent", "AMAZON.StopIntent",
             "AMAZON.CancelIntent", "AMAZON.FallbackIntent"} <= set(intents)
     seen = []
     for i in intents.values():
@@ -503,7 +503,7 @@ def test_the_skill_package_matches_what_the_handler_understands():
             if slots:                                                  # a free-text slot needs words around it
                 assert len(sample.split()) >= 2, sample
     assert len(seen) == len(set(seen)), "the same utterance appears under two intents"
-    topic = intents["ThinkingPartnerIntent"]["slots"][0]
+    topic = intents["KnotsPartnerIntent"]["slots"][0]
     assert topic["name"] == "topic" and topic["type"] == "AMAZON.SearchQuery"       # what handle_alexa reads
     ep = manifest["apis"]["custom"]["endpoint"]
     assert ep["uri"].endswith("/alexa") and ep["sslCertificateType"] == "Trusted"
