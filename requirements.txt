@@ -5,3 +5,4 @@ boto3
 pytest
 numpy
 scikit-learn
+pyjwt[crypto]

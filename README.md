@@ -157,10 +157,15 @@ session text ──► understanding ──► retrieval ──► quality gate 
 
 | Tool | Use |
 | --- | --- |
-| `thinking_partner(session_texts, include_videos=True, challenge_me=False)` | "What are we doing today?" Threads, what's underneath (with confidence), grouped picks with reasons and receipts, watch-and-learn pairs, spoken line, follow-up question |
+| `thinking_partner(session_texts, include_videos=True, challenge_me=False)` | "What are we doing today?" Threads, what's underneath (with confidence), grouped picks with reasons and receipts, watch-and-learn pairs, spoken line, follow-up question, and a `session_id` |
+| `rate_pick(session_id, url, good)` | The person said a pick was good or not. Only for a signed-in person and only for a pick shown to them in that session; this is the feedback retraining learns from |
 | `get_recommendations(session_texts, limit=6, challenge_me=False)` | Full pipeline as ranked cards |
 | `extract_interests(session_texts)` | Topics, concepts, unstated themes, keywords, and which extractor ran |
 | `search_content(topics)` | Catalog lookup for plain topic strings |
+| `what_do_you_remember()` / `forget_me()` | What is held about the signed-in person, and deleting it (memory and logged feedback) |
+
+The server also exposes `GET /health` and `POST /alexa` (an Alexa custom-skill endpoint). See "Identity, feedback
+and deployment" below.
 
 ## Setup
 
@@ -228,8 +233,9 @@ strings, as before) or several as `conversations`:
 
 ## Memory
 
-Pass a `user_id` and Knots remembers the person between conversations. Without
-one it stays stateless: nothing is read or stored.
+Give the engine a `user_id` and Knots remembers the person between conversations. Without
+one it stays stateless: nothing is read or stored. The server does not take that id from the caller: it comes from
+a verified sign-in (see "Identity, feedback and deployment").
 
 **What is kept, per conversation:** the extracted interests (topic, concepts,
 unstated themes, keywords, best mediums), an embedding of the conversation, a
@@ -257,9 +263,9 @@ backoff, and a circuit breaker drops a whole run to hashed rather than mixing
 embedders. The embedder's name is stored with every vector, and vectors from
 different embedders are never compared. `EMBEDDER=auto|cohere|titan|hashed`.
 
-**Control:** `what_do_you_remember(user_id)` lists the threads held and how many
-conversations they come from; `forget_me(user_id)` deletes everything stored for
-that id. Storage is SQLite at `KNOTS_PROFILE_DB` (default `data/knots_profile.db`,
+**Control:** `what_do_you_remember` lists the threads held and how many
+conversations they come from; `forget_me` deletes everything stored for the
+signed-in person, including their logged feedback. Storage is SQLite at `KNOTS_PROFILE_DB` (default `data/knots_profile.db`,
 gitignored), capped at 500 conversations per person, behind a small `ProfileStore`
 interface so DynamoDB can replace it.
 
@@ -267,11 +273,26 @@ interface so DynamoDB can replace it.
 - Embeddings are not raw text, but they are not anonymous: they keep much of the
   meaning of what was said, and the stored "unstated themes" can be sensitive.
   Treat the store as personal data.
-- Do not trust `user_id` as an argument in production. Derive it from the
-  authenticated caller, or one person could read another's profile.
-- A container's local disk does not survive restarts, so a deployed server needs
-  a persistent store (DynamoDB) behind `ProfileStore`.
+- The server never trusts a `user_id` argument: the id comes from a verified bearer
+  token or a signature-checked Alexa request and is stored only as a salted hash, so
+  the database and event log hold no Amazon id or token subject. A caller-supplied id
+  counts only when `KNOTS_ALLOW_CLIENT_USER_ID=1` (development).
+- A container's local disk does not survive restarts. The EC2 setup keeps the database
+  and event log on a Docker volume on the instance's disk; a platform with an ephemeral
+  disk (App Runner) would need a DynamoDB store behind `ProfileStore`, which does not exist yet.
 - Encrypt at rest and say what is kept in the app's privacy notice.
+
+## Identity, feedback and deployment
+
+- **Identity.** MCP calls carry a bearer token (a JWT) verified against your identity provider's keys
+  (`KNOTS_JWKS_URL`) or a shared secret (`KNOTS_JWT_SECRET`), with a required audience. Alexa skill requests are
+  checked against Amazon's signature rules, and `session.user.userId` is the person. Both become an opaque salted id
+  (`KNOTS_USER_SALT`). Code: `knots/identity.py`, `knots/alexa_skill.py`.
+- **Feedback.** Every response logs which picks were shown (`impression`); `rate_pick` and the skill's "good pick" /
+  "not for me" log a verdict. `python eval/monitor.py` reads the log, reports the online metrics and says whether a
+  retrain is due (`docs/METRICS.md`). Only explicit verdicts become training labels.
+- **Alexa skill.** `alexa/` holds the skill manifest and interaction model; `alexa/README.md` has the steps.
+- **Deploying.** `Dockerfile`, `docker-compose.yml` (Caddy gets the HTTPS certificate) and `docs/DEPLOY_EC2.md`.
 
 ## Best medium per interest
 
@@ -294,7 +315,11 @@ leads with the best medium. Skipping a poor-fit medium also saves a catalog call
 - **The heuristic fallback is weak** (frequency-based; it can pick words like
   "buy" as topics). It exists to keep the server answering, not to demo.
 - **No Reddit source yet.** `session_texts` expects Alexa+ conversation strings.
-- **No deployment yet.** Alexa+ needs a public HTTPS endpoint with auth.
+- **The deployment files have not been run on a real server.** The Dockerfile and compose file were not built here
+  (no Docker daemon), Caddy's certificate issuance, the EC2 instance role and a live Alexa test have not been
+  exercised. The server itself was run as a real process and called over HTTP with auth on (see `docs/DEPLOY_EC2.md`).
+- **Alexa+ identity is undocumented.** How Alexa+ passes a signed-in person to an MCP server is not documented; the
+  MCP side supports standard bearer tokens, and the Alexa custom skill identifies people by its own signed request.
 - **The ranker and the pair scorer are not yet trained.** They run on documented
   hand-set priors until enough sessions are labelled with the new card features
   (re-run `run_eval.py run`, label, then `train_rank.py`). Pair floors and the level

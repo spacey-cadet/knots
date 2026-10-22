@@ -1,0 +1,8 @@
+# Caddy obtains and renews a Let's Encrypt certificate for {$DOMAIN} automatically
+# (ports 80 and 443 must be reachable from the internet) and forwards to the app.
+{$DOMAIN} {
+	request_body {
+		max_size 1MB
+	}
+	reverse_proxy knots:8000
+}

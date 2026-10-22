@@ -1,0 +1,17 @@
+.git
+.env
+.env.*
+!.env.example
+data
+**/__pycache__
+**/*.pyc
+.pytest_cache
+tests
+eval
+evidence
+from
+docs
+alexa
+deploy
+scripts
+*.md

@@ -1,0 +1,45 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "knots partner",
+      "intents": [
+        { "name": "AMAZON.CancelIntent", "samples": [] },
+        { "name": "AMAZON.HelpIntent", "samples": [] },
+        { "name": "AMAZON.StopIntent", "samples": [] },
+        { "name": "AMAZON.NavigateHomeIntent", "samples": [] },
+        { "name": "AMAZON.FallbackIntent", "samples": [] },
+        {
+          "name": "ThinkingPartnerIntent",
+          "slots": [{ "name": "topic", "type": "AMAZON.SearchQuery" }],
+          "samples": [
+            "what are we doing today",
+            "what should I explore",
+            "what should I explore today",
+            "what should I watch",
+            "what should I read",
+            "give me an idea",
+            "surprise me",
+            "about {topic}",
+            "tell me about {topic}",
+            "explore {topic}",
+            "recommend something about {topic}",
+            "what should I watch or read about {topic}",
+            "I have been thinking about {topic}",
+            "I have been curious about {topic}"
+          ]
+        },
+        {
+          "name": "GoodPickIntent",
+          "slots": [],
+          "samples": ["good pick", "that was a good pick", "that was good", "I liked it", "I like that one", "nice one"]
+        },
+        {
+          "name": "BadPickIntent",
+          "slots": [],
+          "samples": ["not for me", "bad pick", "that was not good", "I did not like it", "not that one", "that missed"]
+        }
+      ],
+      "types": []
+    }
+  }
+}

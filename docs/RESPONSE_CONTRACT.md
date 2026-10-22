@@ -28,6 +28,8 @@ code, and tested for drift): `tests/golden/response_ok.json`, `tests/golden/alex
 
 ## Still open
 
-- Alexa+ does not document how identity or context reach MCP tools. Until it does, treat the MCP tool as stateless.
+- Alexa+ does not document how identity or context reach MCP tools. The MCP tools identify a person only from a
+  verified bearer token (`knots/identity.py`) and are stateless without one. The separate Alexa custom skill
+  (`knots/alexa_skill.py`) identifies people from Amazon's signed request.
 - The popularity wording thresholds (`widely seen` >= 10,000 ratings etc.) are my defaults, not tuned.
 - No model-written phrasing is wired in; `rephrase` is a hook only.

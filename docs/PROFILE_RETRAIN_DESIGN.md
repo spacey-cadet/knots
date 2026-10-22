@@ -39,6 +39,8 @@ Human-only labels; per-person cap; frozen expert holdout; margin gate; versioned
 - Whether s24-s30 stay the only holdout once listener labels exist.
 
 ## Not wired
-No server code calls `profile.update`, `prior`, `blend_mode`, `retrain` or the `online` event log yet: they need a verified identity
-(derive it from the OAuth token on account linking; never trust a caller-supplied `user_id` on a public endpoint)
-and a store. The contract already accepts `mode`.
+The server has a verified identity (`knots/identity.py`) and writes `impression` and `feedback` events
+(`knots/feedback.py`), which `eval/monitor.py` reads. Still not called by any server code: `profile.update`, `prior`,
+`blend_mode`, and the retrain run itself (the monitor only reports whether one is due). Wiring the profile also
+needs somewhere to keep a `Profile` per person: the SQLite store holds conversations, and nothing persists
+`Profile` objects yet. The contract already accepts `mode`.
