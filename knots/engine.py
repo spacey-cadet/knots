@@ -121,7 +121,8 @@ async def plan(session_texts: list[str] | None = None,
                user_id: str | None = None,
                include_videos: bool = True,
                challenge: bool | None = None) -> dict:
-    return (await run(session_texts, conversations, user_id, include_videos, challenge=challenge)).plan()
+    r = await run(session_texts, conversations, user_id, include_videos, challenge=challenge)
+    return await asyncio.to_thread(r.plan)      # ranking embeds and the note writer calls a model: off the event loop
 
 
 async def recommend(session_texts: list[str] | None = None,

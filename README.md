@@ -179,6 +179,19 @@ set `BEDROCK_MODEL_ID` (a model or inference-profile ID that supports Converse
 with tool use) and `AWS_REGION`, and provide credentials through the standard
 AWS chain. The role needs `bedrock:InvokeModel`. Never commit keys.
 
+## Quality floor and written notes
+
+- **Floor.** `eval/train_rank.py --write` also picks a similarity floor: the most lenient one whose surviving
+  picks were right at least 75% of the time on held-out sessions (never resting on fewer than 40 picks). It is
+  stored in `knots/brain/data/rank_weights.json`. Picks below it are not shown, even to fill a reserved slot, and
+  the "relaxed" ladder is not used to refill the list: fewer, better picks, or an honest empty response. Raw
+  similarity only means the same thing on the embedder it was measured on, so the floor records its embedder and
+  its similarity half is skipped (with a warning) if another one scored the candidates. `KNOTS_FLOOR=off` disables it.
+- **Notes.** `knots/notewriter.py` asks the Bedrock model (`NOTE_MODEL_ID`, else `BEDROCK_MODEL_ID`) for a note
+  and a spoken line per pick in one call. It sees only the catalog's facts and the person's quote, and a note is
+  discarded unless every number, capitalised name and quotation in it traces to that data. A failure or a
+  timeout keeps the templated note. `NOTES_LLM=off` disables it. The eval always runs with both off.
+
 ## Run
 
 ```bash

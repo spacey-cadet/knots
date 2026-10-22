@@ -67,6 +67,42 @@ def trained() -> bool:
     return bool(_artifact().get("weights"))
 
 
+_WARNED: set[str] = set()
+
+
+def floor() -> dict | None:
+    """The quality floor fitted next to the weights (eval/train_rank.py), or None when there is none."""
+    f = _artifact().get("floor")
+    try:
+        return {"sim": float(f["sim"]), "score": float(f.get("score", 0.0)), "embedder": str(f.get("embedder", ""))}
+    except (TypeError, KeyError, ValueError):
+        return None
+
+
+def floor_active() -> bool:
+    """On when a floor was fitted. KNOTS_FLOOR=off disables it (the eval needs every candidate to label)."""
+    return os.environ.get("KNOTS_FLOOR", "on").lower() != "off" and floor() is not None
+
+
+def passes_floor(sc: "Scored", k: int) -> bool:
+    """Is candidate k good enough to show? Without a query there is nothing to compare against: pass.
+
+    Raw similarity only means the same thing on the embedder it was measured on, so the similarity half of the
+    floor is skipped (and the fit-score half kept) if a different embedder, e.g. the hashed fallback, scored it."""
+    f = floor()
+    if f is None or not floor_active() or not sc.query_used:
+        return True
+    if sc.scores[k] < f["score"]:
+        return False
+    if sc.embedder == f["embedder"] or not f["embedder"]:
+        return sc.sims[k] >= f["sim"]
+    if sc.embedder not in _WARNED:
+        _WARNED.add(sc.embedder)
+        log.warning("quality floor was fitted on the %r embedder but %r scored this; applying only the fit-score half. "
+                    "Set EMBED_MODEL_ID to the Cohere profile (or refit) to get the full floor.", f["embedder"], sc.embedder)
+    return True
+
+
 def candidate_text(item) -> str:
     return " ".join(p for p in (item.title, item.abstract or item.blurb, " ".join(item.matched_keywords)) if p)
 
