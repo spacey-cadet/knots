@@ -90,6 +90,20 @@
   ],
   "precision_at_3": 0.611
  },
+ "floor": {
+  "sim": 0.29,
+  "score": 0.0,
+  "target_precision": 0.75,
+  "train_precision": 0.753,
+  "train_kept": 0.377,
+  "train_kept_n": 81,
+  "embedder": "cohere",
+  "holdout": {
+   "n": 24,
+   "kept": 0.436,
+   "precision": 0.833
+  }
+ },
  "embedder": {
   "recorded": true,
   "provider": "cohere",

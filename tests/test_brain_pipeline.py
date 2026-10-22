@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "eval"))
 
-from knots import calibration, fitmodel, pairing, receipts, signals  # noqa: E402
+from knots import calibration, fitmodel, notewriter, pairing, receipts, signals  # noqa: E402
 from knots import catalogs as C  # noqa: E402
 from knots import engine  # noqa: E402
 from knots import extraction as I  # noqa: E402
@@ -23,7 +23,7 @@ from knots.brain import judge  # noqa: E402
 from knots.brain.neighbors import Neighbors  # noqa: E402
 from knots.catalogs import ContentItem  # noqa: E402
 from knots.plan import build_session_plan  # noqa: E402
-from knots.ranking import medium_weight, rank_and_render  # noqa: E402
+from knots.ranking import medium_weight, rank_and_render, render_card  # noqa: E402
 
 
 @pytest.fixture(autouse=True)
@@ -31,6 +31,8 @@ def offline_hashed(monkeypatch, tmp_path):
     # Tests assume the hand-set prior and no calibration, whatever rank_weights.json ships.
     monkeypatch.setattr(fitmodel, "WEIGHTS_FILE", tmp_path / "no_rank_weights.json")
     fitmodel.reload()
+    monkeypatch.delenv("KNOTS_FLOOR", raising=False)
+    monkeypatch.delenv("NOTES_LLM", raising=False)
     monkeypatch.setenv("EMBEDDER", "hashed")
     monkeypatch.delenv("BEDROCK_MODEL_ID", raising=False)
     monkeypatch.setenv("KNOTS_OFFLINE", "1")
@@ -917,3 +919,122 @@ def test_golden_contract_and_alexa_responses_have_not_drifted():
     assert r == json.loads((ROOT / "tests" / "golden" / "response_ok.json").read_text())
     assert a == json.loads((ROOT / "tests" / "golden" / "alexa_ok.json").read_text())
     assert "“" not in r["say"] and len(r["say"]) < 400                           # short and quote-free for the ear
+
+
+# ---------------------------------------------------------------- quality floor
+def _floor_file(tmp_path, monkeypatch, **floor):
+    f = tmp_path / "w.json"
+    f.write_text(json.dumps({"weights": fitmodel.DEFAULT_WEIGHTS, "floor": {"sim": 0.5, "score": 0.0, "embedder": "cohere", **floor}}))
+    monkeypatch.setattr(fitmodel, "WEIGHTS_FILE", f)
+    fitmodel.reload()
+
+
+def _scored(sims, scores, embedder="cohere", query_used=True):
+    return fitmodel.Scored(items=[None] * len(sims), features=[{}] * len(sims), scores=scores, sims=sims,
+                           vecs=[[]] * len(sims), embedder=embedder, query_used=query_used)
+
+
+def test_floor_drops_weak_candidates_and_keeps_strong_ones(tmp_path, monkeypatch):
+    _floor_file(tmp_path, monkeypatch)
+    sc = _scored([0.9, 0.2, 0.9], [1.0, 1.0, -0.5])
+    assert [fitmodel.passes_floor(sc, k) for k in range(3)] == [True, False, False]   # low sim, low score
+
+
+def test_floor_skips_the_similarity_half_on_a_different_embedder(tmp_path, monkeypatch):
+    _floor_file(tmp_path, monkeypatch)
+    assert fitmodel.passes_floor(_scored([0.1], [1.0], embedder="hashed"), 0)          # scale differs: not judged on sim
+    assert not fitmodel.passes_floor(_scored([0.1], [-1.0], embedder="hashed"), 0)     # but the fit score still is
+
+
+def test_floor_is_off_without_a_floor_a_query_or_when_switched_off(tmp_path, monkeypatch):
+    assert fitmodel.passes_floor(_scored([0.0], [-9.0]), 0)                            # no floor fitted (autouse: no file)
+    _floor_file(tmp_path, monkeypatch)
+    assert fitmodel.passes_floor(_scored([0.0], [-9.0], query_used=False), 0)
+    monkeypatch.setenv("KNOTS_FLOOR", "off")
+    assert not fitmodel.floor_active() and fitmodel.passes_floor(_scored([0.0], [-9.0]), 0)
+
+
+def test_with_a_floor_a_thin_catalog_gives_an_honest_empty_not_a_padded_list(tmp_path, monkeypatch):
+    _floor_file(tmp_path, monkeypatch)
+    it = interest("memecoins")
+    items = [item("Barely related", "movie", "memecoins", score=0.05, abstract="Something else entirely.")]
+    r = contract.build_response({"picks": {"watch": [], "read": [], "explore": []}, "themes": [], "ask": "More?"}, items, [it])
+    assert r["status"] == "empty" and r["picks"] == [] and "won't guess" in r["say"]
+
+
+def test_floor_is_fitted_from_labels_and_needs_enough_picks_at_the_target():
+    import train_rank as T
+    rows = [{"sim": 0.1 * i, "y": int(i >= 5)} for i in range(10) for _ in range(10)]     # good only when sim >= 0.5
+    f = T.choose_floor(rows, [1.0] * len(rows))
+    assert f["sim"] == 0.4 and f["train_precision"] == 0.833      # the most lenient floor that still reaches 0.75
+    assert T.choose_floor(rows[:20], [1.0] * 20) is None                                    # too few picks to rest a floor on
+
+
+# ---------------------------------------------------------------- model-written notes
+def _writer_env(monkeypatch):
+    monkeypatch.delenv("KNOTS_OFFLINE", raising=False)
+    monkeypatch.setenv("BEDROCK_MODEL_ID", "test-model")
+    monkeypatch.delenv("NOTES_LLM", raising=False)
+    notewriter._cache.clear()
+
+
+def _fake_bedrock(notes):
+    class C:
+        def converse(self, **kw):
+            return {"output": {"message": {"content": [{"toolUse": {"name": "record_notes", "input": {"notes": notes}}}]}}}
+    return C()
+
+
+THEME = {"theme": "fear of missing out", "evidence": "I keep seeing memecoin threads", "topic": "memecoins", "rank": 1}
+
+
+def test_note_check_accepts_grounded_text_and_rejects_invention():
+    it = film()
+    ok = "A banker spends one night watching a crash unfold, the same dread as “I keep seeing memecoin threads”."
+    assert notewriter.valid(ok, 330, it, THEME)
+    assert not notewriter.valid(ok + " Won 12 Oscars.", 330, it, THEME)                     # number not in the data
+    assert not notewriter.valid("A banker watches a crash, directed by Christopher Nolan overnight.", 330, it, THEME)   # invented name
+    assert not notewriter.valid("A banker watches a crash, “you are all doomed” overnight.", 330, it, THEME)   # not their words
+    assert not notewriter.valid("A banker watches a crash overnight, see https://x.co now.", 330, it, THEME)
+    assert not notewriter.valid("Too short.", 330, it, THEME)
+    assert not notewriter.valid("Watch it in 2011 for a rating.", 330, it, None, spoken=True)   # spoken lines carry no digits
+
+
+def test_write_batch_keeps_good_notes_rejects_bad_ones_and_never_raises(monkeypatch):
+    _writer_env(monkeypatch)
+    good = "A banker spends one night watching a crash unfold, which is the dread behind a feed full of memecoin threads."
+    bad = "A banker watches a crash unfold overnight, and it won 12 Oscars."
+    monkeypatch.setattr(notewriter, "_bedrock", lambda: _fake_bedrock([
+        {"id": 0, "note": good, "spoken": "A banker watches a crash overnight, the same dread as a memecoin feed."},
+        {"id": 1, "note": bad, "spoken": "Whatever."}]))
+    a, b = film(), film(title="Other", source_url="https://x/o")
+    out = notewriter.write_batch([{"item": a, "theme": THEME, "concept": "memecoins"}, {"item": b, "theme": THEME, "concept": "memecoins"}])
+    assert out[0] == (good, "A banker watches a crash overnight, the same dread as a memecoin feed.") and out[1] is None
+
+    def boom():
+        raise TimeoutError("slow")
+    monkeypatch.setattr(notewriter, "_bedrock", boom)
+    notewriter._cache.clear()
+    assert notewriter.write_batch([{"item": a, "theme": THEME, "concept": "x"}]) == [None]
+
+
+def test_note_writer_is_off_offline_when_switched_off_or_without_a_model(monkeypatch):
+    monkeypatch.setenv("BEDROCK_MODEL_ID", "m")                    # autouse fixture already set KNOTS_OFFLINE=1
+    assert not notewriter.enabled()
+    monkeypatch.delenv("KNOTS_OFFLINE")
+    assert notewriter.enabled()
+    monkeypatch.setenv("NOTES_LLM", "off")
+    assert not notewriter.enabled()
+    monkeypatch.delenv("NOTES_LLM"); monkeypatch.delenv("BEDROCK_MODEL_ID")
+    assert not notewriter.enabled()
+
+
+def test_response_uses_the_written_note_but_falls_back_to_the_templated_one():
+    it = interest("memecoins")
+    plan = {"picks": {"watch": [render_card(film(), it)], "read": [], "explore": []},
+            "themes": [{"theme": "fear of missing out", "evidence": "I keep seeing memecoin threads", "topic": "memecoins", "rank": 1}], "ask": "More?"}
+    r = contract.build_response(plan, [film()], [it], writer=lambda es: [("A banker, one night, one crash.", "One night, one crash.")])
+    p = r["picks"][0]
+    assert p["note"] == "A banker, one night, one crash." and p["spoken_note"] == "One night, one crash." and p["written_by"] == "model"
+    r = contract.build_response(plan, [film()], [it], writer=lambda es: [None])
+    assert "written_by" not in r["picks"][0] and r["picks"][0]["note"].startswith("A banker watches a crash")

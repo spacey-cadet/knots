@@ -584,6 +584,9 @@ def main() -> int:
     s.add_argument("--include-mock", action="store_true", help="count offline mock picks too")
     s.set_defaults(fn=cmd_score)
     args = ap.parse_args()
+    # The eval labels every candidate, so neither the quality floor nor the model-written notes may change what it sees.
+    os.environ["KNOTS_FLOOR"] = "off"
+    os.environ["NOTES_LLM"] = "off"
     return args.fn(args)
 
 

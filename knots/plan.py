@@ -13,6 +13,7 @@ Output is shaped for both surfaces Alexa+ has:
 
 from __future__ import annotations
 
+from . import fitmodel
 from .brain.themes import ranked as ranked_themes
 from .catalogs import ContentItem
 from .contract import build_response
@@ -96,7 +97,8 @@ def build_session_plan(interests: list[Interest], items: list[ContentItem],
         seen_urls.add(c["url"])
         bucket.append(c)
     note = "" if any(picks.values()) else (
-        "No catalog results right now (catalogs unavailable or no keys set), so I'm not guessing.")
+        "Nothing found cleared the quality bar, so I'm not padding the list." if items and fitmodel.floor_active()
+        else "No catalog results right now (catalogs unavailable or no keys set), so I'm not guessing.")
     pairs = build_pairs(items, interests, query)
     themes = ranked_themes(interests, 5)
     plan = {

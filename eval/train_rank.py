@@ -30,6 +30,8 @@ from knots import fitmodel  # noqa: E402
 import metrics as M  # noqa: E402
 
 MIN_SESSIONS = 20
+FLOOR_TARGET = 0.75      # precision the surviving picks should reach: "top tier even if few"
+FLOOR_MIN_KEPT = 40      # but never pick a floor that rests on fewer train picks than this
 METRICS = ROOT / "eval" / "results" / "metrics_rank.json"
 KINDS = ("watch", "read", "explore")
 
@@ -54,7 +56,7 @@ def load_rows(labels=None, results=None):
             missing += 1
             continue
         rows.append({"session": x["session_id"], "split": x.get("split", "train"), "type": x["type"],
-                     "y": int(x["good"] == "y"), "old": float(c.get("relevance") or 0.0),
+                     "y": int(x["good"] == "y"), "old": float(c.get("relevance") or 0.0), "sim": c.get("sim"),
                      "x": [float(c["fit_features"][f]) for f in fitmodel.FEATURES]})
     return rows, labelled, missing
 
@@ -76,6 +78,28 @@ def evaluate(rows, C=0.3):
     a, b = M.fit_platt(loso, y)
     cal = 1 / (1 + np.exp(-(a * loso + b)))
     return X, y, g, loso, out, (a, b), M.reliability(cal, y), M.ece(cal, y)
+
+
+def choose_floor(train, loso, score_floor=0.0):
+    """The most lenient raw-similarity floor whose surviving train picks are right >= FLOOR_TARGET of the time.
+
+    Raw similarity (not the z-scored fit score) is what separates good from bad here: the fit score is
+    relative to its candidate set, so the best of a weak set can still score high. Every candidate is scored
+    on held-out (leave-session-out) scores. Returns None if no floor reaches the target on enough picks."""
+    rows = [(r["sim"], s, r["y"]) for r, s in zip(train, loso) if r.get("sim") is not None]
+    for t in sorted({round(sim, 2) for sim, _, _ in rows}):
+        kept = [y for sim, s, y in rows if sim >= t and s >= score_floor]
+        if len(kept) >= FLOOR_MIN_KEPT and np.mean(kept) >= FLOOR_TARGET:
+            return {"sim": t, "score": score_floor, "target_precision": FLOOR_TARGET,
+                    "train_precision": round(float(np.mean(kept)), 3),
+                    "train_kept": round(len(kept) / len(rows), 3), "train_kept_n": len(kept)}
+    return None
+
+
+def floor_report(rows, scores, floor):
+    ks = [(r["y"]) for r, s in zip(rows, scores) if r.get("sim") is not None and r["sim"] >= floor["sim"] and s >= floor["score"]]
+    return {"n": len(ks), "kept": round(len(ks) / max(1, len(rows)), 3),
+            "precision": round(float(np.mean(ks)), 3) if ks else None}
 
 
 def main() -> int:
@@ -107,6 +131,13 @@ def main() -> int:
     by_type = {t: round(float(np.mean([r["y"] for r in train if r["type"] == t])), 3)
                for t in sorted({r["type"] for r in train})}
     holdout = None
+    floor = choose_floor(train, loso)
+    if floor:
+        floor["embedder"] = (M.embedder_info().get("provider") or "hashed")
+        print(f"\nquality floor: sim >= {floor['sim']} and fit >= {floor['score']} -> train precision "
+              f"{floor['train_precision']:.2f}, keeps {floor['train_kept']:.0%} of picks (embedder {floor['embedder']})")
+    else:
+        print("\nquality floor: none reaches the target on enough picks; not set")
     if len(hold) >= 10 and len({r["y"] for r in hold}) > 1:
         hx = np.array([r["x"] for r in hold]); hy = np.array([r["y"] for r in hold]); hg = np.array([r["session"] for r in hold])
         hs = hx @ full.coef_[0]
@@ -114,18 +145,21 @@ def main() -> int:
         holdout = {"n": len(hy), "auc": round(M.auc(hs, hy), 3), "auc_ci90": [round(lo, 3), round(hi, 3)],
                    "precision_at_3": round(M.precision_at_k(hs, hy, hg, 3), 3)}
         print("HOLDOUT:", holdout)
+        if floor:
+            floor["holdout"] = floor_report(hold, hs, floor)
+            print("HOLDOUT under the floor:", floor["holdout"])
     METRICS.write_text(json.dumps({
         "status": "trained", "train_picks": len(y), "train_sessions": sessions, "good_rate": round(float(y.mean()), 3),
         "good_rate_by_type": by_type, "loso": res, "weights": w,
         "calibration": {"a": round(a, 4), "b": round(b, 4), "ece": round(ece, 4), "reliability": rel},
-        "holdout": holdout, "embedder": M.embedder_info()}, indent=1))
+        "holdout": holdout, "floor": floor, "embedder": M.embedder_info()}, indent=1))
     if args.write:
         if sessions < MIN_SESSIONS and not args.force:
             print(f"\nNot written: only {sessions} train sessions (< {MIN_SESSIONS}). Label more, or pass --force.")
             return 2
         out = fitmodel.WEIGHTS_FILE
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(json.dumps({"weights": w, "calibration": {"a": a, "b": b},
+        out.write_text(json.dumps({"weights": w, "calibration": {"a": a, "b": b}, "floor": floor,
                                    "meta": {"picks": len(y), "sessions": sessions, "C": args.C,
                                             "date": date.today().isoformat(), "loso_auc": res["fitted (leave-session-out)"]["auc"]}},
                                   indent=1))

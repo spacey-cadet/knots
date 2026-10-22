@@ -11,13 +11,15 @@ The response contract: one shape every surface (Alexa skill, MCP tool, screen) r
       "mode": {"learn_vs_play": 0..1, "label": "learn" | "play" | "mixed"}   # when a profile supplied it
     }
 
-At least one pick whenever the catalogs returned anything at all. If the normal ranking (which demands receipts)
+At least one pick whenever the catalogs returned anything at all, unless a quality floor is fitted
+(fitmodel.floor): then nothing below the floor is shown and the response may honestly be "empty". If the normal ranking (which demands receipts)
 yields none, the relaxation ladder widens step by step and `status` and `confidence` say so honestly. If the
 catalogs returned nothing there is nothing true to recommend: status is "empty", picks is [] and `say` asks a
 question instead of inventing a title.
 """
 from __future__ import annotations
 
+from . import fitmodel, notewriter
 from .catalogs import ContentItem
 from .notes import build_note, facts
 from .ranking import KIND, render_card
@@ -57,18 +59,20 @@ def _relaxed(items: list[ContentItem], interests: list, n: int) -> list[dict]:
 
 
 def build_response(plan: dict, items: list[ContentItem], interests: list, mode: dict | None = None,
-                   rephrase=None) -> dict:
+                   rephrase=None, writer=None) -> dict:
     by_url = {it.source_url: it for it in items}
     themes = [{"theme": t["theme"], "evidence": t["evidence"], "rank": t["rank"]} for t in plan.get("themes", [])]
     cards, level = _flatten(plan)[:MAX_PICKS], 0
-    if not cards and items and interests:
+    # With a quality floor in force a thin result is the point: do not widen the net to refill it.
+    if not cards and items and interests and not fitmodel.floor_active():
         cards, level = _relaxed(items, interests, 3), 1
         if all((c.get("relevance") or 0) < 0.2 for c in cards):
             level = 2
-    picks = []
+    picks, ctx = [], []
     for c in cards:
         it = by_url.get(c["url"])
         theme = next((t for t in plan.get("themes", []) if t["topic"] == c.get("matched_topic")), None)
+        ctx.append({"item": it, "theme": theme, "concept": c.get("concept", "")})
         picks.append({
             "title": c["title"], "type": c["type"], "year": c.get("year", ""), "url": c["url"],
             "matched_topic": c.get("matched_topic", ""),
@@ -78,6 +82,13 @@ def build_response(plan: dict, items: list[ContentItem], interests: list, mode: 
             "facts": facts(it) if it else [],
             "confidence": _confidence(c, level),
         })
+    # One model call for every pick; a rejected or failed note keeps the faithful templated one above.
+    known = [k for k, x in enumerate(ctx) if x["item"] is not None]
+    for k, w in zip(known, (writer or notewriter.write_batch)([ctx[k] for k in known])):
+        if w:
+            picks[k]["note"] = w[0]
+            picks[k]["spoken_note"] = w[1] or picks[k]["spoken_note"]
+            picks[k]["written_by"] = "model"
     status = "empty" if not picks else "relaxed" if level else "ok"
     resp = {"version": VERSION, "status": status, "say": "", "picks": picks, "themes": themes[:5],
             "ask": plan.get("ask", ""), "extractor": plan.get("extractor", "")}

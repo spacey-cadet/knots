@@ -143,6 +143,9 @@ def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: 
     A third appears only if the opt-in challenge search found one: a well-rated title that
     complicates the person's own view.
 
+    A candidate under the quality floor (fitmodel.floor, fitted from labels) is never shown, even to fill
+    a slot or a reserved blockbuster/gem place: fewer, better picks.
+
     With `query` (the session text) order comes from fitmodel.py: similarity to what was said,
     quality, format fit and, for papers, authority. Every such card carries receipts, and a card
     with nothing to stand on (no matched tags and no summary) is dropped. Without a query the
@@ -161,6 +164,8 @@ def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: 
         interest = interest_by_topic[item.topic]
         if sc is None:
             return render_card(item, interest)
+        if not fitmodel.passes_floor(sc, pos[id(item)]):
+            return None                            # below the quality floor: fewer picks beats a weak one
         card = render_card(item, interest, card_extras(sc, pos[id(item)], item, interest, query))
         return card if receipts.sourced(card["receipts"]) else None
 
