@@ -127,3 +127,22 @@ def test_without_a_salt_the_explorer_works_but_remembers_nobody(monkeypatch):
         body = call(c, "knots_partner", {"session_texts": [SAID], "include_videos": False}).json()
         assert body["ok"] and body["remembered_as"] == "nobody"
         assert c.get("/explore/api/status").json()["remembers_visitors"] is False
+
+
+def test_explain_is_a_tool_argument_and_the_ledger_only_comes_back_when_asked():
+    with client() as c:
+        c.get("/explore")
+        tools = {t["name"]: t for t in c.get("/explore/api/tools").json()["tools"]}
+        assert "explain" in tools["knots_partner"]["inputSchema"]["properties"]
+        plain = call(c, "knots_partner", {"session_texts": [SAID], "include_videos": False}).json()["result"]
+        card = next(x for b in plain["picks"].values() for x in b)
+        assert "receipts" not in card and "fit_score" not in card and "why" not in plain["response"]["picks"][0]
+        full = call(c, "knots_partner", {"session_texts": [SAID], "include_videos": False, "explain": True}).json()["result"]
+        assert any("receipts" in x for b in full["picks"].values() for x in b)
+
+
+def test_the_page_reads_a_pairs_bridge_and_only_shows_how_it_chose_when_explaining():
+    with client() as c:
+        page = c.get("/explore").text
+        assert "p.bridge" in page and "p.why" not in page and "Matched on" not in page
+        assert "Evidence behind this pick" in page

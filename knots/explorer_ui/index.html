@@ -194,6 +194,7 @@ const HINTS = {
   session_texts: "What the person said, one message per line. Alexa turns and Reddit text both work.",
   include_videos: "Also search YouTube for explainers. Off by default: YouTube allows only about 100 searches a day for the whole server.",
   challenge_me: "Reserve one pick that complicates the person's own view.",
+  explain: "Show the evidence behind each pick: the sentence you said, matched tags, the item's own summary. Off by default because the note is what a person should read.",
   limit: "How many cards to return.",
   topics: "Plain topic words, one per line. Searches TMDB, arXiv and YouTube.",
   session_id: "The id returned by knots_partner. Run that tool first.",
@@ -216,7 +217,7 @@ function h(tag, attrs, ...kids) {
     else if (k === "text") el.textContent = v;
     else el.setAttribute(k, v === true ? "" : v);
   }
-  for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  for (const kid of kids.flat(Infinity)) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
   return el;
 }
 const safeUrl = u => { try { const x = new URL(u); return /^https?:$/.test(x.protocol) ? x.href : null; } catch { return null; } };
@@ -473,10 +474,20 @@ function quoted(text, quote) {
   return [text.slice(0, i), h("mark", {text: text.slice(i, i + quote.length)}), text.slice(i + quote.length)];
 }
 function themeBlock(t) { return h("div", {class: "theme"}, h("b", {text: t.theme}), t.evidence ? h("q", {}, "You said: “", h("mark", {text: t.evidence}), "”") : null); }
+const RECEIPT_LABEL = {you_said: "You said", tags: "Matched tags", summary: "Its own summary", status: "Status", citations: "Citations"};
+function evidence(p, ledger) {
+  const rows = (ledger.receipts || []).map(r => [RECEIPT_LABEL[r.kind] || r.kind, r.text]);
+  if (p.matched_topic) rows.unshift(["Matched topic", p.matched_topic]);
+  if (ledger.fit_score != null) rows.push(["Fit score", String(ledger.fit_score)]);
+  if (ledger.sim != null) rows.push(["Similarity to what you said", String(ledger.sim)]);
+  if (!rows.length) return null;
+  return h("details", {}, h("summary", {text: "Evidence behind this pick"}),
+    h("dl", {class: "kv"}, rows.map(([k, v]) => [h("dt", {text: k}), h("dd", {text: v})])));
+}
 const STRIPE = {movie: "film", series: "film", doc: "film", paper: "paper", video: "video"};
 const LABEL = {movie: "Film", series: "Series", doc: "Documentary", paper: "Paper", video: "Video"};
 
-function pickCard(p, sessionId) {
+function pickCard(p, sessionId, ledger) {
   const type = p.type || "movie", href = safeUrl(p.url), spoken = p.spoken_note && p.spoken_note !== p.note ? p.spoken_note : "";
   const rated = h("span", {class: "rated"});
   const rate = good => async e => {
@@ -486,10 +497,10 @@ function pickCard(p, sessionId) {
     } catch (er) { rated.textContent = er.message; } e.target.disabled = false; };
   return h("article", {class: "pick"},
     h("div", {class: "stripe " + (STRIPE[type] || "film")}, LABEL[type] || type, p.year ? `· ${p.year}` : "", h("span", {class: "conf grow", text: p.confidence || ""})),
-    h("div", {class: "main"}, h("h4", {text: p.title}), h("p", {class: "note", text: p.note || p.why || ""}),
+    h("div", {class: "main"}, h("h4", {text: p.title}), h("p", {class: "note", text: p.note || ""}),
       spoken ? h("details", {}, h("summary", {text: "What Alexa says out loud"}), h("p", {class: "spoken", text: spoken})) : null,
       (p.facts || []).length ? h("div", {class: "facts"}, p.facts.map(f => h("span", {class: "fact", title: "Source: " + f.source, text: `${f.label}: ${f.value}`}))) : null,
-      p.matched_topic ? h("p", {class: "hint", style: "margin:4px 0;color:var(--mute);font-size:14px"}, "Matched on ", h("b", {text: p.matched_topic})) : null,
+      ledger ? evidence(p, ledger) : null,
       h("div", {class: "row"}, href ? h("a", {href, target: "_blank", rel: "noopener noreferrer", text: "Open it"}) : null,
         sessionId ? [h("button", {class: "btn small white", type: "button", onclick: rate(true)}, "Good pick"), h("button", {class: "btn small white", type: "button", onclick: rate(false)}, "Missed"), rated] : null)));
 }
@@ -499,19 +510,20 @@ const put = (box, ...kids) => box.append(...kids.flat().filter(k => k != null &&
 function renderCards(name, r) {
   const box = h("div", {});
   if (name === "knots_partner") {
-    const resp = r.response, f = state.status.floor;
+    const resp = r.response, f = state.status.floor, explained = !!(state.last[name] && state.last[name].args && state.last[name].args.explain);
+    const ledger = {}; Object.values(r.picks || {}).flat().forEach(c => { if (c && c.url && (c.receipts || c.fit_score != null)) ledger[c.url] = c; });
     put(box, say(resp.say));
     if (resp.status === "empty") put(box, h("div", {class: "empty"}, h("b", {text: "Nothing cleared the quality bar"}),
       h("span", {text: f ? `Knots hides any pick whose similarity to what was said is under ${f.similarity}, and shows fewer picks instead of padding the list. ` : "Nothing came back from the catalogs. "}), resp.ask || ""));
     if ((resp.themes || []).length) put(box, h("h3", {class: "sect", text: "What it heard underneath"}), resp.themes.map(themeBlock));
-    if ((resp.picks || []).length) put(box, h("h3", {class: "sect", text: `${resp.picks.length} ${resp.picks.length === 1 ? "pick" : "picks"}${resp.status === "relaxed" ? ", looser than usual" : ""}`}), resp.picks.map(p => pickCard(p, r.session_id)));
-    if ((r.pairs || []).length) put(box, h("h3", {class: "sect", text: "Double features"}), r.pairs.map(p => h("div", {class: "theme"}, h("b", {text: `${p.watch?.title} then ${p.learn?.title}`}), p.why ? h("span", {text: p.why}) : null)));
+    if ((resp.picks || []).length) put(box, h("h3", {class: "sect", text: `${resp.picks.length} ${resp.picks.length === 1 ? "pick" : "picks"}${resp.status === "relaxed" ? ", looser than usual" : ""}`}), resp.picks.map(p => pickCard(p, r.session_id, explained ? (ledger[p.url] || {}) : null)));
+    if ((r.pairs || []).length) put(box, h("h3", {class: "sect", text: "Double features"}), r.pairs.map(p => h("div", {class: "theme"}, h("b", {text: `${p.watch?.title} then ${p.learn?.title}`}), p.bridge ? h("span", {text: p.bridge}) : null)));
     if (resp.ask && resp.status !== "empty") put(box, h("h3", {class: "sect", text: "It asks back"}), h("div", {class: "say", style: "border-radius:22px 22px 4px 22px;background:var(--sun)"}, h("p", {text: resp.ask})));
     if (r.memory) put(box, h("h3", {class: "sect", text: "Memory"}), h("dl", {class: "kv"}, h("dt", {text: "Recalled"}), h("dd", {text: `${r.memory.recalled} earlier ${r.memory.recalled === 1 ? "topic" : "topics"}`}), h("dt", {text: "Stored now"}), h("dd", {text: `${r.memory.stored_new} new ${r.memory.stored_new === 1 ? "conversation" : "conversations"}`})));
   } else if (name === "get_recommendations") {
     put(box, h("p", {text: `Extractor: ${r.extractor}. ${r.cards.length} ranked ${r.cards.length === 1 ? "card" : "cards"}.`}));
     r.cards.forEach(c => put(box, pickCard({title: c.title, type: c.type, year: c.year, url: c.url, note: c.reasoning, matched_topic: c.matched_topic,
-      confidence: c.confidence != null ? Math.round(c.confidence * 100) + "% likely good" : (c.fit_score != null ? "fit " + c.fit_score : ""), facts: []}, null)));
+      confidence: c.confidence != null ? Math.round(c.confidence * 100) + "% likely good" : "", facts: []}, null, c.receipts || c.fit_score != null ? c : null)));
     if (!r.cards.length) put(box, h("div", {class: "empty"}, h("b", {text: "No cards"}), "Nothing cleared the quality bar for this input."));
   } else if (name === "extract_interests") {
     put(box, h("p", {text: `Read by: ${r.extractor}`}));
