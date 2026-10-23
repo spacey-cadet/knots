@@ -61,20 +61,30 @@ def popularity_phrase(item: ContentItem) -> str:
     return ""
 
 
-def build_note(item: ContentItem, theme: dict | None = None, rephrase: Callable[[str], str] | None = None) -> str:
-    parts = [first_sentence(item.abstract or item.blurb)]
+def build_note(item: ContentItem, theme: dict | None = None, rephrase: Callable[[str], str] | None = None,
+               said: str = "") -> str:
+    """The faithful fallback note (used when no model-written note is available or one is rejected).
+
+    Order matters: lead with the link to THIS person (their own words and the idea underneath), then what the
+    thing is, then how well regarded it is. Everything comes from catalog fields and the person's own quote."""
+    parts = []
+    said = (said or "").removesuffix(" ...").strip()
+    quote = (theme or {}).get("evidence") or said
+    if theme and theme.get("evidence"):
+        parts.append(f"You touched on “{theme['evidence']}”, and this speaks to {theme['theme']}.")
+    elif said:
+        parts.append(f"You said “{said}”, and this goes straight at it.")
+    parts.append(first_sentence(item.abstract or item.blurb))
     pop = popularity_phrase(item)
     if pop:
         parts.append(pop[0].upper() + pop[1:] + ".")
-    if theme and theme.get("evidence"):
-        parts.append(f"It speaks to {theme['theme']}, which you touched on with “{theme['evidence']}”.")
     note = " ".join(p for p in parts if p)
     if rephrase and note:
         try:
             alt = rephrase(note)
         except Exception:  # noqa: BLE001 - a failed rewrite just keeps the faithful original
             alt = ""
-        if alt and check_numbers(alt, allowed_text(item, theme)):
+        if alt and check_numbers(alt, allowed_text(item, theme) + " " + quote):
             return alt
     return note
 

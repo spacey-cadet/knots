@@ -757,7 +757,8 @@ def test_note_uses_only_catalog_facts_and_the_persons_words():
     it = film()
     theme = {"theme": "fear of missing out", "evidence": "I keep seeing memecoin threads"}
     n = notes.build_note(it, theme)
-    assert n.startswith("A banker watches a crash unfold overnight.")
+    assert n.startswith("You touched on")                    # leads with the link to the person, then what it is
+    assert "A banker watches a crash unfold overnight." in n
     assert "7.1/10 by 4,200 people" in n and "Well known" in n
     assert "“I keep seeing memecoin threads”" in n
     assert notes.check_numbers(n, notes.allowed_text(it, theme))
@@ -1037,4 +1038,4 @@ def test_response_uses_the_written_note_but_falls_back_to_the_templated_one():
     p = r["picks"][0]
     assert p["note"] == "A banker, one night, one crash." and p["spoken_note"] == "One night, one crash." and p["written_by"] == "model"
     r = contract.build_response(plan, [film()], [it], writer=lambda es: [None])
-    assert "written_by" not in r["picks"][0] and r["picks"][0]["note"].startswith("A banker watches a crash")
+    assert "written_by" not in r["picks"][0] and "A banker watches a crash" in r["picks"][0]["note"]

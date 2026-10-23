@@ -72,11 +72,12 @@ def build_response(plan: dict, items: list[ContentItem], interests: list, mode: 
     for c in cards:
         it = by_url.get(c["url"])
         theme = next((t for t in plan.get("themes", []) if t["topic"] == c.get("matched_topic")), None)
-        ctx.append({"item": it, "theme": theme, "concept": c.get("concept", "")})
+        said = next((r.get("text", "") for r in c.get("receipts") or [] if r.get("kind") == "you_said"), "")
+        ctx.append({"item": it, "theme": theme, "concept": c.get("concept", ""), "said": said})
         picks.append({
             "title": c["title"], "type": c["type"], "year": c.get("year", ""), "url": c["url"],
             "matched_topic": c.get("matched_topic", ""),
-            "note": build_note(it, theme, rephrase) if it else c.get("reasoning", ""),
+            "note": build_note(it, theme, rephrase, said) if it else c.get("reasoning", ""),
             "spoken_note": build_note(it, None, rephrase) if it else "",   # no quote: the theme is said once, up front
             "why": c.get("reasoning", ""),
             "facts": facts(it) if it else [],

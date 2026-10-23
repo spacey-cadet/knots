@@ -1,5 +1,7 @@
 """
-The model-written note: a vivid line or two on each pick, written from the catalog's own facts.
+The model-written note: the line that makes the case. On each pick it says why THIS person would love it,
+written from the catalog's own facts and the person's own words. (The evidence behind the pick is a separate,
+internal ledger; the note is the only thing a person is asked to be persuaded by.)
 
 `notes.build_note` is the faithful, templated note. This module lets a model (Claude on Bedrock, the
 same account as the extractor) rewrite it with some voice. One call covers every pick in a response, so it
@@ -10,7 +12,8 @@ Faithfulness is the rule, not the hope. The model is handed only what the catalo
 rating, citations, year) and the person's own quote. Its note is then REJECTED, entry by entry, unless
   - every number in it appears in that data (notes.check_numbers),
   - every capitalised name in it appears in that data, the title, the topic or the quote (`check_names`),
-  - anything it puts in quotation marks is a verbatim piece of the person's quote,
+  - anything it puts in quotation marks is a verbatim piece of the person's own words (the quote a theme rests
+    on, or the sentence they said that matches the topic),
   - it carries no URL and stays short.
 A rejected note falls back to the templated one. Nothing here researches beyond what the catalogs returned;
 that is deliberate, because a model asked to "research" a title from memory is the thing that invents a cast.
@@ -33,21 +36,26 @@ log = logging.getLogger("knots.notewriter")
 MAX_NOTE, MAX_SPOKEN = 330, 220
 
 _SYSTEM = """You write the short note under each recommendation in a "what should I watch or read" assistant. \
-Your reader is one person whose own words are quoted for you. Write like a well-read friend who has just \
-thought of the perfect thing for them: specific, warm, a little playful, never salesy.
+The note is where the case gets made: its whole job is to make this ONE person want to press play, and to \
+believe the pick was chosen for them. Write like a well-read friend who has just thought of the perfect thing: \
+specific, warm, a little playful, never salesy.
 
 Hard rules (a note that breaks one is thrown away):
-- Use ONLY the facts, description and quote given for that item. Never add plot points, characters, cast, \
-directors, awards, dates, rankings or numbers that are not given. If the description is thin, say less.
+- Use ONLY the facts, description and words given for that item. Never add plot points, characters, cast, \
+directors, awards, dates, rankings or numbers that are not given. If the description is thin, say less, but \
+still say why it fits them.
 - No spoilers. No URLs.
 - Copy any number exactly as given. Do not round it or convert it.
-- If you quote the person, use their exact words, once, and only if it is natural.
+- If you quote the person, use their exact words (`their_words`), once, and only if it is natural.
 
 Craft:
-- `note`: one or two sentences, at most 45 words. Say what it IS in a fresh, concrete image, then why it fits \
-THIS person. Name the idea it shares with what they asked about.
+- `note`: one or two sentences, at most 45 words. Start from THEM, not from the item: the question they are \
+sitting with, the idea underneath (`their_theme`, `about`), or their own words. Then give the one concrete \
+thing the item will do for that: make it felt, make it clear, test it, complicate it. Close on a reason to \
+start it now. Do not summarise the plot or list facts: the facts are already shown separately.
 - `spoken`: one sentence, at most 30 words, for a voice assistant: no quotation marks, no digits, no titles in \
-quotes. It should still carry the 'why it fits'.
+quotes. It must still carry the 'why this one is for you'.
+- Never explain how you chose it (no "matched on", "based on your", "the algorithm", "evidence").
 - Vary your openings across items. Do not start with "If you", "Since you", "Because you" or the title. \
 Avoid clichés such as rollercoaster, gripping, must-watch, deep dive, rabbit hole, journey.
 - Match the medium: a film is something to sink into, an explainer to learn from, a paper to dig into."""
@@ -102,14 +110,20 @@ def check_quotes(note: str, quote: str) -> bool:
     return all(re.sub(r"\s+", " ", m.lower()).strip(" .,") in q for m in _QUOTED.findall(note))
 
 
-def valid(text: str, limit: int, item, theme: dict | None, *, spoken: bool = False) -> bool:
+def valid(text: str, limit: int, item, theme: dict | None, *, spoken: bool = False, said: str = "") -> bool:
     if not isinstance(text, str) or not (20 <= len(text.strip()) <= limit) or re.search(r"https?:|www\.", text):
         return False
-    quote = (theme or {}).get("evidence", "")
+    quote = " ".join(x for x in ((theme or {}).get("evidence", ""), said or "") if x)
     allowed = " ".join([allowed_text(item, theme), item.title, item.topic, (theme or {}).get("theme", ""), quote])
     if spoken and (re.search(r"\d", text) or _QUOTED.search(text)):
         return False
     return check_numbers(text, allowed) and check_names(text, allowed) and check_quotes(text, quote)
+
+
+def _their_words(entry: dict) -> str:
+    """The person's own words to build the note around: the quote an unstated theme rests on, else the sentence
+    they said that matches the topic (from the internal ledger)."""
+    return ((entry.get("theme") or {}).get("evidence") or entry.get("said") or "").strip()
 
 
 def _payload(entries: list[dict]) -> list[dict]:
@@ -120,7 +134,7 @@ def _payload(entries: list[dict]) -> list[dict]:
                     "description": re.sub(r"\s+", " ", it.abstract or it.blurb or "").strip()[:500],
                     "facts": [f"{f['label']}: {f['value']}" for f in facts(it)],
                     "about": e.get("concept") or it.topic,
-                    "their_theme": theme.get("theme", ""), "their_words": theme.get("evidence", "")})
+                    "their_theme": theme.get("theme", ""), "their_words": _their_words(e)})
     return out
 
 
@@ -151,7 +165,7 @@ def write_batch(entries: list[dict]) -> list[tuple[str, str] | None]:
         out: list[tuple[str, str] | None] = []
         for k, e in enumerate(entries):
             note, spoken = got.get(k, ("", ""))
-            ok_note = valid(note, MAX_NOTE, e["item"], e.get("theme"))
+            ok_note = valid(note, MAX_NOTE, e["item"], e.get("theme"), said=e.get("said", ""))
             ok_spoken = valid(spoken, MAX_SPOKEN, e["item"], None, spoken=True)
             out.append((note, spoken if ok_spoken else "") if ok_note else None)
             if not ok_note:
