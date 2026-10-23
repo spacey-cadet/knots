@@ -18,6 +18,7 @@ Tools (Streamable HTTP, MCP spec 2025-11-25+):
 Other routes (outside the MCP bearer-token check, each protected its own way):
   GET  /health   liveness for the load balancer and Docker
   POST /alexa    Alexa custom skill requests (Amazon's signature is verified; see knots/alexa_skill.py)
+  GET  /explore  a Swagger-style page for these tools (off unless KNOTS_EXPLORER=on; see knots/explorer.py)
 
 Identity. A `user_id` argument is NOT trusted: who is calling comes from a verified bearer token (set
 KNOTS_JWKS_URL or KNOTS_JWT_SECRET, see knots/identity.py) and is turned into an opaque salted id. With no auth
@@ -235,6 +236,8 @@ def create_mcp() -> FastMCP:
         server.tool()(fn)
     server.custom_route("/health", methods=["GET"])(health)
     server.custom_route("/alexa", methods=["POST"])(alexa_route)
+    from knots import explorer
+    explorer.register(server, limiter)        # inert (404) unless KNOTS_EXPLORER=on
     return server
 
 

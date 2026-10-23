@@ -24,6 +24,8 @@ Environment:
 from __future__ import annotations
 
 import asyncio
+import contextlib
+import contextvars
 import hashlib
 import hmac
 import logging
@@ -60,8 +62,24 @@ def allow_client_user_id() -> bool:
     return os.environ.get("KNOTS_ALLOW_CLIENT_USER_ID") == "1"
 
 
+_override: contextvars.ContextVar[str | None] = contextvars.ContextVar("knots_user_override", default=None)
+
+
+@contextlib.contextmanager
+def acting_as(user: str | None):
+    """Run a block as an already-verified, opaque user id. Only code that has itself verified the caller (the
+    explorer's signed visitor cookie) may use this; nothing a client sends reaches it."""
+    token = _override.set(user)
+    try:
+        yield
+    finally:
+        _override.reset(token)
+
+
 def current_user() -> str | None:
     """The verified caller of the MCP request being handled, as an opaque id, or None (anonymous)."""
+    if _override.get():
+        return _override.get()
     try:
         from mcp.server.auth.middleware.auth_context import get_access_token
     except ImportError:                                           # pragma: no cover
