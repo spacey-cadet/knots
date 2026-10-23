@@ -479,6 +479,7 @@ function evidence(p, ledger) {
   const rows = (ledger.receipts || []).map(r => [RECEIPT_LABEL[r.kind] || r.kind, r.text]);
   if (p.matched_topic) rows.unshift(["Matched topic", p.matched_topic]);
   if (ledger.fit_score != null) rows.push(["Fit score", String(ledger.fit_score)]);
+  if (ledger.cleared_floor != null) rows.push(["Cleared the full quality floor", ledger.cleared_floor ? "yes" : "no, so the note makes no claim about you"]);
   if (ledger.sim != null) rows.push(["Similarity to what you said", String(ledger.sim)]);
   if (!rows.length) return null;
   return h("details", {}, h("summary", {text: "Evidence behind this pick"}),

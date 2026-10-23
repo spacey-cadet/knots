@@ -61,7 +61,8 @@ def test_ranked_cards_show_the_note_not_the_ledger_or_the_templated_reason():
 
 def test_note_cards_gives_ranked_cards_the_written_note_or_the_templated_one():
     it = Interest(topic="memecoins", depth="deep", sentiment="curious", mentions=1, concepts=["memecoins"], keywords=["memecoins"])
-    mk = lambda: [render_card(_film(), it, {"receipts": [{"kind": "you_said", "text": "I keep seeing memecoin threads"}]})]
+    mk = lambda cleared=True: [render_card(_film(), it, {"receipts": [{"kind": "you_said", "text": "I keep seeing memecoin threads"}],
+                                                          "cleared_floor": cleared})]
     calls = []
     def writer(entries):
         calls.append(entries); return [("One night, one crash, and the thread you keep seeing.", "One night, one crash.")]
@@ -71,6 +72,9 @@ def test_note_cards_gives_ranked_cards_the_written_note_or_the_templated_one():
     fallback = contract.note_cards(mk(), [_film()], [it], writer=lambda es: [None])[0]
     assert "written_by" not in fallback and fallback["note"].startswith("You said “I keep seeing memecoin threads”")
     assert fallback["note"] != fallback["reasoning"] and fallback["spoken_note"]
+    plain = contract.note_cards(mk(cleared=False), [_film()], [it], writer=lambda es: [None])[0]
+    assert plain["note"].startswith("A banker watches a crash") and "You said" not in plain["note"]   # no certified fit: no claim
+    assert contract.note_cards(mk(), [_film()], [it], writer=lambda es: [None])[0]["note"].startswith("You said")
     assert contract.note_cards([], [_film()], [it], writer=lambda es: 1 / 0) == []      # nothing to write: no call at all
 
 
@@ -105,3 +109,29 @@ def test_templated_note_leads_with_the_person_when_only_their_sentence_is_known(
 def test_the_brief_asks_for_why_you_would_love_it_and_forbids_explaining_the_choice():
     s = notewriter._SYSTEM
     assert "make this ONE person want to press play" in s and "Never explain how you chose it" in s
+
+
+def test_cleared_floor_needs_the_full_floor_not_just_a_pass(tmp_path, monkeypatch):
+    import json
+    from knots import fitmodel
+    f = tmp_path / "w.json"
+    f.write_text(json.dumps({"weights": fitmodel.DEFAULT_WEIGHTS, "floor": {"sim": 0.5, "score": 0.0, "embedder": "cohere"}}))
+    monkeypatch.setattr(fitmodel, "WEIGHTS_FILE", f); fitmodel.reload()
+    sc = lambda sims, scores, emb="cohere", q=True: fitmodel.Scored(items=[None] * len(sims), features=[{}] * len(sims), scores=scores,
+                                                                  sims=sims, vecs=[[]] * len(sims), embedder=emb, query_used=q)
+    assert fitmodel.cleared_floor(sc([0.9], [1.0]), 0) is True
+    assert fitmodel.cleared_floor(sc([0.2], [1.0]), 0) is False                       # below the similarity floor
+    other = sc([0.1], [1.0], emb="hashed")
+    assert fitmodel.passes_floor(other, 0) is True and fitmodel.cleared_floor(other, 0) is False   # shown, but not certified
+    assert fitmodel.cleared_floor(sc([0.9], [1.0], q=False), 0) is False
+    monkeypatch.setenv("KNOTS_FLOOR", "off")
+    assert fitmodel.cleared_floor(sc([0.9], [1.0]), 0) is False
+    fitmodel.reload()
+
+
+def test_cards_record_whether_they_cleared_the_floor_and_the_presenter_keeps_it_internal():
+    assert "cleared_floor" not in presenter.PUBLIC_CARD_KEYS and "cleared_floor" not in presenter.PUBLIC_RANKED_KEYS
+    it = Interest(topic="memecoins", depth="deep", sentiment="curious", mentions=1, concepts=["memecoins"], keywords=["memecoins"])
+    card = render_card(_film(), it, {"cleared_floor": True, "receipts": [{"kind": "tags", "text": "x"}]})
+    assert "cleared_floor" not in presenter.public_cards({"cards": [card]})["cards"][0]
+    assert presenter.public_cards({"cards": [card]}, explain=True)["cards"][0]["cleared_floor"] is True

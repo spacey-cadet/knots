@@ -63,7 +63,8 @@ def _card_context(card: dict, by_url: dict, themes: list[dict]) -> dict:
     """What the note for one card is built from: its catalog item, the theme on its topic, and what the person said."""
     theme = next((t for t in themes if t["topic"] == card.get("matched_topic")), None)
     said = next((r.get("text", "") for r in card.get("receipts") or [] if r.get("kind") == "you_said"), "")
-    return {"item": by_url.get(card["url"]), "theme": theme, "concept": card.get("concept", ""), "said": said}
+    return {"item": by_url.get(card["url"]), "theme": theme, "concept": card.get("concept", ""), "said": said,
+            "personal": bool(card.get("cleared_floor"))}     # only a pick that cleared the full floor may claim it fits
 
 
 def note_cards(cards: list[dict], items: list[ContentItem], interests: list, writer=None) -> list[dict]:
@@ -77,7 +78,7 @@ def note_cards(cards: list[dict], items: list[ContentItem], interests: list, wri
     ctx = [_card_context(c, by_url, themes) for c in cards]
     for c, x in zip(cards, ctx):
         it = x["item"]
-        c["note"] = build_note(it, x["theme"], None, x["said"]) if it else c.get("reasoning", "")
+        c["note"] = build_note(it, x["theme"], None, x["said"], x["personal"]) if it else c.get("reasoning", "")
         c["spoken_note"] = build_note(it, None) if it else ""
     known = [k for k, x in enumerate(ctx) if x["item"] is not None]
     for k, w in zip(known, (writer or notewriter.write_batch)([ctx[k] for k in known])):
@@ -107,7 +108,7 @@ def build_response(plan: dict, items: list[ContentItem], interests: list, mode: 
         picks.append({
             "title": c["title"], "type": c["type"], "year": c.get("year", ""), "url": c["url"],
             "matched_topic": c.get("matched_topic", ""),
-            "note": build_note(it, theme, rephrase, said) if it else c.get("reasoning", ""),
+            "note": build_note(it, theme, rephrase, said, x["personal"]) if it else c.get("reasoning", ""),
             "spoken_note": build_note(it, None, rephrase) if it else "",   # no quote: the theme is said once, up front
             "why": c.get("reasoning", ""),
             "facts": facts(it) if it else [],

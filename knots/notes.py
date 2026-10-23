@@ -62,17 +62,21 @@ def popularity_phrase(item: ContentItem) -> str:
 
 
 def build_note(item: ContentItem, theme: dict | None = None, rephrase: Callable[[str], str] | None = None,
-               said: str = "") -> str:
+               said: str = "", personal: bool = True) -> str:
     """The faithful fallback note (used when no model-written note is available or one is rejected).
 
     Order matters: lead with the link to THIS person (their own words and the idea underneath), then what the
-    thing is, then how well regarded it is. Everything comes from catalog fields and the person's own quote."""
+    thing is, then how well regarded it is. Everything comes from catalog fields and the person's own quote.
+
+    The lead says the pick fits them ("this goes straight at it"), so it is only written when `personal` is true:
+    the caller passes that only for a pick that cleared the full quality floor (fitmodel.cleared_floor). Otherwise the
+    note is the plain description and standing, which claims nothing about the person."""
     parts = []
     said = (said or "").removesuffix(" ...").strip()
     quote = (theme or {}).get("evidence") or said
-    if theme and theme.get("evidence"):
+    if personal and theme and theme.get("evidence"):
         parts.append(f"You touched on “{theme['evidence']}”, and this speaks to {theme['theme']}.")
-    elif said:
+    elif personal and said:
         parts.append(f"You said “{said}”, and this goes straight at it.")
     parts.append(first_sentence(item.abstract or item.blurb))
     pop = popularity_phrase(item)
