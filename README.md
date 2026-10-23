@@ -179,6 +179,21 @@ set `BEDROCK_MODEL_ID` (a model or inference-profile ID that supports Converse
 with tool use) and `AWS_REGION`, and provide credentials through the standard
 AWS chain. The role needs `bedrock:InvokeModel`. Never commit keys.
 
+## Knots Explorer
+
+A Swagger-style page for the MCP tools at `https://<your-host>/explore`. Pick a tool, fill in the input (or start
+from a sample conversation), press **Run tool**, and see the answer as cards, raw JSON, and the exact MCP request
+(with a `curl` you can paste). The Good pick / Missed buttons call `rate_pick`, so the learning loop is visible too.
+
+- **Off by default.** Set `KNOTS_EXPLORER=on`. Optionally `KNOTS_EXPLORER_PASSCODE`; the page asks for it.
+- **Same server, same tools.** Calls go through the MCP server's own tool registry, so what you see is what Alexa+ gets.
+- **No MCP token in the browser.** Each visitor is a random id in a signed, HttpOnly, SameSite=Strict cookie, turned
+  into an opaque per-visitor user: memory and ratings work and no visitor can read another's. A `user_id` argument is
+  always dropped. Without `KNOTS_USER_SALT` the page works but remembers nobody.
+- **Quota guards.** Each visitor is limited to `KNOTS_EXPLORER_RATE` runs a minute on top of the global limit, and the
+  YouTube toggle starts off (YouTube allows about 100 searches a day for the whole server).
+- The page is one self-contained file, `knots/explorer_ui/index.html`, with its two fonts embedded (see `FONTS.md`).
+
 ## Quality floor and written notes
 
 - **Floor.** `eval/train_rank.py --write` also picks a similarity floor: the most lenient one whose surviving
