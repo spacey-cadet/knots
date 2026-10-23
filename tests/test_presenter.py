@@ -48,12 +48,37 @@ def test_explain_returns_the_full_cards_and_the_input_is_never_mutated():
     assert plan["picks"]["watch"][0]["receipts"] and "why" in plan["response"]["picks"][0]
 
 
-def test_ranked_cards_keep_their_one_line_reason_but_lose_the_ledger():
+def test_ranked_cards_show_the_note_not_the_ledger_or_the_templated_reason():
     it = Interest(topic="memecoins", depth="deep", sentiment="curious", mentions=1, concepts=["memecoins"], keywords=["memecoins"])
-    res = {"extractor": "bedrock", "interests": [], "cards": [render_card(_film(), it, {"receipts": [{"kind": "tags", "text": "x"}], "fit_score": 1.0})]}
-    card = presenter.public_cards(res)["cards"][0]
-    assert "reasoning" in card and not (INTERNAL - {"reasoning"}) & set(card)
-    assert "receipts" in presenter.public_cards(res, explain=True)["cards"][0]
+    card = render_card(_film(), it, {"receipts": [{"kind": "tags", "text": "x"}], "fit_score": 1.0})
+    card["note"], card["spoken_note"] = "A night it all unravels.", "A night."
+    res = {"extractor": "bedrock", "interests": [], "cards": [card]}
+    shown = presenter.public_cards(res)["cards"][0]
+    assert shown["note"] == "A night it all unravels." and not INTERNAL & set(shown)       # reasoning is in INTERNAL
+    full = presenter.public_cards(res, explain=True)["cards"][0]
+    assert "receipts" in full and "reasoning" in full
+
+
+def test_note_cards_gives_ranked_cards_the_written_note_or_the_templated_one():
+    it = Interest(topic="memecoins", depth="deep", sentiment="curious", mentions=1, concepts=["memecoins"], keywords=["memecoins"])
+    mk = lambda: [render_card(_film(), it, {"receipts": [{"kind": "you_said", "text": "I keep seeing memecoin threads"}]})]
+    calls = []
+    def writer(entries):
+        calls.append(entries); return [("One night, one crash, and the thread you keep seeing.", "One night, one crash.")]
+    cards = contract.note_cards(mk(), [_film()], [it], writer=writer)
+    assert cards[0]["note"].startswith("One night") and cards[0]["written_by"] == "model" and len(calls) == 1
+    assert calls[0][0]["said"] == "I keep seeing memecoin threads"                   # the person's own sentence goes to the writer
+    fallback = contract.note_cards(mk(), [_film()], [it], writer=lambda es: [None])[0]
+    assert "written_by" not in fallback and fallback["note"].startswith("You said “I keep seeing memecoin threads”")
+    assert fallback["note"] != fallback["reasoning"] and fallback["spoken_note"]
+    assert contract.note_cards([], [_film()], [it], writer=lambda es: 1 / 0) == []      # nothing to write: no call at all
+
+
+def test_a_card_whose_item_is_unknown_keeps_its_templated_reason_as_the_note():
+    it = Interest(topic="memecoins", depth="deep", sentiment="curious", mentions=1, concepts=["memecoins"], keywords=["memecoins"])
+    card = render_card(_film(), it, {})
+    out = contract.note_cards([card], [], [it], writer=lambda es: [])[0]
+    assert out["note"] == card["reasoning"] and out["spoken_note"] == ""
 
 
 def test_an_unknown_new_card_field_stays_internal_by_default():

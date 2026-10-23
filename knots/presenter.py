@@ -23,8 +23,9 @@ PUBLIC_CARD_KEYS = (
     "title", "type", "kind", "year", "url", "matched_topic", "concept",
     "note", "spoken_note", "confidence", "gem", "blockbuster", "challenge", "status",
 )
-# `get_recommendations` has no written note, so its templated one-line reason travels with the card.
-PUBLIC_RANKED_KEYS = PUBLIC_CARD_KEYS + ("reasoning",)
+# `get_recommendations` cards carry the same written note as a `knots_partner` pick (contract.note_cards), so they
+# show the same fields. The templated one-line `reasoning` is part of the ledger now: only with explain=True.
+PUBLIC_RANKED_KEYS = PUBLIC_CARD_KEYS
 # A pick in the response contract: drop `why` (the templated reasoning); keep the note and the sourced facts.
 PUBLIC_RESPONSE_PICK_DROP = ("why",)
 

@@ -146,3 +146,13 @@ def test_the_page_reads_a_pairs_bridge_and_only_shows_how_it_chose_when_explaini
         page = c.get("/explore").text
         assert "p.bridge" in page and "p.why" not in page and "Matched on" not in page
         assert "Evidence behind this pick" in page
+
+
+def test_get_recommendations_cards_carry_a_note_and_hide_the_reasoning_until_asked():
+    with client() as c:
+        c.get("/explore")
+        out = call(c, "get_recommendations", {"session_texts": [SAID], "limit": 2}).json()["result"]
+        card = out["cards"][0]
+        assert card["note"] and "reasoning" not in card and "receipts" not in card
+        full = call(c, "get_recommendations", {"session_texts": [SAID], "limit": 2, "explain": True}).json()["result"]["cards"][0]
+        assert full["note"] and full["reasoning"] and "receipts" in full

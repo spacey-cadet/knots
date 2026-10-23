@@ -165,7 +165,7 @@ session text ──► understanding ──► retrieval ──► quality gate 
 | --- | --- |
 | `knots_partner(session_texts, include_videos=True, challenge_me=False, explain=False)` | "What are we doing today?" Threads, what's underneath (with confidence), grouped picks each with a note on why you'd love it (the evidence ledger only with `explain=true`), watch-and-learn pairs, spoken line, follow-up question, and a `session_id` |
 | `rate_pick(session_id, url, good)` | The person said a pick was good or not. Only for a signed-in person and only for a pick shown to them in that session; this is the feedback retraining learns from |
-| `get_recommendations(session_texts, limit=6, challenge_me=False, explain=False)` | Full pipeline as ranked cards (evidence ledger only with `explain=true`) |
+| `get_recommendations(session_texts, limit=6, challenge_me=False, explain=False)` | Full pipeline as ranked cards, each with a note on why you'd love it (the evidence ledger and templated reasoning only with `explain=true`) |
 | `extract_interests(session_texts)` | Topics, concepts, unstated themes, keywords, and which extractor ran |
 | `search_content(topics)` | Catalog lookup for plain topic strings |
 | `what_do_you_remember()` / `forget_me()` | What is held about the signed-in person, and deleting it (memory and logged feedback) |

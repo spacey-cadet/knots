@@ -522,7 +522,7 @@ function renderCards(name, r) {
     if (r.memory) put(box, h("h3", {class: "sect", text: "Memory"}), h("dl", {class: "kv"}, h("dt", {text: "Recalled"}), h("dd", {text: `${r.memory.recalled} earlier ${r.memory.recalled === 1 ? "topic" : "topics"}`}), h("dt", {text: "Stored now"}), h("dd", {text: `${r.memory.stored_new} new ${r.memory.stored_new === 1 ? "conversation" : "conversations"}`})));
   } else if (name === "get_recommendations") {
     put(box, h("p", {text: `Extractor: ${r.extractor}. ${r.cards.length} ranked ${r.cards.length === 1 ? "card" : "cards"}.`}));
-    r.cards.forEach(c => put(box, pickCard({title: c.title, type: c.type, year: c.year, url: c.url, note: c.reasoning, matched_topic: c.matched_topic,
+    r.cards.forEach(c => put(box, pickCard({title: c.title, type: c.type, year: c.year, url: c.url, note: c.note || c.reasoning, spoken_note: c.spoken_note, matched_topic: c.matched_topic,
       confidence: c.confidence != null ? Math.round(c.confidence * 100) + "% likely good" : "", facts: []}, null, c.receipts || c.fit_score != null ? c : null)));
     if (!r.cards.length) put(box, h("div", {class: "empty"}, h("b", {text: "No cards"}), "Nothing cleared the quality bar for this input."));
   } else if (name === "extract_interests") {

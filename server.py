@@ -110,7 +110,7 @@ async def get_recommendations(session_texts: list[str] | None = None, limit: int
     """
     Full pipeline: extract interests from session text, match them against
     the content catalogs, rank, and return ready-to-render cards, each with a
-    one-line reason. Accepts one conversation (`session_texts`) or several
+    `note`: a short line on why this person would love it. Accepts one conversation (`session_texts`) or several
     (`conversations`), as in extract_interests.
 
     The evidence behind each card (the person's own sentence, matched tags, fit features) is internal and
