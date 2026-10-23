@@ -54,14 +54,19 @@ votes).
   rated ...").
 - Every number above is a constant in `quality.py`.
 
-## Trust: receipts, confidence, and saying nothing
+## Trust: an internal ledger, a persuasive note, confidence, and saying nothing
 
-- **Receipts** (`receipts.py`): every card lists its evidence: a sentence you said
+- **The note is what the person reads.** Each pick carries a short note on why *they* would love it, tied to their
+  own words (`notewriter.py`, with a faithful templated fallback in `notes.py`). Every number, name and quotation in
+  it must trace to catalog data or the person's own words, or it is discarded.
+- **Receipts are an internal ledger, not something shown by default** (`receipts.py`): behind every card sits its evidence: a sentence you said
   that shares terms with the interest (quoted, never paraphrased), the catalog tags
   that matched, the first sentences of the item's own overview or abstract, and for
   papers whether it is a **preprint, not peer reviewed** or has a journal reference
   (arXiv lists one only if the authors added it), plus an OpenAlex citation count when
-  the title matches exactly. A card with no matched tags and no summary is not shown.
+  the title matches exactly. A card with no matched tags and no summary is not shown. The ledger gates cards,
+  feeds the grounding metric and checks the notes, but `knots/presenter.py` keeps it out of the response; pass
+  `explain=true` (for "why did you pick that?") to get it.
 - **Papers are ranked on more than a keyword**: citations (omitted, never guessed,
   when unknown) and survey/review status lift accessible, well-cited overviews.
 - **Confidence only when measured**: themes carry a calibrated probability
@@ -110,7 +115,8 @@ knots/                  the algorithm
   ranking.py            ranking, reserved slots (blockbuster, gem, challenge), grounded reasons
   fitmodel.py           the fit model: similarity + quality + format + authority, calibrated if fitted
   signals.py            survey flag, reading level, level ladder, paper authority
-  receipts.py           the evidence shown with every card
+  receipts.py           the internal evidence ledger behind every card (not shown unless explain=true)
+  presenter.py          what leaves the server: an allowlist of card fields, notes filled in
   pairing.py            watch-and-learn pairs
   calibration.py        "when it says 80%, is it right 80% of the time?"
   plan.py               watch / read / explore, pairs, spoken line, follow-up question
@@ -157,9 +163,9 @@ session text ──► understanding ──► retrieval ──► quality gate 
 
 | Tool | Use |
 | --- | --- |
-| `knots_partner(session_texts, include_videos=True, challenge_me=False)` | "What are we doing today?" Threads, what's underneath (with confidence), grouped picks with reasons and receipts, watch-and-learn pairs, spoken line, follow-up question, and a `session_id` |
+| `knots_partner(session_texts, include_videos=True, challenge_me=False, explain=False)` | "What are we doing today?" Threads, what's underneath (with confidence), grouped picks each with a note on why you'd love it (the evidence ledger only with `explain=true`), watch-and-learn pairs, spoken line, follow-up question, and a `session_id` |
 | `rate_pick(session_id, url, good)` | The person said a pick was good or not. Only for a signed-in person and only for a pick shown to them in that session; this is the feedback retraining learns from |
-| `get_recommendations(session_texts, limit=6, challenge_me=False)` | Full pipeline as ranked cards |
+| `get_recommendations(session_texts, limit=6, challenge_me=False, explain=False)` | Full pipeline as ranked cards, each with a note on why you'd love it (the evidence ledger and templated reasoning only with `explain=true`) |
 | `extract_interests(session_texts)` | Topics, concepts, unstated themes, keywords, and which extractor ran |
 | `search_content(topics)` | Catalog lookup for plain topic strings |
 | `what_do_you_remember()` / `forget_me()` | What is held about the signed-in person, and deleting it (memory and logged feedback) |
@@ -178,6 +184,21 @@ To enable Bedrock: in the AWS console request access to a model in your region,
 set `BEDROCK_MODEL_ID` (a model or inference-profile ID that supports Converse
 with tool use) and `AWS_REGION`, and provide credentials through the standard
 AWS chain. The role needs `bedrock:InvokeModel`. Never commit keys.
+
+## Knots Explorer
+
+A Swagger-style page for the MCP tools at `https://<your-host>/explore`. Pick a tool, fill in the input (or start
+from a sample conversation), press **Run tool**, and see the answer as cards, raw JSON, and the exact MCP request
+(with a `curl` you can paste). The Good pick / Missed buttons call `rate_pick`, so the learning loop is visible too.
+
+- **Off by default.** Set `KNOTS_EXPLORER=on`. Optionally `KNOTS_EXPLORER_PASSCODE`; the page asks for it.
+- **Same server, same tools.** Calls go through the MCP server's own tool registry, so what you see is what Alexa+ gets.
+- **No MCP token in the browser.** Each visitor is a random id in a signed, HttpOnly, SameSite=Strict cookie, turned
+  into an opaque per-visitor user: memory and ratings work and no visitor can read another's. A `user_id` argument is
+  always dropped. Without `KNOTS_USER_SALT` the page works but remembers nobody.
+- **Quota guards.** Each visitor is limited to `KNOTS_EXPLORER_RATE` runs a minute on top of the global limit, and the
+  YouTube toggle starts off (YouTube allows about 100 searches a day for the whole server).
+- The page is one self-contained file, `knots/explorer_ui/index.html`, with its two fonts embedded (see `FONTS.md`).
 
 ## Quality floor and written notes
 

@@ -34,6 +34,7 @@ import asyncio
 from dataclasses import dataclass, field
 
 from .catalogs import ContentItem, search_content
+from .contract import note_cards
 from .context import (Conversation, extract_history, profile_summary, recall_and_extract)
 from .extraction import Interest
 from .memory import get_store
@@ -75,8 +76,9 @@ class Run:
         if not self.interests:
             return {"extractor": self.extractor, "interests": [], "cards": [],
                     "note": "No topics detected in the conversation text."}
+        cards = rank_and_render(self.items, self.interests, limit=limit, query=self.query)
         out = {"extractor": self.extractor, "interests": [i.to_dict() for i in self.interests],
-               "cards": rank_and_render(self.items, self.interests, limit=limit, query=self.query)}
+               "cards": note_cards(cards, self.items, self.interests)}   # each card carries the written note
         if self.memory is not None:
             out["memory"] = self.memory
         return out
@@ -130,7 +132,8 @@ async def recommend(session_texts: list[str] | None = None,
                     user_id: str | None = None,
                     limit: int = 6,
                     challenge: bool | None = None) -> dict:
-    return (await run(session_texts, conversations, user_id, challenge=challenge)).cards(limit)
+    r = await run(session_texts, conversations, user_id, challenge=challenge)
+    return await asyncio.to_thread(r.cards, limit)      # ranking embeds and the note writer calls a model
 
 
 async def extract(session_texts: list[str] | None = None,

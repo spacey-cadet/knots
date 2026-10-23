@@ -21,6 +21,7 @@ from __future__ import annotations
 
 from . import fitmodel, notewriter
 from .catalogs import ContentItem
+from .brain.themes import ranked as ranked_themes
 from .notes import build_note, facts
 from .ranking import KIND, render_card
 
@@ -58,6 +59,36 @@ def _relaxed(items: list[ContentItem], interests: list, n: int) -> list[dict]:
     return out
 
 
+def _card_context(card: dict, by_url: dict, themes: list[dict]) -> dict:
+    """What the note for one card is built from: its catalog item, the theme on its topic, and what the person said."""
+    theme = next((t for t in themes if t["topic"] == card.get("matched_topic")), None)
+    said = next((r.get("text", "") for r in card.get("receipts") or [] if r.get("kind") == "you_said"), "")
+    return {"item": by_url.get(card["url"]), "theme": theme, "concept": card.get("concept", ""), "said": said,
+            "personal": bool(card.get("cleared_floor"))}     # only a pick that cleared the full floor may claim it fits
+
+
+def note_cards(cards: list[dict], items: list[ContentItem], interests: list, writer=None) -> list[dict]:
+    """Give ranked cards (`get_recommendations`) the same note a `knots_partner` pick gets: a model-written one that
+    passed the faithfulness checks, else the templated one that leads with the person. Adds `note`, `spoken_note`
+    (and `written_by` when a model wrote it). Changes the cards in place and returns them. One model call in all."""
+    if not cards:
+        return cards
+    by_url = {it.source_url: it for it in items}
+    themes = ranked_themes(interests, 5)
+    ctx = [_card_context(c, by_url, themes) for c in cards]
+    for c, x in zip(cards, ctx):
+        it = x["item"]
+        c["note"] = build_note(it, x["theme"], None, x["said"], x["personal"]) if it else c.get("reasoning", "")
+        c["spoken_note"] = build_note(it, None) if it else ""
+    known = [k for k, x in enumerate(ctx) if x["item"] is not None]
+    for k, w in zip(known, (writer or notewriter.write_batch)([ctx[k] for k in known])):
+        if w:
+            cards[k]["note"] = w[0]
+            cards[k]["spoken_note"] = w[1] or cards[k]["spoken_note"]
+            cards[k]["written_by"] = "model"
+    return cards
+
+
 def build_response(plan: dict, items: list[ContentItem], interests: list, mode: dict | None = None,
                    rephrase=None, writer=None) -> dict:
     by_url = {it.source_url: it for it in items}
@@ -71,12 +102,13 @@ def build_response(plan: dict, items: list[ContentItem], interests: list, mode: 
     picks, ctx = [], []
     for c in cards:
         it = by_url.get(c["url"])
-        theme = next((t for t in plan.get("themes", []) if t["topic"] == c.get("matched_topic")), None)
-        ctx.append({"item": it, "theme": theme, "concept": c.get("concept", "")})
+        x = _card_context(c, by_url, plan.get("themes", []))
+        theme, said = x["theme"], x["said"]
+        ctx.append(x)
         picks.append({
             "title": c["title"], "type": c["type"], "year": c.get("year", ""), "url": c["url"],
             "matched_topic": c.get("matched_topic", ""),
-            "note": build_note(it, theme, rephrase) if it else c.get("reasoning", ""),
+            "note": build_note(it, theme, rephrase, said, x["personal"]) if it else c.get("reasoning", ""),
             "spoken_note": build_note(it, None, rephrase) if it else "",   # no quote: the theme is said once, up front
             "why": c.get("reasoning", ""),
             "facts": facts(it) if it else [],

@@ -18,6 +18,7 @@ Tools (Streamable HTTP, MCP spec 2025-11-25+):
 Other routes (outside the MCP bearer-token check, each protected its own way):
   GET  /health   liveness for the load balancer and Docker
   POST /alexa    Alexa custom skill requests (Amazon's signature is verified; see knots/alexa_skill.py)
+  GET  /explore  a Swagger-style page for these tools (off unless KNOTS_EXPLORER=on; see knots/explorer.py)
 
 Identity. A `user_id` argument is NOT trusted: who is calling comes from a verified bearer token (set
 KNOTS_JWKS_URL or KNOTS_JWT_SECRET, see knots/identity.py) and is turned into an opaque salted id. With no auth
@@ -45,7 +46,7 @@ from starlette.responses import JSONResponse
 
 load_dotenv()  # before the import below reads any env-driven config
 
-from knots import Conversation, engine, feedback, identity  # noqa: E402
+from knots import Conversation, engine, feedback, identity, presenter  # noqa: E402
 from knots.ratelimit import RateLimiter  # noqa: E402
 
 limiter = RateLimiter()
@@ -104,21 +105,27 @@ async def search_content(topics: list[str]) -> list[dict]:
 async def get_recommendations(session_texts: list[str] | None = None, limit: int = 6,
                               conversations: list[ConversationIn] | None = None,
                               user_id: str | None = None,
-                              challenge_me: bool = False) -> dict:
+                              challenge_me: bool = False,
+                              explain: bool = False) -> dict:
     """
     Full pipeline: extract interests from session text, match them against
-    the content catalogs, rank, and return ready-to-render cards, each with the
-    reason it was chosen. Accepts one conversation (`session_texts`) or several
+    the content catalogs, rank, and return ready-to-render cards, each with a
+    `note`: a short line on why this person would love it. Accepts one conversation (`session_texts`) or several
     (`conversations`), as in extract_interests.
+
+    The evidence behind each card (the person's own sentence, matched tags, fit features) is internal and
+    is left out. Set `explain` only when the person asks why something was picked.
     """
-    return await engine.recommend(session_texts, _convs(conversations), _caller(user_id), limit,
-                                  challenge=challenge_me or None)
+    out = await engine.recommend(session_texts, _convs(conversations), _caller(user_id), limit,
+                                 challenge=challenge_me or None)
+    return presenter.public_cards(out, explain)
 
 
 async def knots_partner(session_texts: list[str] | None = None, include_videos: bool = True,
                            conversations: list[ConversationIn] | None = None,
                            user_id: str | None = None,
-                           challenge_me: bool = False) -> dict:
+                           challenge_me: bool = False,
+                           explain: bool = False) -> dict:
     """
     Call this when the person asks things like "what are we doing today?",
     "what should I explore?", "what should I watch or read?", or opens a
@@ -137,16 +144,20 @@ async def knots_partner(session_texts: list[str] | None = None, include_videos: 
     The result carries a `session_id`. If the person then says whether a pick was
     good or not, call `rate_pick` with that `session_id` and the pick's `url`.
 
-    Also returns `pairs`: watch-and-learn double features (a film or series plus the explainer or
-    paper on the same idea), each card with its receipts. Set `challenge_me` to reserve one pick
-    that complicates the person's own view.
+    Each pick has a `note`: a short line on why this person would love it. Say that, not a list of
+    facts. Also returns `pairs`: watch-and-learn double features (a film or series plus the explainer or
+    paper on the same idea). Set `challenge_me` to reserve one pick that complicates the person's own view.
+
+    The evidence behind each pick (the person's own sentence, matched tags, fit features) is kept
+    internal and is not returned. Only if the person asks why a pick was chosen, call again with
+    `explain` set to true to get it.
     """
     user = _caller(user_id)
     plan = await engine.plan(session_texts, _convs(conversations), user, include_videos,
                              challenge=challenge_me or None)
     plan["session_id"] = feedback.new_session_id()
-    await asyncio.to_thread(feedback.record_impression, plan, user, plan["session_id"])
-    return plan
+    await asyncio.to_thread(feedback.record_impression, plan, user, plan["session_id"])   # logs the full plan
+    return presenter.public_plan(plan, explain)
 
 
 async def rate_pick(session_id: str, url: str, good: bool) -> dict:
@@ -235,6 +246,8 @@ def create_mcp() -> FastMCP:
         server.tool()(fn)
     server.custom_route("/health", methods=["GET"])(health)
     server.custom_route("/alexa", methods=["POST"])(alexa_route)
+    from knots import explorer
+    explorer.register(server, limiter)        # inert (404) unless KNOTS_EXPLORER=on
     return server
 
 

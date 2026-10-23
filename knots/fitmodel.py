@@ -103,6 +103,17 @@ def passes_floor(sc: "Scored", k: int) -> bool:
     return True
 
 
+def cleared_floor(sc: "Scored", k: int) -> bool:
+    """True only when a floor is in force AND candidate k passed its FULL test, similarity half included.
+
+    passes_floor lets a candidate through when the floor cannot be fully applied (another embedder scored it); this
+    does not. It is what licenses a note to say "this goes straight at it": a fit claim needs a certified fit."""
+    f = floor()
+    if f is None or not floor_active() or not sc.query_used:
+        return False
+    return sc.scores[k] >= f["score"] and sc.sims[k] >= f["sim"] and (sc.embedder == f["embedder"] or not f["embedder"])
+
+
 def candidate_text(item) -> str:
     return " ".join(p for p in (item.title, item.abstract or item.blurb, " ".join(item.matched_keywords)) if p)
 

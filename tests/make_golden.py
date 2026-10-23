@@ -12,13 +12,22 @@ SAID = "I keep seeing memecoin threads on my Reddit feed, is this all just a bub
 
 
 def build():
-    saved = (TH.judge.assess, {k: os.environ.get(k) for k in ("EMBEDDER", "KNOTS_OFFLINE")})
+    import tempfile
+    from knots import fitmodel
+    saved = (TH.judge.assess, {k: os.environ.get(k) for k in ("EMBEDDER", "KNOTS_OFFLINE")}, fitmodel.WEIGHTS_FILE)
     os.environ["EMBEDDER"], os.environ["KNOTS_OFFLINE"] = "hashed", "1"
     TH.judge.assess = lambda t, ths: (list(ths), [], {})
+    # The production path: a quality floor is in force and this pick clears it (a permissive floor on the offline embedder).
+    floor = Path(tempfile.mkdtemp()) / "w.json"
+    floor.write_text(json.dumps({"weights": fitmodel.DEFAULT_WEIGHTS, "floor": {"sim": -1.0, "score": -99.0, "embedder": "hashed"}}))
+    fitmodel.WEIGHTS_FILE = floor
+    fitmodel.reload()
     try:
         return _build()
     finally:                                   # leave no trace for other tests
         TH.judge.assess = saved[0]
+        fitmodel.WEIGHTS_FILE = saved[2]
+        fitmodel.reload()
         for k, v in saved[1].items():
             os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
 

@@ -79,6 +79,7 @@ def card_extras(sc: "fitmodel.Scored", k: int, item: ContentItem, interest: Inte
         "sim": round(sc.sims[k], 4) if sc.query_used else None,
         "fit_features": {f: round(v, 3) for f, v in sc.features[k].items()},
         "fit_score": round(sc.scores[k], 3),
+        "cleared_floor": fitmodel.cleared_floor(sc, k),   # internal: may the note claim this fits the person?
         "confidence": sc.confidence(k),          # None = no calibration fitted, so no number is shown
         "receipts": receipts.build(item, interest, query),
         "level": signals.level_of(item),
