@@ -108,22 +108,26 @@ async def run(session_texts: list[str] | None = None,
               user_id: str | None = None,
               include_videos: bool | None = None,
               search: bool = True,
-              challenge: bool | None = None) -> Run:
+              challenge: bool | None = None,
+              request: str | None = None) -> Run:
     """The whole pipeline. `include_videos=None` defers to the INCLUDE_VIDEOS env flag.
     `search=False` stops after understanding (no catalog calls)."""
-    interests, used, memory = await _understand(session_texts, conversations, user_id)
+    # With no conversation context, a direct request can still provide a topic to recommend around.
+    understanding_texts = session_texts or ([request] if request and request.strip() else None)
+    interests, used, memory = await _understand(understanding_texts, conversations, user_id)
     items = (await search_content(interests, include_videos=include_videos, challenge=challenge)
              if (interests and search) else [])
     return Run(interests=interests, extractor=used, items=items, memory=memory,
-               query=query_text(session_texts, conversations))
+               query="\n".join(x for x in (query_text(session_texts, conversations), (request or "").strip()) if x))
 
 
 async def plan(session_texts: list[str] | None = None,
                conversations: list[Conversation] | None = None,
                user_id: str | None = None,
                include_videos: bool = True,
-               challenge: bool | None = None) -> dict:
-    r = await run(session_texts, conversations, user_id, include_videos, challenge=challenge)
+               challenge: bool | None = None,
+               request: str | None = None) -> dict:
+    r = await run(session_texts, conversations, user_id, include_videos, challenge=challenge, request=request)
     return await asyncio.to_thread(r.plan)      # ranking embeds and the note writer calls a model: off the event loop
 
 
@@ -131,8 +135,9 @@ async def recommend(session_texts: list[str] | None = None,
                     conversations: list[Conversation] | None = None,
                     user_id: str | None = None,
                     limit: int = 6,
-                    challenge: bool | None = None) -> dict:
-    r = await run(session_texts, conversations, user_id, challenge=challenge)
+                    challenge: bool | None = None,
+                    request: str | None = None) -> dict:
+    r = await run(session_texts, conversations, user_id, challenge=challenge, request=request)
     return await asyncio.to_thread(r.cards, limit)      # ranking embeds and the note writer calls a model
 
 

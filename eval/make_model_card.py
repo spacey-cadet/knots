@@ -60,17 +60,17 @@ def embedder_line(info: dict | None) -> str:
 
 def embedder_section(brain, rank, pairs) -> list[str]:
     L = ["## Embedder", "",
-         "The fit ranker and the pair scorer compare texts as vectors, so their numbers depend on which embedding model "
-         "produced them, and so do the pair floors and similarity thresholds (set per embedder, still untuned). "
-         "Each part below says what it was measured with.", "",
+         "The fit ranker and pair selection compare texts as vectors, so their measurements depend on which embedding "
+         "model produced them. Pair floors and similarity thresholds are set per embedder and remain untuned. "
+         "Each result below says what it was measured with.", "",
          "- Theme judge: none. It scores theme phrases with character n-gram TF-IDF and a feature critic; "
          "no embedding model is involved, so its numbers do not depend on the embedder.",
          f"- Fit ranker: {embedder_line((rank or {}).get('embedder'))}",
-         f"- Pair scorer: {embedder_line((pairs or {}).get('embedder'))}", ""]
-    infos = [(n, (m or {}).get("embedder")) for n, m in (("fit ranker", rank), ("pair scorer", pairs))]
+         f"- Pair evaluation: {embedder_line((pairs or {}).get('embedder'))}", ""]
+    infos = [(n, (m or {}).get("embedder")) for n, m in (("fit ranker", rank), ("pair evaluation", pairs))]
     infos = [(n, i) for n, i in infos if i and i.get("recorded")]
     if len({i["provider"] for _, i in infos}) > 1:
-        L += ["**Warning:** the ranker and the pair scorer were measured with different embedders.", ""]
+        L += ["**Warning:** the ranker and pair evaluation used different embedders.", ""]
     for n, i in infos:
         if i.get("fell_back_runs"):
             L += [f"**Warning:** {i['fell_back_runs']} eval run(s) behind the {n} fell back to the hashed embedder "
@@ -172,9 +172,9 @@ def main() -> int:
          "Numbers below are copied from those files, not written by hand.", "",
          "## What it is", "",
          "Knots reads what someone has been researching and recommends things to watch (films, series, "
-         "documentaries), explainers (YouTube) and research (arXiv), including watch-and-learn pairs. "
-         "Three small learned parts sit on top of retrieval from TMDB, YouTube and arXiv: a **theme judge** "
-         "(which unstated themes to trust), a **fit ranker** (what fits this session), and a **pair scorer**.", "",
+         "documentaries), explainers (YouTube) and research (arXiv), including watch-and-learn pairs. The "
+         "**theme judge** is learned from labelled themes. The **fit ranker** can be trained from labelled picks "
+         "but currently uses hand-set prior weights. Pair selection is a deterministic formula, not a trained model.", "",
          ] + embedder_section(brain, rank, pairs) + [
          "## How the labels were made", "",
          "One person labelled every row (see `eval/`). Sessions marked `holdout` in `eval/sessions.json` are "
@@ -221,7 +221,9 @@ def main() -> int:
             L.append(f"- {k}: " + (f"{v['pairs']} labelled pairs, success {v['success_rate']:.0%} {v['success_ci90']}, "
                                    f"pair_score AUC {v['score_auc']}" if v else "none labelled"))
     else:
-        L.append("Not yet measured: no pair has been labelled. The pair score and its thresholds are untuned design choices.")
+        L.append("Not yet measured: no pair has been labelled. Pair generation uses a fixed formula over component fit, "
+                 "text similarity and a medium-level rule; its thresholds and level ladder are untuned design choices. "
+                 "There is no separate trained pair model.")
     L += ["", "## Limits", "",
           "- Few sessions, one labeller, one extraction model: results will not transfer unchanged to other people.",
           "- Confidence numbers appear only where a calibration was fitted on held-out data.",

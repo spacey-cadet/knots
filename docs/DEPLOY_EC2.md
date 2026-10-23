@@ -104,9 +104,16 @@ Every MCP call needs `Authorization: Bearer <token>`; the person is the token's 
   `python scripts/mint_token.py --sub you --days 7`. The token is a password.
 - **For real listeners:** use an identity provider and set `KNOTS_JWKS_URL` to its keys. Tokens must carry your
   `KNOTS_JWT_AUDIENCE` and be unexpired.
-- **Alexa+:** how Alexa+ hands a signed-in person to an MCP server is not documented, and I have not verified how to
-  register an MCP server with it. The endpoint is standard Streamable HTTP with bearer auth. Without a token the
-  tools still answer but stay stateless (nothing remembered, no feedback).
+- **Alexa+ MCP add-on:** the current path uses Amazon's Alexa AI CLI to register a remote MCP server URL, deploy
+  the add-on to development, test it in the web simulator/device, then submit it for certification. Knots' MCP
+  endpoint is Streamable HTTP at `https://<DOMAIN>/mcp`. However, the Inspector capture supplied for this project
+  shows OAuth authorization-server discovery returning 404, so authenticated Alexa+ onboarding/account linking
+  is not ready on the current deployment. This app validates bearer JWTs but does not provide the OAuth
+  authorization/token service; set that up and verify the OAuth metadata/PKCE S256 requirements before
+  configuring account linking. Amazon's current guidance is in the [MCP Toolkit quickstart](https://developer.amazon.com/docs/alexaplus/add-ons/mcp-toolkit-quickstart.html)
+  and [authentication guide](https://developer.amazon.com/docs/alexaplus/add-ons/mcp-toolkit-authentication.html).
+  Without verified per-person identity Knots can answer statelessly, but it cannot retain a profile or tie
+  feedback to that person. The legacy custom skill at `/alexa` is a separate integration.
 
 ## 7. Operate it
 

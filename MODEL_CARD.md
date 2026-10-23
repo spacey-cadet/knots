@@ -4,15 +4,15 @@ Generated 2026-10-21 from `eval/results/metrics_*.json` by `eval/make_model_card
 
 ## What it is
 
-Knots reads what someone has been researching and recommends things to watch (films, series, documentaries), explainers (YouTube) and research (arXiv), including watch-and-learn pairs. Three small learned parts sit on top of retrieval from TMDB, YouTube and arXiv: a **theme judge** (which unstated themes to trust), a **fit ranker** (what fits this session), and a **pair scorer**.
+Knots reads what someone has been researching and recommends things to watch (films, series, documentaries), explainers (YouTube) and research (arXiv), including watch-and-learn pairs. The **theme judge** is learned from labelled themes. The **fit ranker** can be trained from labelled picks but currently uses hand-set prior weights. Pair selection is a deterministic formula, not a trained model.
 
 ## Embedder
 
-The fit ranker and the pair scorer compare texts as vectors, so their numbers depend on which embedding model produced them, and so do the pair floors and similarity thresholds (set per embedder, still untuned). Each part below says what it was measured with.
+The fit ranker and pair selection compare texts as vectors, so their measurements depend on which embedding model produced them. Pair floors and similarity thresholds are set per embedder and remain untuned. Each result below says what it was measured with.
 
 - Theme judge: none. It scores theme phrases with character n-gram TF-IDF and a feature critic; no embedding model is involved, so its numbers do not depend on the embedder.
 - Fit ranker: not recorded (measured before the embedder was tracked): do not assume it was the semantic embedder; re-run `python eval/run_eval.py run` to record it
-- Pair scorer: not recorded (measured before the embedder was tracked): do not assume it was the semantic embedder; re-run `python eval/run_eval.py run` to record it
+- Pair evaluation: not recorded (measured before the embedder was tracked): do not assume it was the semantic embedder; re-run `python eval/run_eval.py run` to record it
 
 ## How the labels were made
 
@@ -144,7 +144,7 @@ Holdout sessions are not used here until they are labelled.
 
 ## Watch-and-learn pairs
 
-Not yet measured: no pair has been labelled. The pair score and its thresholds are untuned design choices.
+Not yet measured: no pair has been labelled. Pair generation uses a fixed formula over component fit, text similarity and a medium-level rule; its thresholds and level ladder are untuned design choices. There is no separate trained pair model.
 
 ## Limits
 

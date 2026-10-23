@@ -77,6 +77,7 @@ async def extract_interests(session_texts: list[str] | None = None,
                             conversations: list[ConversationIn] | None = None,
                             user_id: str | None = None) -> dict:
     """
+    Use this only when the person asks to inspect or summarize their interests; it does not search for picks.
     Extract what the person is really interested in from recent Alexa+
     conversation turns and/or Reddit activity text. For each interest returns
     the surface topic, the abstract concepts at stake, unstated themes the text
@@ -94,6 +95,8 @@ async def extract_interests(session_texts: list[str] | None = None,
 
 async def search_content(topics: list[str]) -> list[dict]:
     """
+    Use this only when topics are already known and the person asks for catalog matches; it does not infer
+    interests from conversation. For a conversational recommendation request, use `knots_partner` instead.
     Match plain topic strings against TMDB (films, series and documentaries), arXiv
     (papers) and optionally YouTube. A missing key or failed call returns nothing
     for that source (mock results only when KNOTS_OFFLINE=1).
@@ -102,41 +105,48 @@ async def search_content(topics: list[str]) -> list[dict]:
     return await engine.search(topics)
 
 
-async def get_recommendations(session_texts: list[str] | None = None, limit: int = 6,
+async def get_recommendations(session_texts: list[str] | None = None, request: str | None = None, limit: int = 6,
                               conversations: list[ConversationIn] | None = None,
                               user_id: str | None = None,
                               challenge_me: bool = False,
                               explain: bool = False) -> dict:
     """
+    Use this when a caller needs a straightforward ranked card list. For the main user-facing experience—with
+    themes, grouped watch/read/explore picks, spoken summary and follow-up question—use `knots_partner`.
+
     Full pipeline: extract interests from session text, match them against
     the content catalogs, rank, and return ready-to-render cards, each with a
     `note`: a short line on why this person would love it. Accepts one conversation (`session_texts`) or several
     (`conversations`), as in extract_interests.
 
+    `session_texts` is context: what the person has been discussing. `request` is the separate thing they want
+    now, such as "what should I watch?" It steers ranking without being treated as another conversation turn.
+
     The evidence behind each card (the person's own sentence, matched tags, fit features) is internal and
     is left out. Set `explain` only when the person asks why something was picked.
     """
     out = await engine.recommend(session_texts, _convs(conversations), _caller(user_id), limit,
-                                 challenge=challenge_me or None)
+                                 challenge=challenge_me or None, request=request)
     return presenter.public_cards(out, explain)
 
 
-async def knots_partner(session_texts: list[str] | None = None, include_videos: bool = True,
+async def knots_partner(session_texts: list[str] | None = None, request: str | None = None, include_videos: bool = True,
                            conversations: list[ConversationIn] | None = None,
                            user_id: str | None = None,
                            challenge_me: bool = False,
                            explain: bool = False) -> dict:
     """
-    Call this when the person asks things like "what are we doing today?",
-    "what should I explore?", "what should I watch or read?", or opens a
-    session with no specific request. Acts as an intellectual partner: says what
-    they seem to be circling (including what's underneath), then suggests films,
+    This is the primary user-facing recommendation tool. Call it when the person asks things like
+    "what are we doing today?", "what should I explore?", "what should I watch or read about [topic]?", or opens a
+    session with no specific request. Identifies the ideas and themes in context,
+    including what's underneath, then suggests films,
     series and documentaries to watch, papers to read and videos to explore, each
     with its reason. `response.say` is a short line to read aloud; `response.ask`
     is a follow-up question to keep the conversation going.
 
-    Pass the current conversation as `session_texts`. If you can also see recent
-    earlier conversations (up to about 8, last 60 days), pass them as
+    Pass the current conversation as `session_texts`, and the immediate ask in
+    `request` separately. If you can also see recent earlier conversations (up
+    to about 8, last 60 days), pass them as
     `conversations` so recurring interests count for more. When the person is
     signed in, Knots remembers their interests (an embedding of each conversation,
     never the words) and can answer with no conversation text at all.
@@ -154,7 +164,7 @@ async def knots_partner(session_texts: list[str] | None = None, include_videos: 
     """
     user = _caller(user_id)
     plan = await engine.plan(session_texts, _convs(conversations), user, include_videos,
-                             challenge=challenge_me or None)
+                             challenge=challenge_me or None, request=request)
     plan["session_id"] = feedback.new_session_id()
     await asyncio.to_thread(feedback.record_impression, plan, user, plan["session_id"])   # logs the full plan
     return presenter.public_plan(plan, explain)

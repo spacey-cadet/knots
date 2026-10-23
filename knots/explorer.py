@@ -34,6 +34,7 @@ from . import fitmodel, identity, notewriter
 from .ratelimit import RateLimiter
 
 PAGE = Path(__file__).parent / "explorer_ui" / "index.html"
+PITCH = Path(__file__).parent / "pitch.html"
 COOKIE = "knots_visitor"
 MAX_ARGS_BYTES = 60_000
 KIND = {"knots_partner": "read", "get_recommendations": "read", "extract_interests": "read", "search_content": "read",
@@ -113,6 +114,9 @@ def register(server, limiter) -> None:
         resp = HTMLResponse(PAGE.read_text(encoding="utf-8"), headers={"Cache-Control": "no-store"})
         return _with_cookie(request, resp, vid, new)
 
+    async def pitch(request: Request) -> Response:
+        return HTMLResponse(PITCH.read_text(encoding="utf-8"), headers={"Cache-Control": "no-cache"})
+
     async def tools(request: Request) -> Response:
         if (d := _denied(request)) is not None:
             return d
@@ -167,6 +171,7 @@ def register(server, limiter) -> None:
         payload.update(ms=round((time.perf_counter() - t0) * 1000), request=envelope, remembered_as="visitor" if user else "nobody")
         return _with_cookie(request, JSONResponse(payload), vid, new)
 
+    server.custom_route("/", methods=["GET"])(pitch)
     server.custom_route("/explore", methods=["GET"])(page)
     server.custom_route("/explore/api/tools", methods=["GET"])(tools)
     server.custom_route("/explore/api/status", methods=["GET"])(status)

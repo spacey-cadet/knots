@@ -1,14 +1,15 @@
 # Knots (Alexa+ MCP server)
 
-Knots is a self-hosted MCP server for the Alexa+ track of the Amazon Developer Hackathon.
-It acts as an **intellectual partner**: ask Alexa+ "what are we doing today?" and
-it says what you seem to be circling, including the ideas underneath that you
-never named, then suggests films and documentaries to watch, papers to read and
-videos to explore, each with the reason it was picked.
+Knots is a grounded recommender for Alexa+: it connects what a person has been
+curious about with films, documentaries, explainers and research that help make
+those ideas vivid. Ask "what are we doing today?" and Knots identifies the
+threads and concepts underneath recent conversation, then returns picks with a
+reason tied to the person and the source. The root page (`/`) is a swipeable
+project pitch; `/explore` is the live tool console.
 
-The goal is to help people who think hard about abstract ideas find the films
-that make those ideas concrete: entertainment that sits close to the research,
-not a random feed. Entertainment and learning belong together, so Knots also builds
+Knots is for people who think hard about abstract ideas and love film. It helps
+them find entertainment that sits close to research, rather than a random feed.
+Entertainment and learning belong together, so Knots also builds
 **watch-and-learn pairs** (a drama plus the explainer or paper on the same idea) and
 shows, for every pick, the evidence behind it.
 
@@ -32,10 +33,11 @@ votes).
   ran. Without the person's words the original rule applies unchanged: shared
   film-tag keywords, weighted by medium, rating as tie-break. Popularity is not a
   signal, so the same famous films do not win every session.
-- **Weights are stated, not hidden.** Until `eval/train_rank.py --write` has fitted
-  them on 20+ labelled sessions, `fitmodel.DEFAULT_WEIGHTS` are hand-set priors, and
-  cards show **no** confidence number (an uncalibrated probability would be invented).
-  Once fitted, weights ship with a calibration measured on held-out sessions.
+- **Weights are stated, not hidden.** The current ranker uses hand-set priors in
+  `fitmodel.DEFAULT_WEIGHTS`; it is not yet trained on a sufficient labelled set.
+  Cards show **no calibrated confidence** without held-out calibration data; the
+  `stretch` label only identifies picks admitted by the floor allowance. Once
+  fitted, weights ship with a calibration measured on held-out sessions.
 - **Quality is a floor, not a score** (`quality.py`): TMDB rating >= 6.5 with >= 100
   votes; series >= 7.0 with >= 150; anything before 1990 needs 7.5+ and 1,000+
   votes.
@@ -163,9 +165,9 @@ session text ──► understanding ──► retrieval ──► quality gate 
 
 | Tool | Use |
 | --- | --- |
-| `knots_partner(session_texts, include_videos=True, challenge_me=False, explain=False)` | "What are we doing today?" Threads, what's underneath (with confidence), grouped picks each with a note on why you'd love it (the evidence ledger only with `explain=true`), watch-and-learn pairs, spoken line, follow-up question, and a `session_id` |
+| `knots_partner(session_texts, request, include_videos=True, challenge_me=False, explain=False)` | "What are we doing today?" Threads, what's underneath, grouped picks each with a note on why you'd love it (the evidence ledger only with `explain=true`), watch-and-learn pairs, spoken line, follow-up question, and a `session_id`. `session_texts` is conversation context; `request` is the separate immediate ask, such as "what should I watch?" |
 | `rate_pick(session_id, url, good)` | The person said a pick was good or not. Only for a signed-in person and only for a pick shown to them in that session; this is the feedback retraining learns from |
-| `get_recommendations(session_texts, limit=6, challenge_me=False, explain=False)` | Full pipeline as ranked cards, each with a note on why you'd love it (the evidence ledger and templated reasoning only with `explain=true`) |
+| `get_recommendations(session_texts, request, limit=6, challenge_me=False, explain=False)` | Full pipeline as ranked cards. Context and immediate request are separate; each card has a note on why you'd love it (the evidence ledger and templated reasoning only with `explain=true`) |
 | `extract_interests(session_texts)` | Topics, concepts, unstated themes, keywords, and which extractor ran |
 | `search_content(topics)` | Catalog lookup for plain topic strings |
 | `what_do_you_remember()` / `forget_me()` | What is held about the signed-in person, and deleting it (memory and logged feedback) |
@@ -187,7 +189,10 @@ AWS chain. The role needs `bedrock:InvokeModel`. Never commit keys.
 
 ## Knots Explorer
 
-A Swagger-style page for the MCP tools at `https://<your-host>/explore`. Pick a tool, fill in the input (or start
+The pitch is served at `https://<your-host>/`; its **Try it live** button opens `/explore`. Keep any passcode in
+private submission notes, not on the pitch page.
+
+The Swagger-style tool console is at `https://<your-host>/explore`. Pick a tool, fill in the input (or start
 from a sample conversation), press **Run tool**, and see the answer as cards, raw JSON, and the exact MCP request
 (with a `curl` you can paste). The Good pick / Missed buttons call `rate_pick`, so the learning loop is visible too.
 
@@ -198,16 +203,19 @@ from a sample conversation), press **Run tool**, and see the answer as cards, ra
   always dropped. Without `KNOTS_USER_SALT` the page works but remembers nobody.
 - **Quota guards.** Each visitor is limited to `KNOTS_EXPLORER_RATE` runs a minute on top of the global limit, and the
   YouTube toggle starts off (YouTube allows about 100 searches a day for the whole server).
-- The page is one self-contained file, `knots/explorer_ui/index.html`, with its two fonts embedded (see `FONTS.md`).
+- The explorer is `knots/explorer_ui/index.html`; the pitch is `knots/pitch.html`. Both use the same colors and embedded fonts.
+- For recommendation tools, enter **context** (the conversation that reveals interests) separately from the
+  **request** (what the person wants now, such as "what should I watch?"). With no context, a topical request can
+  supply the subject by itself.
 
 ## Quality floor and written notes
 
-- **Floor.** `eval/train_rank.py --write` also picks a similarity floor: the most lenient one whose surviving
-  picks were right at least 75% of the time on held-out sessions (never resting on fewer than 40 picks). It is
-  stored in `knots/brain/data/rank_weights.json`. Picks below it are not shown, even to fill a reserved slot, and
-  the "relaxed" ladder is not used to refill the list: fewer, better picks, or an honest empty response. Raw
-  similarity only means the same thing on the embedder it was measured on, so the floor records its embedder and
-  its similarity half is skipped (with a warning) if another one scored the candidates. `KNOTS_FLOOR=off` disables it.
+- **Floor.** `eval/train_rank.py --write` can fit a similarity floor from held-out labels; it is stored in
+  `knots/brain/data/rank_weights.json`. Picks below it do not count as having cleared the floor. By default, if
+  fewer than three picks clear it, Knots may fill the list with nearby candidates within `KNOTS_FLOOR_SLACK`
+  (default `0.10` similarity), mark them `relaxed`, and label their confidence `stretch`. Set
+  `KNOTS_FLOOR_MIN_PICKS=0` for strict-floor behavior. Raw similarity only means the same thing on the embedder
+  it was measured on, so a mismatched embedder cannot use the allowance.
 - **Notes.** `knots/notewriter.py` asks the Bedrock model (`NOTE_MODEL_ID`, else `BEDROCK_MODEL_ID`) for a note
   and a spoken line per pick in one call. It sees only the catalog's facts and the person's quote, and a note is
   discarded unless every number, capitalised name and quotation in it traces to that data. A failure or a
@@ -328,6 +336,66 @@ interface so DynamoDB can replace it.
 - **Alexa skill.** `alexa/` holds the skill manifest and interaction model; `alexa/README.md` has the steps.
 - **Deploying.** `Dockerfile`, `docker-compose.yml` (Caddy gets the HTTPS certificate) and `docs/DEPLOY_EC2.md`.
 
+### Planned Alexa+ integration: MCP add-on
+
+The Alexa+ add-on has **not been created or connected yet**. Knots' MCP server is implemented at `/mcp`, and the
+Explorer calls those tools as a browser MCP client. This is separate from the legacy custom skill in `alexa/`,
+which receives signed requests at `/alexa`.
+
+When connected, an Alexa+ MCP add-on will register the remote server. Alexa+ discovers its tools and their names,
+descriptions and input schemas through MCP, then its own reasoning chooses which tool fits the person's request.
+MCP supplies the tools and their contracts; it does not specify Alexa+'s tool-selection algorithm. The Explorer
+does **not** emulate Alexa+'s natural-language understanding or automatic tool selection: a person chooses a tool
+from its list, enters its arguments and sees the server response. It demonstrates the MCP request/response path,
+not the Alexa+ experience or device presentation.
+
+`knots_partner` is intended as the main user-facing recommendation tool. Its MCP description already says to use
+it for requests such as these:
+
+- “What are we doing today?”
+- “What should I watch or read about free will?”
+- “Connect what I’ve been curious about to a film and something to read.”
+
+These are example phrases to include in the future add-on's `examplePhrases`; they are guidance for Alexa+'s
+discovery and reasoning, not exact-match triggers. For a call, Alexa+ should pass recent discussion as
+`session_texts` (context) and the immediate ask separately as `request`. `get_recommendations` is for a plain
+ranked card list; `extract_interests` inspects interests without searching; `search_content` looks up topics
+already supplied. The other tools handle feedback and memory actions.
+
+The add-on package is the Alexa-side registration and description of this service; recommendation logic stays in
+this server. Knots fits the general Alexa+ **MCP Toolkit** path rather than a category-specific add-on. The
+onboarding flow uses the Alexa AI CLI to scaffold and deploy the package, then test it in the web simulator and on
+a device before certification. Redeploy after changing tools or their descriptions. See Amazon's
+[MCP Toolkit overview](https://developer.amazon.com/docs/alexaplus/add-ons/mcp-toolkit-overview.html),
+[MCP onboarding guide](https://developer.amazon.com/docs/alexaplus/add-ons/mcp-toolkit-quickstart.html), and
+[certification guide](https://developer.amazon.com/docs/alexaplus/add-ons/mcp-toolkit-certify.html). The toolkit
+is currently limited to selected partners and the US; check the current [developer docs](https://developer.amazon.com/docs/alexaplus/add-ons/home.html)
+for access and availability.
+
+```bash
+alexa-ai configure
+alexa-ai new mcp --name "Knots" --locale en-US --mcp-server-url "https://<DOMAIN>/mcp"
+# Review addon-package/addon.json; add the required description, example phrases, policy URLs and media.
+alexa-ai deploy
+# Test in the Alexa+ web simulator/device; submit for certification when ready.
+```
+
+**Authentication to finish before a connected add-on can use identity-linked features:** the supplied Inspector
+capture shows the unauthenticated `initialize` got `401`; the
+protected-resource metadata pointed to `https://knots-tool.duckdns.org/` as the authorization server, and the
+Inspector then received `404` from `/.well-known/oauth-authorization-server`. The server accepts bearer JWTs,
+but does not host the OAuth authorization/token service required for Alexa-managed account linking. Before
+enabling linked profiles and feedback, deploy a compatible OAuth 2.1 authorization service and expose discovery
+metadata and PKCE S256 support as required by Amazon's [authentication guide](https://developer.amazon.com/docs/alexaplus/add-ons/mcp-toolkit-authentication.html).
+The capture also shows a `WWW-Authenticate` header on the `401`; Amazon's current checklist says not to send that
+header. This concerns the captured deployment's auth discovery, not whether the Explorer can manually call the
+MCP tools. Recheck the live endpoints during add-on onboarding.
+
+The auth work matters for Knots' per-person memory and pick feedback. Without a verified user identity, Knots can
+still make stateless recommendations, but it cannot retain a profile or accept persistent feedback for that person.
+The separate Alexa custom skill already verifies Amazon-signed requests; that mechanism does not authenticate the
+MCP add-on.
+
 ## Best medium per interest
 
 Each interest carries a ranked list of `film`, `video` and `paper`. Film means
@@ -340,29 +408,23 @@ leads with the best medium. Skipping a poor-fit medium also saves a catalog call
 
 ## Known limitations
 
-- **Live paths not yet tested against the real services.** Bedrock, TMDB, YouTube
-  and arXiv are covered offline (fake Bedrock client, mock transports) but have
-  not been called live from the build environment. Smoke-test with real keys
-  before recording the demo.
-- **Offline mock data is fixed** (a memecoin-themed set) and only used with
-  `KNOTS_OFFLINE=1`. Without a TMDB key and without that flag, no films are returned.
 - **The heuristic fallback is weak** (frequency-based; it can pick words like
   "buy" as topics). It exists to keep the server answering, not to demo.
 - **No Reddit source yet.** `session_texts` expects Alexa+ conversation strings.
-- **The deployment files have not been run on a real server.** The Dockerfile and compose file were not built here
-  (no Docker daemon), Caddy's certificate issuance, the EC2 instance role and a live Alexa test have not been
-  exercised. The server itself was run as a real process and called over HTTP with auth on (see `docs/DEPLOY_EC2.md`).
-- **Alexa+ identity is undocumented.** How Alexa+ passes a signed-in person to an MCP server is not documented; the
-  MCP side supports standard bearer tokens, and the Alexa custom skill identifies people by its own signed request.
-- **The ranker and the pair scorer are not yet trained.** They run on documented
-  hand-set priors until enough sessions are labelled with the new card features
-  (re-run `run_eval.py run`, label, then `train_rank.py`). Pair floors and the level
-  ladder are untuned, and so are the per-embedder similarity thresholds. Similarity is a
-  hashed lexical proxy unless Bedrock embeddings (Cohere Embed v4 or Titan) are configured;
-  the pair and ranking quality should be re-measured with the embedder you will run in
-  production. `MODEL_CARD.md` states which embedder each number was measured with.
-- **OpenAlex and the challenge search are untested against the live services.** They are
-  covered by mock transports only. A failure leaves citations unknown, never guessed.
+- **Alexa+ add-on is not connected yet.** The Explorer is a manual MCP client, not an Alexa+ simulator; it cannot
+  show Alexa+'s automatic tool choice, voice response or device UI. The tool descriptions name the intended
+  recommendation trigger requests, but actual selection needs to be confirmed in an Alexa+ add-on test.
+- **Alexa+ account-linking OAuth is not configured.** The supplied Inspector capture reaches resource metadata but
+  gets 404 from OAuth authorization-server discovery. The app accepts bearer JWTs, but a compatible OAuth flow
+  and per-person identity mapping still need deployment work before linked profiles and feedback can be used.
+- **Pair selection is a fixed formula.** It combines the
+  component picks' fit percentiles, their text similarity and a medium-level rule.
+  No pairs have been labelled yet, so its thresholds and level ladder remain
+  untuned. Similarity is a hashed lexical proxy unless Bedrock embeddings (Cohere
+  Embed v4 or Titan) are configured; ranking and pair quality should be measured
+  again with the production embedder. `eval/train_brain.py --save` trains a
+  different component—the theme judge—and does not train ranking or pairs.
+  `MODEL_CARD.md` reports the current state and measurement embedder.
 - **One labeller, few sessions.** See `MODEL_CARD.md` for what is and is not measured.
 
 

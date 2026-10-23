@@ -191,7 +191,8 @@ footer.note{max-width:1500px;margin:0 auto;padding:0 28px 40px;color:var(--mute)
 "use strict";
 const PRESETS = [{"name": "Memecoins and FOMO", "turns": ["Alexa, what's a memecoin and why do people buy them?", "Can you explain memecoin tokenomics, like liquidity pools and market cap?", "I keep seeing memecoin threads on my Reddit feed, is this all just a bubble?", "Tell me more about the research behind speculative crypto assets."], "topics": ["memecoins", "speculation"]}, {"name": "Free will", "turns": ["Alexa, is free will an illusion?", "What did that neuroscience experiment say about decisions being made before we're aware of them?", "If everything is determined, how can anyone be held responsible for what they do?", "I've been reading about compatibilism, explain it simply."], "topics": ["free will", "determinism"]}, {"name": "Housing prices", "turns": ["Why are housing prices so high in big cities?", "Is it zoning or is it investors?", "What did Tokyo do differently?"], "topics": ["housing", "zoning"]}, {"name": "Lonely online", "turns": ["Why do I feel more lonely the more time I spend online?", "Is there research on social media and mental health?", "My feed is mostly strangers arguing. Why does outrage spread faster than anything else?", "What happened to the idea that the internet would bring people together?"], "topics": ["loneliness", "social media"]}, {"name": "Sleep", "turns": ["Why is sleep so important and what happens if you skip it?", "Is the 8 hour rule real?", "Does catching up on weekends work?"], "topics": ["sleep"]}, {"name": "Vague and curious", "turns": ["Alexa, what's the weather like later?", "Play something relaxing. Also what time is it in Tokyo?", "I've been kind of curious lately, not sure about what though.", "Maybe something with time travel? Or not."], "topics": ["time travel"]}];
 const HINTS = {
-  session_texts: "What the person said, one message per line. Alexa turns and Reddit text both work.",
+  session_texts: "Context: what the person has been discussing, one message per line. This is used to infer their interests.",
+  request: "The separate ask for right now, such as ‘what should I watch?’ or ‘show me something about free will’. It steers the ranking; it is not treated as conversation context.",
   include_videos: "Also search YouTube for explainers. Off by default: YouTube allows only about 100 searches a day for the whole server.",
   challenge_me: "Reserve one pick that complicates the person's own view.",
   explain: "Show the evidence behind each pick: the sentence you said, matched tags, the item's own summary. Off by default because the note is what a person should read.",
@@ -334,7 +335,8 @@ function drawIn() {
 
 function fieldFor(name, schema, required) {
   const ty = typeOf(schema), id = "f_" + name, wrap = h("div", {class: "field", "data-name": name});
-  const label = (typeTxt) => h("div", {class: "name"}, h("label", {for: id}, h("b", {text: name})), h("span", {class: "type", text: typeTxt}), required ? h("span", {class: "req", text: "required"}) : null);
+  const shown = {session_texts: "Conversation context", request: "Your request"}[name] || name;
+  const label = (typeTxt) => h("div", {class: "name"}, h("label", {for: id}, h("b", {text: shown})), h("span", {class: "type", text: typeTxt}), required ? h("span", {class: "req", text: "required"}) : null);
   let input, kind = "text";
   if (ty.t === "boolean") {
     input = h("input", {type: "checkbox", id, checked: schema.default === true && name !== "include_videos"});
@@ -344,13 +346,13 @@ function fieldFor(name, schema, required) {
     input = h("input", {type: "number", id, value: schema.default ?? "", min: ty.min ?? 1, max: ty.max ?? 50});
     wrap.append(label(ty.t), input); kind = "num";
   } else if (ty.t === "array" && (ty.items || {}).type === "string") {
-    input = h("textarea", {id, rows: name === "session_texts" ? 7 : 3, placeholder: name === "session_texts" ? "Is free will an illusion?\nWhat did that neuroscience experiment say?" : "free will\nmemecoins"});
+    input = h("textarea", {id, rows: name === "session_texts" ? 6 : 3, placeholder: name === "session_texts" ? "CONTEXT — what have they been discussing?\nIs free will an illusion?\nWhat did that neuroscience experiment say?" : (name === "request" ? "REQUEST — what do they want now?\nWhat should I watch?" : "free will\nmemecoins")});
     wrap.append(label("list of text, one per line"), input); kind = "lines";
   } else if (ty.t === "array") {
     input = h("textarea", {id, rows: 3, placeholder: "[]", spellcheck: "false"});
     wrap.append(label("JSON list"), input); kind = "json";
   } else {
-    input = h("input", {type: "text", id, autocomplete: "off", spellcheck: "false"});
+    input = name === "request" ? h("textarea", {id, rows: 2, placeholder: "What should I watch?", spellcheck: "false"}) : h("input", {type: "text", id, autocomplete: "off", spellcheck: "false"});
     if (name === "url" && state.lastPartner) input.setAttribute("list", "urls");
     wrap.append(label("text"), input);
     if (name === "session_id" && state.lastPartner) input.value = state.lastPartner.session_id;
@@ -395,6 +397,7 @@ function switchMode(m) {
 function loadPreset(i) {
   if (i === "") return; const p = PRESETS[i], name = props(state.current).some(([k]) => k === "session_texts") ? "session_texts" : "topics";
   const el = document.getElementById("f_" + name); if (el) el.value = (name === "topics" ? p.topics : p.turns).join("\n");
+  const ask = document.getElementById("f_request"); if (ask && !ask.value.trim()) ask.value = "What should I watch or read that connects these ideas?";
 }
 
 /* ---------- run ---------- */
