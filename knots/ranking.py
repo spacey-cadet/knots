@@ -206,4 +206,25 @@ def rank_and_render(items: list[ContentItem], interests: list[Interest], limit: 
         card = make(pick) if pick is not None else None
         if card is not None:
             cards.insert(min(CHALLENGE_POSITION, len(cards)), card)
+
+    # The allowance: a floor that leaves fewer than min_picks cards may be topped up from just under it. These
+    # cards are flagged `relaxed`, rank after every card that cleared, and never claim a personal fit.
+    need = fitmodel.min_picks() if sc is not None and fitmodel.floor_active() else 0
+    for item in scored:
+        if len(cards) >= need:
+            break
+        interest = interest_by_topic.get(item.topic)
+        key = (item.topic, item.content_type)
+        if interest is None or key in seen or item.source_url in used_urls:
+            continue
+        k = pos[id(item)]
+        if not fitmodel.within_allowance(sc, k):
+            continue
+        card = render_card(item, interest, card_extras(sc, k, item, interest, query))
+        if not receipts.sourced(card["receipts"]):
+            continue
+        card["relaxed"] = True
+        seen.add(key)
+        used_urls.add(item.source_url)
+        cards.append(card)
     return cards[:limit]

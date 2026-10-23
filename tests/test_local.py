@@ -1315,3 +1315,49 @@ def test_reviewer_notes_are_diagnostics_not_prompt_content_or_shipped_labels(mon
     monkeypatch.undo()
     shipped = importlib.import_module("knots.brain.guidance")._examples()
     assert shipped and all(set(e) == {"session_id", "session_text", "theme", "supported"} for e in shipped)
+
+
+# --- the floor allowance: a thin list is topped up from just under the floor, and says so ---------------------
+
+def _allowance_setup(monkeypatch, sims, scores, items):
+    from knots import fitmodel as F
+    monkeypatch.delenv("KNOTS_FLOOR_MIN_PICKS", raising=False)
+    monkeypatch.delenv("KNOTS_FLOOR_SLACK", raising=False)
+    monkeypatch.setattr(F, "floor", lambda: {"sim": 0.29, "score": 0.0, "embedder": "cohere"})
+    monkeypatch.setattr(F, "floor_active", lambda: True)
+    sc = F.Scored(items=items, features=[{f: 0.0 for f in F.FEATURES} for _ in items], scores=scores,
+                  sims=sims, vecs=[[0.0] for _ in items], embedder="cohere", query_used=True)
+    monkeypatch.setattr(F, "score_items", lambda *a, **k: sc)
+
+
+def _sourced_film(title, topic="memecoins"):
+    f = _film(title, 7.0, 500, topic=topic)
+    f.abstract, f.matched_keywords = "A thriller about money and ruin.", ["speculation"]
+    return f
+
+
+def _paper(title, topic="memecoins"):
+    return ContentItem(title=title, content_type="paper", source_url=f"https://x/{title}", topic=topic,
+                       topic_overlap_score=0.8, abstract="A study of speculative bubbles in markets.")
+
+
+def test_floor_allowance_tops_up_to_three_and_marks_them_relaxed(monkeypatch):
+    items = [_paper("Bubbles"), _sourced_film("Shadow"), _paper("Microstructure", topic="crypto research")]
+    _allowance_setup(monkeypatch, [0.280, 0.206, 0.191], [1.07, -0.25, -0.90], items)
+    cards = rank_and_render(items, [_topic("memecoins"), _topic("crypto research")], query="memecoin bubble?")
+    assert len(cards) == 3 and all(c["relaxed"] for c in cards)
+    assert not any(c["cleared_floor"] for c in cards)             # none may claim a personal fit
+    resp = build_session_plan([_topic("memecoins"), _topic("crypto research")], items, query="memecoin bubble?")["response"]
+    assert resp["status"] == "relaxed" and len(resp["picks"]) == 3
+    assert {p["confidence"] for p in resp["picks"]} == {"stretch"}
+    assert "looser matches" in resp["say"]
+
+
+def test_floor_allowance_has_a_limit_and_an_off_switch(monkeypatch):
+    items = [_paper("Bubbles"), _sourced_film("Shadow"), _paper("Unrelated", topic="crypto research")]
+    _allowance_setup(monkeypatch, [0.280, 0.206, 0.100], [1.07, -0.25, -0.90], items)
+    topics = [_topic("memecoins"), _topic("crypto research")]
+    cards = rank_and_render(items, topics, query="memecoin bubble?")
+    assert [c["title"] for c in cards] == ["Bubbles", "Shadow"]    # 0.100 is further under the floor than the slack
+    monkeypatch.setenv("KNOTS_FLOOR_MIN_PICKS", "0")
+    assert rank_and_render(items, topics, query="memecoin bubble?") == []

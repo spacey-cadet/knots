@@ -135,3 +135,16 @@ def test_cards_record_whether_they_cleared_the_floor_and_the_presenter_keeps_it_
     card = render_card(_film(), it, {"cleared_floor": True, "receipts": [{"kind": "tags", "text": "x"}]})
     assert "cleared_floor" not in presenter.public_cards({"cards": [card]})["cards"][0]
     assert presenter.public_cards({"cards": [card]}, explain=True)["cards"][0]["cleared_floor"] is True
+
+
+def test_spoken_brief_is_for_the_ear_and_keeps_the_hard_rules():
+    s = notewriter._SYSTEM
+    assert "SAYS aloud" in s and "never repeat the title" in s and "never name another item" in s   # new voice guidance
+    assert "Use ONLY the facts" in s and "Never explain how you chose it" in s                      # hard rules untouched
+
+
+def test_spoken_line_may_run_to_two_short_sentences_but_not_further():
+    two = "That crash you keep circling is the whole film, told overnight. It is slow and talky, and better for it."
+    assert len(two) <= notewriter.MAX_SPOKEN and notewriter.valid(two, notewriter.MAX_SPOKEN, _film(), None, spoken=True)
+    assert not notewriter.valid(two + " " + two + " " + two, notewriter.MAX_SPOKEN, _film(), None, spoken=True)   # too long
+    assert not notewriter.valid("It runs 94 minutes and is slow and talky overall.", notewriter.MAX_SPOKEN, _film(), None, spoken=True)  # digits stay out of speech

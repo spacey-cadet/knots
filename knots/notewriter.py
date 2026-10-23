@@ -33,7 +33,7 @@ from .notes import allowed_text, check_numbers, facts
 
 log = logging.getLogger("knots.notewriter")
 
-MAX_NOTE, MAX_SPOKEN = 330, 220
+MAX_NOTE, MAX_SPOKEN = 330, 280
 
 _SYSTEM = """You write the short note under each recommendation in a "what should I watch or read" assistant. \
 The note is where the case gets made: its whole job is to make this ONE person want to press play, and to \
@@ -53,12 +53,21 @@ Craft:
 sitting with, the idea underneath (`their_theme`, `about`), or their own words. Then give the one concrete \
 thing the item will do for that: make it felt, make it clear, test it, complicate it. Close on a reason to \
 start it now. Do not summarise the plot or list facts: the facts are already shown separately.
-- `spoken`: one sentence, at most 30 words, for a voice assistant: no quotation marks, no digits, no titles in \
-quotes. It must still carry the 'why this one is for you'.
+- `spoken`: what the assistant SAYS aloud, so write it for the ear, not the page: one or two short sentences, \
+at most 40 words in all, no quotation marks, no digits, no titles in quotes. The voice has already introduced \
+the pick by title, kind and year ("Let's start with ..., a film from ..." or "And if you want the research \
+behind it, there's ..., a paper."), so never repeat the title, the kind or the year: pick up right after that \
+introduction. Say why this one is for THEM first, then the one thing it will do for them.
 - Never explain how you chose it (no "matched on", "based on your", "the algorithm", "evidence").
 - Vary your openings across items. Do not start with "If you", "Since you", "Because you" or the title. \
 Avoid clichés such as rollercoaster, gripping, must-watch, deep dive, rabbit hole, journey.
-- Match the medium: a film is something to sink into, an explainer to learn from, a paper to dig into."""
+- Match the medium: a film is something to sink into, an explainer to learn from, a paper to dig into.
+
+Voice (for `spoken` only):
+- Talk like a person across a table: contractions, plain words, and a little wit when it comes naturally. At \
+most one light touch per line. Never forced, never an exclamation mark, no filler such as "great pick".
+- The lines of one response should sound like one conversation: a later line may pick up the thread of an \
+earlier one ("same idea, other angle"), but never name another item, and never add a fact you were not given."""
 
 _TOOL = {"toolSpec": {
     "name": "record_notes",

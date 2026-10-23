@@ -99,6 +99,9 @@ def build_response(plan: dict, items: list[ContentItem], interests: list, mode: 
         cards, level = _relaxed(items, interests, 3), 1
         if all((c.get("relevance") or 0) < 0.2 for c in cards):
             level = 2
+    allowance = not level and any(c.get("relaxed") for c in cards)
+    if allowance:
+        level = 1                      # the floor allowance topped the list up: status "relaxed", and say so
     picks, ctx = [], []
     for c in cards:
         it = by_url.get(c["url"])
@@ -112,7 +115,7 @@ def build_response(plan: dict, items: list[ContentItem], interests: list, mode: 
             "spoken_note": build_note(it, None, rephrase) if it else "",   # no quote: the theme is said once, up front
             "why": c.get("reasoning", ""),
             "facts": facts(it) if it else [],
-            "confidence": _confidence(c, level),
+            "confidence": "stretch" if c.get("relaxed") else _confidence(c, 0 if allowance else level),
         })
     # One model call for every pick; a rejected or failed note keeps the faithful templated one above.
     known = [k for k, x in enumerate(ctx) if x["item"] is not None]

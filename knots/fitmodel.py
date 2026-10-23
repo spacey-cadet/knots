@@ -114,6 +114,35 @@ def cleared_floor(sc: "Scored", k: int) -> bool:
     return sc.scores[k] >= f["score"] and sc.sims[k] >= f["sim"] and (sc.embedder == f["embedder"] or not f["embedder"])
 
 
+def min_picks() -> int:
+    """The allowance: with a floor in force, still show at least this many picks when candidates exist
+    (KNOTS_FLOOR_MIN_PICKS, default 3; 0 turns the allowance off). Extra picks come from just under the floor."""
+    try:
+        return max(0, int(os.environ.get("KNOTS_FLOOR_MIN_PICKS", "3")))
+    except ValueError:
+        return 3
+
+
+def slack() -> float:
+    """How far below the similarity floor an allowance pick may fall (KNOTS_FLOOR_SLACK, default 0.10)."""
+    try:
+        return max(0.0, float(os.environ.get("KNOTS_FLOOR_SLACK", "0.10")))
+    except ValueError:
+        return 0.10
+
+
+def within_allowance(sc: "Scored", k: int) -> bool:
+    """Is candidate k close enough under the floor to fill a thin list? Similarity only: the fit score is
+    z-scored inside the candidate set, so on a handful of candidates it says little. These picks never count
+    as having cleared the floor (cleared_floor stays False), so no note claims they fit the person."""
+    f = floor()
+    if f is None or not floor_active() or not sc.query_used:
+        return False
+    if sc.embedder != f["embedder"] and f["embedder"]:
+        return False                      # raw similarity only means something on the embedder it was fitted on
+    return sc.sims[k] >= f["sim"] - slack()
+
+
 def candidate_text(item) -> str:
     return " ".join(p for p in (item.title, item.abstract or item.blurb, " ".join(item.matched_keywords)) if p)
 
